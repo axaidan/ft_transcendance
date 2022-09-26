@@ -20,11 +20,14 @@ export class IntraStrategy extends PassportStrategy(Strategy)
     }
 
     async validate(accessToken: string, refreshToken: string, profile: Profile) 
-    : Promise<any> {
-        return {
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            profile: profile.username
-        };
+    : Promise<string> {
+
+        // return {
+        //     access_token: accessToken,
+        //     refresh_token: refreshToken,
+        //     username: profile.username
+        // };
+        
+        return (profile.username);
     }
 }
