@@ -6,21 +6,8 @@ export class AuthService {
 
     constructor(private usersService: UsersService) {}
 
-    async findUserFromIntraUsername(intraUsername: string) : Promise<any> {
-        const user = await this.usersService.findOne(intraUsername);
-
-        // if (!user) {
-        //     throw new UnauthorizedException();
-        // }
-
-        return user;
+    async loginOrCreateUser() {
+        
     }
 
-    async validateUser(username: string) : Promise<any> {
-        const user = await this.usersService.findOne(username);
-        if (!user) {
-            throw new UnauthorizedException();
-          }
-        return user;
-      }
 }
