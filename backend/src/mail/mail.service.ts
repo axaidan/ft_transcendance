@@ -8,7 +8,7 @@ export class MailService {
     }
 
     async sendLoginToken(user: User, token: string) {
-        const url= `http://localhost:3000/auth/mail-callback?token=${token}`;
+        const url= `http://localhost:3000/auth/2fa-callback?token=${token}`;
 
         await this.mailerService.sendMail({
             to: user.email,

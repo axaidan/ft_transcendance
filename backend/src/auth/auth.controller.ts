@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
 import { Request } from 'express';
@@ -16,5 +16,13 @@ export class AuthController {
 	@Get('callback')
 	callback( @Req() req: Request  ) {
 		return this.authService.signin( req.user.toString() );
+	}
+
+	@Get('2fa-callback')
+	twoFaCallback(@Query() query: any) {
+		// console.log(query);
+		return {
+			access_token: query.token
+		};
 	}
 }
