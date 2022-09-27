@@ -19,19 +19,25 @@ model User {
     login String @unique
     username String? @unique
 
-	achviments Achivment[]
+    // achievements Achievement[]
+	  achviments Achivment[]
+
+    email String? @unique
+    twoFactorAuth Boolean @default(false)
 
     @@map("user")
 }
 
-
+// model Achievement {
 model Achivment{
 	id Int @id @default(autoincrement())
 
 	title String @unique
+  // description String ?
 	descriptions String?
 
 	users User [] 
 
+  // @@map("achievements")
 	@@map("achivments")
 }
