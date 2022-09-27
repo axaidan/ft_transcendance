@@ -4,21 +4,14 @@ import { GetUser } from '../auth/decorator';
 import { JwtGuard, FtGuard } from '../auth/guard';
 import { User } from '@prisma/client'
 
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
 	constructor( private userService: UserService) {};
 
-	@UseGuards(JwtGuard)
 	@Get('me')
 	getme(@GetUser() user: User) {
 		return user;
-	}
-
-	@UseGuards(FtGuard)
-	@Post('create')
-	@HttpCode(HttpStatus.OK)
-	createUser( login: string ) {
-		return this.userService.createUser(login);
 	}
 
 }

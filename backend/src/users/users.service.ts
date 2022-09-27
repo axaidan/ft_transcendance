@@ -33,12 +33,4 @@ import { PrismaService } from '../prisma/prisma.service';
 export class UserService {
 	constructor(private prisma: PrismaService) {};
 
-	async createUser( login: string ) {
-		const user = await this.prisma.user.create({
-			data: {
-				login: login,
-			}
-		})
-		return user;
-	}
 }

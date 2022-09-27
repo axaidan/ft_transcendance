@@ -15,7 +15,7 @@ export class AuthService {
 	async signin( login: string ) {
 		let user = await this.prisma.user.findFirst({ where: { login: login }});
 		if (!user)
-			user = await this.userService.createUser( login );
+			user = await this.prisma.user.create({ data: { login: login }})
 		return this.signToken( user.id, user.login );
 	}
 
