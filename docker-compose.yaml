@@ -4,9 +4,11 @@ services:
         container_name: db
         image: postgres:latest
         ports:
-            - "5434:5432"
-        env_file:
-            - .env
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: maxime
+            POSTGRES_PASSWORD: maxime
+            POSTGRES_DB: db_maxime
         volumes:
            - postgres:/var/lib/posgresql/data
 
@@ -17,15 +19,16 @@ services:
         ports: 
             - "3000:3000"
             - "5555:5555"
-        env_file:
-            - .env
-#        command: "tail -f"
-#       command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; npm --prefix /back/nestjs-api-tutorial install; npm add -D prisma ; npm add @prisma/client ; npm run --prefix /back/nestjs-api-tutorial start:dev;" #npx prisma generate; npx prisma migrate dev; npm run start:dev"
-#        command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; cd nestjs-api-tutorial ; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;" # npm run start:dev"
-        command: sh -c "npm i -g @nestjs/cli; npm install; npm run start:dev;"
+        command: sh -c "npm i -g @nestjs/cli; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;"
         volumes:
             - "./backend:/back"
         working_dir: /back
+        
+#        command: "tail -f"
+#       command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; npm --prefix /back/nestjs-api-tutorial install; npm add -D prisma ; npm add @prisma/client ; npm run --prefix /back/nestjs-api-tutorial start:dev;" #npx prisma generate; npx prisma migrate dev; npm run start:dev"
+#        command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; cd nestjs-api-tutorial ; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;" # npm run start:dev"
+
+
 
         #    frontend:
         #        container_name: front
