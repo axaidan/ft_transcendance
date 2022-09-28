@@ -2,6 +2,8 @@ import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query } from '@n
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
 import { Request } from 'express';
+import { GetUser } from './decorator';
+import { User } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +22,6 @@ export class AuthController {
 
 	@Get('2fa-callback')
 	twoFaCallback(@Query() query: any) {
-		// console.log(query);
 		return {
 			access_token: query.token
 		};
