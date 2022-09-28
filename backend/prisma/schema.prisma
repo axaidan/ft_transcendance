@@ -47,9 +47,9 @@ model Achivment{
 model Relation {
 	id Int @id @default(autoincrement())
 
-	User1 User @relation("r1",fields: [user_id1], references: [id])
+	User1 User @relation("r1",fields: [user_id1], references: [id], onDelete: Cascade)
 	user_id1 Int
 
-	User2 User @relation("r2",fields: [user_id2], references: [id])
+	User2 User @relation("r2",fields: [user_id2], references: [id], onDelete: Cascade)
 	user_id2 Int
 }

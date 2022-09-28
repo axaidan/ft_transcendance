@@ -29,7 +29,6 @@ log-back:
 log-db:
 	docker logs db -f
 
-
 enter-back:
 	docker exec -it back sh
 
@@ -50,6 +49,7 @@ prisma-studio:
 postgre-stop:
 	service postgresql stop
 
+# FOR axaidan ONLY
 perms-back:
 	docker exec -it back "chmod -R 777 ."
 
