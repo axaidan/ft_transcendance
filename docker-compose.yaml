@@ -28,8 +28,6 @@ services:
 #       command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; npm --prefix /back/nestjs-api-tutorial install; npm add -D prisma ; npm add @prisma/client ; npm run --prefix /back/nestjs-api-tutorial start:dev;" #npx prisma generate; npx prisma migrate dev; npm run start:dev"
 #        command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; cd nestjs-api-tutorial ; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;" # npm run start:dev"
 
-
-
         #    frontend:
         #        container_name: front
         #        image: node:lts-alpine

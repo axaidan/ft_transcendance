@@ -33,9 +33,15 @@ enter-back:
 enter-db:
 	docker exec -it db sh
 
+enter-front:
+	docker exec -it front sh
+
 prisma-studio:
 	docker exec -it back sh -c 'npx prisma studio'
 
 # FOR axaidan ONLY
 postgre-stop:
 	service postgresql stop
+
+react-cmd:
+	npx create-react-app ./ --template typescript
