@@ -19,11 +19,13 @@ model User {
     login String @unique
     username String? @unique
 
-    // achievements Achievement[]
-	  achviments Achivment[]
-
     email String? @unique
     twoFactorAuth Boolean @default(false)
+
+  	relation1 Relation[] @relation("r1")
+	  relation2 Relation[] @relation("r2")
+
+	  achviments Achivment[]
 
     @@map("user")
 }
@@ -40,4 +42,14 @@ model Achivment{
 
   // @@map("achievements")
 	@@map("achivments")
+}
+
+model Relation {
+	id Int @id @default(autoincrement())
+
+	User1 User @relation("r1",fields: [user_id1], references: [id])
+	user_id1 Int
+
+	User2 User @relation("r2",fields: [user_id2], references: [id])
+	user_id2 Int
 }

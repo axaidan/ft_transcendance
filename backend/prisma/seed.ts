@@ -3,10 +3,43 @@ const prisma = new PrismaClient()
 
 
 async function main() {
-	/*
+	
 	const sergent = await prisma.user.upsert({
-		where: {}
-	}) */
+		where: {login: 'mlormois'}, 
+		update: {},
+		create: {
+			login: 'mlormois',
+			username: 'lmasturbator',
+		},
+	}) 
+
+	const Axel = await prisma.user.upsert({
+		where: {login: 'axaidan'}, 
+		update: {},
+		create: {
+			login: 'axaidan',
+			username: 'skusku',
+		},
+	}) 
+
+	const Catino = await prisma.user.upsert({
+		where: {login: 'fcatinau'},
+		update: {},
+		create: {
+			login: 'fcatinau',
+			username: 'ouinouin',
+		},
+	})
+
+	const viporten = await prisma.user.upsert({
+		where: {login: 'viporten'},
+		update:{},
+		create:{
+			login: 'viporten',
+			username: 'el beaugausse',
+		},
+	})
+
 	const achiv = await prisma.achivment.upsert({
 		where: {title: '10 in a raw'},
 		update: {}, 
