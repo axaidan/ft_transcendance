@@ -29,8 +29,6 @@ log-back:
 log-db:
 	docker logs db -f
 
-perms-back:
-	docker exec -it back "chmod -R 777 ."
 
 enter-back:
 	docker exec -it back sh
@@ -41,12 +39,19 @@ enter-db:
 enter-front:
 	docker exec -it front sh
 
+test-prisma-studio:
+	docker exec -it back sh -c 'npx dotenv -e .env.test -- prisma studio'
+	#docker exec -it back sh -c 'npm run test-studio'
+
 prisma-studio:
 	docker exec -it back sh -c 'npx prisma studio'
 
 # FOR axaidan ONLY
 postgre-stop:
 	service postgresql stop
+
+perms-back:
+	docker exec -it back "chmod -R 777 ."
 
 react-cmd:
 	npx create-react-app ./ --template typescript
