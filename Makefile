@@ -9,6 +9,11 @@ re: clean-docker build all
 
 restart: stop all
 
+test:
+	docker-compose rm test-db -s -f -v
+	docker-compose up test-db -d
+	docker exec -it back sh -c "npm run test:e2e"
+
 down:
 	docker-compose down
 

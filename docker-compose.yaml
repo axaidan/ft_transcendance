@@ -12,6 +12,18 @@ services:
         volumes:
            - postgres:/var/lib/posgresql/data
 
+    test-db:
+        container_name: test-db
+        image: postgres:latest
+        ports:
+            - "5435:5432"
+        environment:
+            POSTGRES_USER: maxime
+            POSTGRES_PASSWORD: maxime
+            POSTGRES_DB: db_maxime
+        volumes:
+           - test-db-vol:/var/lib/posgresql/data
+
     back:
         container_name: back
         image: node:lts-alpine
@@ -42,4 +54,4 @@ services:
 
 volumes:
     postgres:
-    test_db_vol:
+    test-db-vol:
