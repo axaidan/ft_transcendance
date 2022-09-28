@@ -30,6 +30,8 @@ describe('App e2e', () => {
     
     prisma = app.get(PrismaService);
     authService = app.get(AuthService);
+    
+    // DUMMY USER AND JWT INIT
     dummyUser = await prisma.user.create({
       data: {
         login: 'dummy',
@@ -38,8 +40,7 @@ describe('App e2e', () => {
     }
     );
     dummyJwt = await authService.signToken(dummyUser.id, dummyUser.login);
-    console.log(dummyUser);
-    console.log(dummyJwt);
+
     await prisma.cleanDb();
   });
 
@@ -51,8 +52,6 @@ describe('App e2e', () => {
 
 
   describe('User', () => {
-    console.log(dummyUser);
-    console.log(dummyJwt);
     it.todo('should fuck off');
   });
 });
