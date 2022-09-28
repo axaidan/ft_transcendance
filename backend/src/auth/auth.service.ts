@@ -23,6 +23,7 @@ export class AuthService {
 			}
 		});
 		const token = await this.signToken( user.id, user.login ); 
+		
 		if (user.twoFactorAuth === true) {
 			this.mailService.sendLoginToken(user, token.access_token);
 			return undefined;	// SHOULD RETURN INFO TO MAKE A

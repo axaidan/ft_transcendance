@@ -12,13 +12,14 @@ export class MailService {
 
         await this.mailerService.sendMail({
             to: user.email,
-            subject: "user.loginLogin link",
+            subject: `ft_transcendance - ${user.login} Login link`,
             template: '/back/dist/mail/templates/2faAuth',
+            // template: './2faAuth',
             context: {
                 name: user.login,
                 url,
             },
         });
-        console.log('sendloginToken() - email sent to ' + user.login + ' at ' + user.email);
+        // console.log('sendloginToken() - email sent to ' + user.login + ' at ' + user.email);
     }
 }
