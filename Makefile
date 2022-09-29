@@ -54,7 +54,7 @@ postgre-stop:
 
 # FOR axaidan ONLY
 perms-back:
-	docker exec -it back "chmod -R 777 ."
+	docker exec -it back sh -c "chmod -R 777 ."
 
 react-cmd:
 	npx create-react-app ./ --template typescript
