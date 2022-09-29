@@ -5,10 +5,10 @@ export const GetUser = createParamDecorator(
 		const request = ctx
 			.switchToHttp()
 			.getRequest();
-		console.log("GetUser() decorator - request.user = ", request.user);
+		// console.log("GetUser() decorator - request.user = ", request.user);
 		if (data) {
 			return request.user[data];
 		}
-		return request.user;
+		return request.user; 
 	}
 )

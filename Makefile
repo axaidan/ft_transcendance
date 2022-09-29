@@ -29,6 +29,9 @@ log-back:
 log-db:
 	docker logs db -f
 
+log-test-db:
+	docker logs test-db -f
+
 enter-back:
 	docker exec -it back sh
 

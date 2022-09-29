@@ -13,7 +13,7 @@ services:
            - postgres:/var/lib/posgresql/data
 
     test-db:
-        container_name: test-db-db
+        container_name: test-db
         image: postgres:latest
         ports:
             - "5435:5432"
