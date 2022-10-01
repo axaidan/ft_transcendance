@@ -32,6 +32,25 @@ export class AchivmentService{
 		return unlock;
 	}
 
-	getOneAchiv = (AchivDto: any) => {}
+	async findUserForAchivId(userId: string, achivId:string){
+		let uid = parseInt(userId, 10);	
+		let aid = parseInt(achivId, 10);
+
+		const soldat = await this.prisma.user.findFirst({where: {id: uid}});
+
+		const achiv = await this.prisma.achivment.findFirst({where: { id: aid }}).users({where: {id: uid}});
+
+		if (!achiv.length)
+		{
+			console.log("nothing found")
+			return "no achiv found for user";
+		}
+		else {
+		console.log(achiv);
+		}
+		return  achiv;
+
+	}
+
 	deleteAchiv = (AchivDto: any) => {}
 }

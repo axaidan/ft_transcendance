@@ -20,4 +20,9 @@ export class AchivController {
 	updateAchiv(@Body() dto: LinkDto){
 		return this.achivService.updateAchiv(dto.userId, dto.achivId);
 	}
+
+	@Post('findAchivFor')
+	findUserForAchivIda(@Body() dto:LinkDto) {
+		return this.achivService.findUserForAchivId(dto.userId, dto.achivId);
+	}
 }

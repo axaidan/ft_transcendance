@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
 import { AchivModule } from './achiv/achiv.module';
+import { RelationModule } from './relations/relation.module';
 
 @Module({
   imports: [
@@ -13,6 +14,8 @@ import { AchivModule } from './achiv/achiv.module';
 	  PrismaModule,
 	  AuthModule,
 	  UserModule,
-		AchivModule]
+		AchivModule,
+		RelationModule,
+	]
 })
 export class AppModule {}

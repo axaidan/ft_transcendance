@@ -19,8 +19,8 @@ model User {
     login String @unique
     username String? @unique
 
-	relation1 Relation[] @relation("r1")
-	relation2 Relation[] @relation("r2")
+	whoIWatch Relation[] @relation("r1")
+	whoWatchesMe Relation[] @relation("r2")
 
 	achviments Achivment[]
 
@@ -39,12 +39,15 @@ model Achivment{
 	@@map("achivments")
 }
 
+
 model Relation {
 	id Int @id @default(autoincrement())
 
-	User1 User @relation("r1",fields: [user_id1], references: [id], onDelete: Cascade)
-	user_id1 Int
+	me User @relation("r1",fields: [userId], references: [id], onDelete: Cascade)
+	userId Int
 
-	User2 User @relation("r2",fields: [user_id2], references: [id])
-	user_id2 Int
+	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
+	userIWatchdId Int
+
+	relation Int @default(0)//0NONE, 1 Friend, 2 block 
 }
