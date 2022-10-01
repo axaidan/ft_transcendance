@@ -18,6 +18,7 @@ model User {
 
     login String @unique
     username String? @unique
+	email String?
 
     email String? @unique
     twoFactorAuth Boolean @default(false)
