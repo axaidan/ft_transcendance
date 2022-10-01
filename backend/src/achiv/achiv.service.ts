@@ -36,14 +36,14 @@ export class AchivmentService{
 		let uid = parseInt(userId, 10);	
 		let aid = parseInt(achivId, 10);
 
-		const soldat = await this.prisma.user.findFirst({where: {id: uid}});
+		let soldat = await this.prisma.user.findFirst({where: {id: uid}});
 
-		const achiv = await this.prisma.achivment.findFirst({where: { id: aid }}).users({where: {id: uid}});
+		let achiv = await this.prisma.achivment.findFirst({where: { id: aid }}).users({where: {id: uid}});
 
 		if (!achiv.length)
 		{
 			console.log("nothing found")
-			return "no achiv found for user";
+			return null;
 		}
 		else {
 		console.log(achiv);

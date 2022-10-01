@@ -8,23 +8,33 @@ export class RelationController {
 	constructor(private relationService: RelationService) {}
 
 	@Post('add_friend')
-	add_friend(@Body() {user, user_id_to_add}){
-		return this.relationService.add_friend(user, user_id_to_add);
+	add_friend(@Body() {user, user_to_check}){
+		return this.relationService.add_friend(user, user_to_check);
 	}
 
 	@Post('add')
-	add_user(@Body() {user, user_id_to_add}) {
-		return this.relationService.add_user(user, user_id_to_add);
+	add_user(@Body() {user, user_to_check}) {
+		return this.relationService.add_user(user, user_to_check);
 	}
 
 	@Post('block')
-	block_user(@Body() {user, user_id_to_add}) {
-		return this.relationService.block_user(user, user_id_to_add);
+	block_user(@Body() {user, user_to_check}) {
+		return this.relationService.block_user(user,user_to_check );
 	}
 
 	@Post('list')
 	list(@Body() {user}) {
 		return this.relationService.list(user);
+	}
+
+	@Post('list_block')
+	list_block(@Body() {user}) {
+		return this.relationService.list_block(user);
+	}
+
+	@Post('is_friend')
+	is_my_friend(@Body() {user, user_to_check}) {
+		return this.relationService.is_my_friend(user,user_to_check  )
 	}
 
 }

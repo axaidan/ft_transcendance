@@ -1,16 +1,45 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
+import { AchivmentService } from "src/achiv/achiv.service";
+import { identity } from "rxjs";
 
 @Injectable()
 export class RelationService{
 	constructor(
-		private prisma: PrismaService,) {}
+		private prisma: PrismaService,
+		private achivService: AchivmentService) {}
+
+	async is_my_friend(userId: string, userIdToCheck: string) {
+		let uid = parseInt(userId, 10);
+
+		let uitc = parseInt(userIdToCheck, 10);
+
+		let user = await this.prisma.user.findFirst({where: {id: uid }});
+		let userToFind = await this.prisma.user.findFirst({where: {id: uitc }});
+		let curRelation = await this.prisma.relation.findFirst({where: {me: user, userIWatch: userToFind}});
+		if (!curRelation) {
+			return false;
+		}
+		if (curRelation.relation === 1)		
+			return true;
+		return false;
+
+	}
+
+	async list_block(userId: string) {
+	let uid = parseInt(userId, 10);		
+
+	let list = await this.prisma.relation.findMany({where: {userId: uid, relation: 2}});
+
+	return list;
+
+	}
 
 	async list(userId: string ) {
 		let uid = parseInt(userId, 10);
 
-		let list = await this.prisma.relation.findMany({where: {userId: uid}})
+		let list = await this.prisma.relation.findMany({where: {userId: uid, relation: 1}})
 		return list;
 	}		
 
@@ -82,6 +111,13 @@ export class RelationService{
 				relation: 1,
 
 			}});
+			console.log("je creer la relation");
+			var num = meUser.id.toString();
+			let curlyAchiv = await this.achivService.findUserForAchivId(num, "4")
+			if (!curlyAchiv) {
+				console.log("je go faire l'achiv");
+				this.achivService.updateAchiv(num, "4");
+			}
 			return newRelation;
 		}
 
