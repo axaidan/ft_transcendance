@@ -52,5 +52,6 @@ model Relation {
 	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
 	userIWatchdId Int
 
+	relation Int
 	
 }
