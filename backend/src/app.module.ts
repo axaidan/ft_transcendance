@@ -3,6 +3,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
+import { MailModule } from './mail/mail.module';
 import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
 
@@ -14,6 +15,7 @@ import { RelationModule } from './relations/relation.module';
 	  PrismaModule,
 	  AuthModule,
 	  UserModule,
+	  MailModule,
 		AchivModule,
 		RelationModule,
 	]

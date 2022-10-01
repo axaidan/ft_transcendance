@@ -27,15 +27,17 @@ model User {
     @@map("user")
 }
 
-
+// model Achievement {
 model Achivment{
 	id Int @id @default(autoincrement())
 
 	title String @unique
+  // description String ?
 	descriptions String?
 
 	users User [] 
 
+  // @@map("achievements")
 	@@map("achivments")
 }
 
@@ -49,5 +51,5 @@ model Relation {
 	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
 	userIWatchdId Int
 
-	relation Int @default(0)//0NONE, 1 Friend, 2 block 
+	
 }
