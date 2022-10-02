@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Redirect } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
 import { Request } from 'express';

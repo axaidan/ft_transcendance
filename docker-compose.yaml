@@ -1,28 +1,29 @@
 version: "3"
 services:
-    # postgres:
-    #     container_name: db
-    #     image: postgres:latest
-    #     ports:
-    #         - "5432:5432"
-    #     environment:
-    #         POSTGRES_USER: maxime
-    #         POSTGRES_PASSWORD: maxime
-    #         POSTGRES_DB: db_maxime
-    #     volumes:
-    #        - postgres:/var/lib/posgresql/data
+    postgres:
+        container_name: db
+        image: postgres:latest
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: maxime
+            POSTGRES_PASSWORD: maxime
+            POSTGRES_DB: db_maxime
+        volumes:
+           - postgres:/var/lib/posgresql/data
 
-    # back:
-    #     container_name: back
-    #     image: node:lts-alpine
-    #     restart: unless-stopped
-    #     ports: 
-    #         - "3000:3000"
-    #         - "5555:5555"
-    #     command: sh -c "npm i -g @nestjs/cli; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;"
-    #     volumes:
-    #         - "./backend:/back"
-    #     working_dir: /back
+    back:
+        container_name: back
+        image: node:lts-alpine
+        restart: unless-stopped
+        ports: 
+            - "3000:3000"
+            - "5555:5555"
+        command: "tail -f"
+        # command: sh -c "npm i -g @nestjs/cli; npm install; npx prisma generate; npx prisma migrate dev; npm run start:dev;"
+        volumes:
+            - "./backend:/back"
+        working_dir: /back
 
     frontend:
         container_name: front
@@ -36,9 +37,9 @@ services:
             - "./frontend:/front"
         working_dir: /front
 
-# volumes:
-#     postgres:
-#     test_db_vol:
+volumes:
+    postgres:
+    test_db_vol:
 
 #        command: "tail -f"
 #        command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; npm --prefix /back/nestjs-api-tutorial install; npm add -D prisma ; npm add @prisma/client ; npm run --prefix /back/nestjs-api-tutorial start:dev;" #npx prisma generate; npx prisma migrate dev; npm run start:dev"
