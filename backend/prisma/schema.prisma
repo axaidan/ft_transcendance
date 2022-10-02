@@ -19,19 +19,39 @@ model User {
     login String @unique
     username String? @unique
 
+   	email String? @unique
+    twoFactorAuth Boolean @default(false)
+	whoIWatch Relation[] @relation("r1")
+	whoWatchesMe Relation[] @relation("r2")
+
 	achviments Achivment[]
 
     @@map("user")
 }
 
-
+// model Achievement {
 model Achivment{
 	id Int @id @default(autoincrement())
 
 	title String @unique
+  // description String ?
 	descriptions String?
 
 	users User [] 
 
+  // @@map("achievements")
 	@@map("achivments")
+}
+
+model Relation {
+	id Int @id @default(autoincrement())
+
+	me User @relation("r1",fields: [userId], references: [id], onDelete: Cascade)
+	userId Int
+
+	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
+	userIWatchdId Int
+
+	relation Int
+	
 }

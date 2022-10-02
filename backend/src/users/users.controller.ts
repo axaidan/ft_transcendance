@@ -1,8 +1,9 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
 import { GetUser } from '../auth/decorator';
-import { JwtGuard, FtGuard } from '../auth/guard';
+import { JwtGuard } from '../auth/guard';
 import { User } from '@prisma/client'
+import { EditUserDto } from './dto/edit-user.dto';
 
 // @UseGuards(JwtGuard)
 
@@ -20,10 +21,24 @@ export class UserController {
 	// 	return user;
 	// }
 
-	// @Get(':id')
-	// getUserById( @Param('id', ParseIntPipe) userId: number ) {
-	// 	return this.userService.getUser(userId);
-	// }
+	@Get(':id')
+	getUserById( @Param('id', ParseIntPipe) userId: number ) {
+		return this.userService.getUser(userId);
+	}
+	
+	@HttpCode(200)
+	@Get('me')
+	getme(@GetUser() user: User) {
+		return user;
+	}
+
+	@Patch()
+	editUser(
+		@GetUser('id') userId: number,
+		@Body() dto: EditUserDto
+	) {
+		return (this.userService.editUser(userId, dto));
+	}
 
 }
 
