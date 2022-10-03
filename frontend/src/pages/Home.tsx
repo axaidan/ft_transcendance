@@ -7,12 +7,12 @@ export function Home () {
 
 	useEffect( () => {
 		axios.get('http://localhost:3000/user/1')
-			.then((res) => setUser(res.data.login))
+			.then((res) => { console.log(res.data); setUser(res.data); })
 	}, []);
 
 	return (
 		<div>
-			<h1>{user}</h1>
+			<h1>{ user }</h1>
 		</div>
 	)
 }

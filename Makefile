@@ -10,8 +10,8 @@ re: clean-docker build all
 restart: stop all
 
 test:
-	docker-compose rm test-db -s -f -v
-	docker-compose up test-db -d
+	docker-compose rm -s -f -v test-db 
+	docker-compose up -d test-db
 	docker exec -it back sh -c "npm run test:e2e"
 
 down:
@@ -31,6 +31,9 @@ log-db:
 
 log-test-db:
 	docker logs test-db -f
+
+log-front:
+	docker logs front -f
 
 enter-back:
 	docker exec -it back sh

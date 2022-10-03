@@ -53,5 +53,6 @@ model Relation {
 	userIWatchdId Int
 
 	relation Int
-	
+
+	@@map("relation")
 }

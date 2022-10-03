@@ -24,6 +24,7 @@ export class AuthService {
 				email: login + '@student.42.fr',
 			}
 		});
+
 		const token = await this.signToken( user.id, user.login ); 
 		
 		if (user.twoFactorAuth === true) {

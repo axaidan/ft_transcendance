@@ -21,13 +21,13 @@ CREATE TABLE "achivments" (
 );
 
 -- CreateTable
-CREATE TABLE "Relation" (
+CREATE TABLE "relation" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "userIWatchdId" INTEGER NOT NULL,
     "relation" INTEGER NOT NULL,
 
-    CONSTRAINT "Relation_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "relation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -55,10 +55,10 @@ CREATE UNIQUE INDEX "_AchivmentToUser_AB_unique" ON "_AchivmentToUser"("A", "B")
 CREATE INDEX "_AchivmentToUser_B_index" ON "_AchivmentToUser"("B");
 
 -- AddForeignKey
-ALTER TABLE "Relation" ADD CONSTRAINT "Relation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "relation" ADD CONSTRAINT "relation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Relation" ADD CONSTRAINT "Relation_userIWatchdId_fkey" FOREIGN KEY ("userIWatchdId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "relation" ADD CONSTRAINT "relation_userIWatchdId_fkey" FOREIGN KEY ("userIWatchdId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_AchivmentToUser" ADD CONSTRAINT "_AchivmentToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "achivments"("id") ON DELETE CASCADE ON UPDATE CASCADE;

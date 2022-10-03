@@ -4,6 +4,7 @@ import { FtGuard } from './guard';
 import { Request } from 'express';
 import { GetUser } from './decorator';
 import { User } from '@prisma/client';
+import axios from 'axios';
 
 @Controller('auth')
 export class AuthController {
@@ -12,11 +13,11 @@ export class AuthController {
 	@UseGuards(FtGuard)
 	@HttpCode(HttpStatus.OK)
 	@Get('signin')
-	signin() {}
-
+	signin( @Req() req: Request ) {}
+	
 	@UseGuards(FtGuard)
 	@Get('callback')
-	callback( @Req() req: Request  ) {
+	callback( @Req() req: Request ) {
 		return this.authService.signin( req.user.toString() );
 	}
 
