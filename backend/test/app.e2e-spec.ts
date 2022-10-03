@@ -13,8 +13,9 @@ describe('App e2e', () => {
   let prisma: PrismaService;
   let authService: AuthService;
   
-  let dummyUser: User;
-  let dummyJwt: {access_token: string};
+  let currentUser: User;
+  let currentJwt: {access_token: string};
+  let user2: User;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -33,19 +34,27 @@ describe('App e2e', () => {
     authService = app.get(AuthService);
     await prisma.cleanDb();
     
-    // DUMMY USER AND JWT INIT
-    dummyUser = await prisma.user.create({
+    // current USER AND JWT INIT
+    currentUser = await prisma.user.create({
         data: {
-          login: 'dummy',
-          email: 'dummy@student.42.fr',
+          login: 'current',
+          email: 'current@student.42.fr',
         }
       }
     );
-    dummyJwt = await authService.signToken(dummyUser.id, dummyUser.login);
+	user2 = await prisma.user.create({
+        data: {
+          login: 'user2',
+          email: 'user2@student.42.fr',
+        }
+      }
+    );
+	//	SEED ACHIEVEMENTS HERE
+    currentJwt = await authService.signToken(currentUser.id, currentUser.login);
     // SET baseUrl FOR PACTUM
     pactum.request.setBaseUrl('http://localhost:3333');
     // STORE JwtAccessToken IN PACTUM FOR REUSE- NOT WORKING
-    // pactum.spec().stores('userAt', 'dummyJwt.access_token');
+    // pactum.spec().stores('userAt', 'currentJwt.access_token');
 
   });
 
@@ -62,7 +71,7 @@ describe('App e2e', () => {
         .spec()
         .get('/user/me')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .expectStatus(200)
         /*.inspect()*/;
@@ -87,8 +96,8 @@ describe('App e2e', () => {
     describe('EditUser()', () => {
 
       const baseDto: EditUserDto = {
-        email: 'dummy@gmail.com',
-        username: 'LoveDummyDu93',
+        email: 'current@gmail.com',
+        username: 'LovecurrentDu93',
         twoFactorAuth: true,
       }
 
@@ -98,7 +107,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200)
@@ -128,7 +137,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(400)
@@ -141,7 +150,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200)
@@ -151,12 +160,12 @@ describe('App e2e', () => {
 
       it('VALID USERNAME - should return 200', () => {
         const {email, twoFactorAuth, ...dto} = baseDto;
-        dto.username = "HateDummyDu94";
+        dto.username = "HatecurrentDu94";
         return pactum
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200)
@@ -171,7 +180,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200)
@@ -186,7 +195,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(400);
@@ -201,7 +210,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200);
@@ -215,7 +224,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200);
@@ -225,8 +234,8 @@ describe('App e2e', () => {
 
       it('EXTRA PROPERTY - should return 200', () => {
         const dto = {
-          email: 'dummy@hotmail.com',
-          username: 'BoGossDummy',
+          email: 'current@hotmail.com',
+          username: 'BoGosscurrent',
           twoFactorAuth: true,
           extraProperty: "ok",
         };
@@ -234,7 +243,7 @@ describe('App e2e', () => {
         .spec()
         .patch('/user')
         .withHeaders({
-          Authorization: `Bearer ${dummyJwt.access_token}`,
+          Authorization: `Bearer ${currentJwt.access_token}`,
         })
         .withBody(dto)
         .expectStatus(200);
@@ -244,6 +253,30 @@ describe('App e2e', () => {
 
     });
 
+  });
+
+  describe('Relation', () => {
+	  describe('POST add_friend()', () => {
+
+	      it('VALID USERS - should add a friend to current user', () => {
+			const dto = {
+				user_to_check: user2.id
+			}
+	        return pactum
+	        .spec()
+	        .post('/relation/add_friend')
+	        .withHeaders({
+		         Authorization: `Bearer ${currentJwt.access_token}`,
+		     })
+			.withBody(dto)
+	        .expectStatus(201)
+			.expectBodyContains(currentUser.id)
+			.expectBodyContains(user2.id)
+			.expectBodyContains('1')
+	        /*.inspect()*/;
+	      });  
+		});
+	
   });
 
 });

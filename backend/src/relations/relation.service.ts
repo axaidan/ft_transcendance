@@ -32,6 +32,7 @@ export class RelationService{
 
 	let list = await this.prisma.relation.findMany({where: {userId: uid, relation: 2}});
 
+	console.log(list);
 	return list;
 
 	}
@@ -113,14 +114,13 @@ export class RelationService{
 			}});
 			console.log("je creer la relation");
 			var num = meUser.id.toString();
-			let curlyAchiv = await this.achivService.findUserForAchivId(num, "4")
+/*			let curlyAchiv = await this.achivService.findUserForAchivId(num, "4")
 			if (!curlyAchiv) {
 				console.log("je go faire l'achiv");
 				this.achivService.updateAchiv(num, "4");
-			}
+			} */
 			return newRelation;
 		}
-
 		return ;
 	}
 

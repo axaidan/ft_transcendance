@@ -6,7 +6,7 @@ import { User } from '@prisma/client'
 import { EditUserDto } from './dto/edit-user.dto';
 
 
-// @UseGuards(JwtGuard)
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
 	constructor( private userService: UserService) {};
