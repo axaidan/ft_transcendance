@@ -23,8 +23,9 @@ export class RelationController {
 	}
 
 	@Post('list')
-	list(@Body() {user}) {
-		return this.relationService.list(user);
+	async list(@Body() {user}) : Promise<User[]>{
+		const array = await this.relationService.list(user);
+		return array;
 	}
 
 	@Post('list_block')

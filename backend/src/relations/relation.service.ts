@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
+import { prisma, Relation, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AchivmentService } from "src/achiv/achiv.service";
 import { identity } from "rxjs";
+import { ConstraintMetadata } from "class-validator/types/metadata/ConstraintMetadata";
 
 @Injectable()
 export class RelationService{
@@ -36,11 +37,60 @@ export class RelationService{
 
 	}
 
-	async list(userId: string ) {
+	async list(userId: string ) : Promise<User[]> {
 		let uid = parseInt(userId, 10);
 
-		let list = await this.prisma.relation.findMany({where: {userId: uid, relation: 1}})
-		return list;
+//		let list = await this.prisma.user.findMany({where: { whoWatchesMe: {every: {userId: uid , relation: 1}}}})
+/*		let list = await this.prisma.relation.findMany({
+			where : { userId: uid, relation:1},
+			select: {userIWatch: {include: { id: true}},
+
+			} }) */
+		// let list: object| null = await this.prisma.relation.findMany({
+		// 	where : { userId: uid},
+		// 	select: {
+		// 		userIWatch: {select : {
+		// 							login:true}}, 
+		// },});
+
+		// let relationArr= [];
+		// const relations: {} = await this.prisma.relation.findMany({
+		// 	where : { userId: uid},
+		// 	// select: {
+			
+		// 	// 	userIWatch: {select: { login:true}},
+		// 	// },},
+		// });
+		// console.log("teste");
+		// console.log(relations[0]);
+		// for (let i in relations) {
+		// 	console.log(
+		// 	relations[i].userIWatchdId
+		// 	);
+		// 	relationArr.push(relations[i].userIWatchdId);
+		// }
+		// let list = await this.prisma.user.findMany({
+		// 	where : {
+		// 		id: {in : relationArr },
+		// 	},
+		// 	select: {login: true},
+		// });
+		// return list;
+		var userArr : User[] = [];
+		const friends = await this.prisma.relation.findMany({
+			where: {
+				userId: uid,
+				relation: 1,
+			},
+			select: {
+				userIWatch: true,
+			},
+		});
+		for (let friend in friends) {
+			userArr.push(friends[friend].userIWatch);
+		}
+		console.log(userArr);
+		return userArr;
 	}		
 
 	async block_user(meId: string, user_id_to_add: string) {
