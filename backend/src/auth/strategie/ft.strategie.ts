@@ -14,6 +14,7 @@ export class FtStrategy extends PassportStrategy(Strategy) {
 			callbackURL: conf.get('RED_URI'),
 		});
 	}
+
 	async validate( access_token: string, refresh_token: string, profile: Profile ): Promise<string> {
 		return profile.username;
 	}

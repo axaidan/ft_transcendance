@@ -1,14 +1,31 @@
 import axios from 'axios'
+import { useEffect } from 'react';
 
-const API_URL = "http://localhost:4200/auth/signin";
+const test = async () => {
 
-async function connectUser() {
+	
 
+	await axios.get("http://localhost:3000/auth/signin")
+	.then( res => {
+		console.log(res);
+		return (res);
+	})
+	.catch( e => {
+		console.log(e);
+		return (e);
+	})
 }
 
 export function Login () {
-	connectUser();
+
+	useEffect( () => {
+		test();
+	}, []);
+
 	return (
-			<h1>Login</h1>
+		<>
+			<h1>SUCCESS</h1>
+			<h1>salut</h1>
+		</>
 	)
 }

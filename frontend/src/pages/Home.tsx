@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react"
 import axios from 'axios'
+import { useCookies } from "react-cookie";
 
 export function Home () {
 	
 	const [ user, setUser ] = useState('username');
-
+	const [ cookies ] = useCookies();
+	
 	useEffect( () => {
-		axios.get('http://localhost:3000/user/1')
-			.then((res) => { console.log(res.data); setUser(res.data); })
+		if (cookies.access_token === 'undefined') {
+			setUser('Go check your mails to login.')
+			return ;
+		}
+		const config = {
+			headers: {
+				Authorization: `Bearer ${cookies.access_token}`,
+			},
+		};
+		axios.get('http://localhost:3000/user/me', config)
+			.then((res) => {
+				setUser(res.data.login);
+			});
 	}, []);
 
 	return (

@@ -12,6 +12,7 @@ restart: stop all
 test:
 	docker-compose rm -s -f -v test-db 
 	docker-compose up -d test-db
+	sleep 5
 	docker exec -it back sh -c "npm run test:e2e"
 
 down:
