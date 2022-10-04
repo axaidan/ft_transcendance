@@ -28,9 +28,12 @@ export class AuthController {
 	}
 
 	@Get('2fa-callback')
-	twoFaCallback(@Query() query: any) {
-		return {
-			access_token: query.token
-		};
+	twoFaCallback(@Query() query: any, @Res({ passthrough: true }) response: Response) {
+
+		const token = query.token;
+		response.cookie('access_token', token, {
+			expires: new Date(Date.now() + 6000000)
+		});
+		response.redirect("http://localhost:4200");
 	}
 }
