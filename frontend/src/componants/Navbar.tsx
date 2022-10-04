@@ -2,68 +2,49 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import '../styles/components/Navbar.css';
 import { FaUserCircle, FaHome, FaComments, FaStore } from 'react-icons/fa';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 export function Navbar() {
+
+	const [toggleMenu, setToggleMenu] = useState(false);
+	const [largeur, setLargeur] = useState(window.innerWidth);
+
+	const toggleNavResponsive = () => {
+		setToggleMenu(!toggleMenu);
+	}
+
+	useEffect(() => {
+
+		const changeWidth = () => {
+			setLargeur(window.innerWidth);
+			if (window.innerWidth > 700) {
+				setToggleMenu(false);
+			}
+		}
+
+		window.addEventListener('resize', changeWidth);
+		return () => {
+			window.removeEventListener('resize', changeWidth);
+		}
+
+	}, [])
+
 	return (
-		<div>
-			<ul className="nav">
-				<li>
-					<NavLink exact to="/">Home</NavLink>
-				</li>
-				<li>
-					<NavLink activeStyle={{ color: '#5754a8' }} to="/about">
-						About
-					</NavLink>
-				</li>
-				<li>
-					<NavLink activeStyle={{ color: '#5754a8' }} to="/projects">
-						Projects
-					</NavLink>
-				</li>
-				<li>
-					<NavLink activeStyle={{ color: '#5754a8' }} to="/blogs">
-						Blogs
-					</NavLink>
-				</li>
-				<li>
-					<NavLink activeStyle={{ color: '#5754a8' }} to="/contact">
-						Contact
-					</NavLink>
-				</li>
-			</ul>
-		</div>
+		<nav>
+			{(toggleMenu || largeur > 700) && (
 
+				<ul className="liste">
+					<li className="items">Play</li>
+					<li className="items">Home</li>
+					<li className="items">User</li>
+					<li className="items">Friends</li>
+					<li className="items">Channels</li>
+					<li className="items">Store</li>
+				</ul>
 
-		// <div className="nav">
-		// 	<ul>
-		// 		<div className="L_Box" >
-		// 			<Link to="/game">
-		// 				<div className="name">Jouer</div>
-		// 			</Link>
-		// 			<Link to="/">
-		// 				<span className="icon"></span>
-		// 				<FaHome />
-		// 				<div className="name">Acceuil</div>
-		// 			</Link >
-		// 			<Link to="/profile">
-		// 				<span className="icon"></span>
-		// 				<FaUserCircle />
-		// 				<div className="name">User</div>
-		// 			</Link >
-		// 		</div>
-		// 		<div className="R_Box" >
-		// 			<Link to="/login">
-		// 				<span className="icon"></span>
-		// 				<FaComments />
-		// 				<div className="name">Channel</div>
-		// 			</Link>
-		// 			<Link to="/store">
-		// 				<span className="icon"></span>
-		// 				<FaStore />
-		// 				<div className="name">Store</div>
-		// 			</Link>
-		// 		</div>
-		// 	</ul >
-		// </div >
-	)
+			)}
+			<button onClick={toggleNavResponsive} className="btn">BTN</button>
+		</nav>
+	);
 }

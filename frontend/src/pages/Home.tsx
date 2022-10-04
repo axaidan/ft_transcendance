@@ -5,14 +5,15 @@ import { Login } from './Login';
 
 export function Home() {
 
-	interface IUser {
-		login: string;
-		username: string;
-		createdAt: string;
-	}
+	// interface IUser {
+	// 	login: string;
+	// 	username: string;
+	// 	createdAt: string;
+	// }
 	const [cookies] = useCookies();
 
-	const [user, setUser] = useState({ login: 'username', username: '', createdAt: '' });
+	// const [user, setUser] = useState('{ login: 'username', username: '', createdAt: '' }');
+	const [user, setUser] = useState('username');
 	const [achievement, setAchievment] = useState('')
 
 	useEffect(() => {
@@ -38,10 +39,10 @@ export function Home() {
 
 	return (
 		<div>
-			<h1>{user.login}</h1>
-			<h2>{user.username}</h2>
+			<h1>{user}</h1>
+			{/* <h2>{user.username}</h2>
 			<h2>{user.createdAt}</h2>
-			<h2>{achievement}</h2>
+			<h2>{achievement}</h2> */}
 		</div>
 	)
 }
