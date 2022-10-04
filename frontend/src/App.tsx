@@ -14,8 +14,6 @@ export default function App() {
 				<Route path='/ladder' element={ <Ladder />} />
 				<Route path='/profile/:id' element={ <Profile />} />
 			</Routes>
-
-
 		</div>
 	);
 }

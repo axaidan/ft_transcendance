@@ -8,14 +8,14 @@ import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
 
 @Module({
-  imports: [
-	  ConfigModule.forRoot({
-		  isGlobal: true,
-	  }),
-	  PrismaModule,
-	  AuthModule,
-	  UserModule,
-	  MailModule,
+	imports: [
+		ConfigModule.forRoot({
+			isGlobal: true,
+		}),
+		PrismaModule,
+		AuthModule,
+		UserModule,
+		MailModule,
 		AchivModule,
 		RelationModule,
 	]

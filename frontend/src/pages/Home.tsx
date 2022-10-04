@@ -5,20 +5,13 @@ import { useCookies } from "react-cookie";
 export function Home () {
 	
 	const [ user, setUser ] = useState('username');
-	const [cookies, setCookie] = useCookies();
-
-	console.log('===============================');
-	console.log(cookies.access_token);
-	console.log('===============================');
-
-
+	const [ cookies ] = useCookies();
 	
 	useEffect( () => {
 		if (cookies.access_token === 'undefined') {
 			setUser('Go check your mails to login.')
 			return ;
 		}
-
 		const config = {
 			headers: {
 				Authorization: `Bearer ${cookies.access_token}`,

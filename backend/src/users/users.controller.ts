@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -16,14 +16,7 @@ export class UserController {
 		return this.userService.getAllUser();
 	}
 
-	// @Get('me')
-	// getme(@GetUser() user: User) {
-	// 	return user;
-	// }
-
-
-	@UseGuards(JwtGuard)
-	// @HttpCode(HttpStatus.OK)
+	@UseGuards(JwtGuard)	//	PASS GLOBALLY TO CONTROLLER LATER
 	@Get('me')
 	getme(@GetUser() user: User) {
 		return user;
@@ -33,8 +26,8 @@ export class UserController {
 	getUserById( @Param('id', ParseIntPipe) userId: number ) {
 		return this.userService.getUser(userId);
 	}
-	
 
+	@UseGuards(JwtGuard)	//	PASS GLOBALLY TO CONTROLLER LATER
 	@Patch()
 	editUser(
 		@GetUser('id') userId: number,
