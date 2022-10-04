@@ -1,0 +1,44 @@
+body {
+	margin: 0px;
+	padding: 0px;
+}
+
+.name {
+	color: aliceblue;
+}
+
+.L_Box {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	justify-content: center;
+}
+
+.R_Box {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+	justify-content: center;
+}
+
+.icon {
+	padding-left: 5px;
+}
+
+.nav {
+	padding: 20px;
+	width: 100%;
+	background-color: b;
+	opacity: 50%;
+	display: flex;
+	justify-content: center;
+}
+
+
+
+.nav {
+	display: flex;
+	opacity: 100%;
+	justify-content: space-between;
+	align-items: center;
+}

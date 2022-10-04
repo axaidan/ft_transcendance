@@ -1,43 +1,69 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import './Navbar.css'
+import { Link, NavLink } from "react-router-dom";
+import '../styles/components/Navbar.css';
+import { FaUserCircle, FaHome, FaComments, FaStore } from 'react-icons/fa';
 
 export function Navbar() {
 	return (
-		<header>
-			<div className="Box">
-				<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-				<div className="name"><h1>Ft_transendence</h1></div>
-			</div>
-			<div className="nav">
-				<Link to="/">
-					<div className="Box" >
-						<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-						<div className="name">Acceuil</div>
-					</div>
-				</Link>
-				<Link to="/ladder">
-					<div className="Box" >
-							<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-							<div className="name">LadderBoard</div>
-					</div>
-				</Link>
-				<Link to="/login">
-					<div className="Box" >
-							<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-							<div className="name">Channel</div>
-					</div>
-				</Link>
-				<Link to="/login">
-					<div className="Box" >
-						<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-						<div className="name">Game</div>
-					</div>
-				</Link>
-				<Link to="/profile">
-					<div className="Box"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-				</Link>
-			</div>
-		</header>
+		<div>
+			<ul className="nav">
+				<li>
+					<NavLink exact to="/">Home</NavLink>
+				</li>
+				<li>
+					<NavLink activeStyle={{ color: '#5754a8' }} to="/about">
+						About
+					</NavLink>
+				</li>
+				<li>
+					<NavLink activeStyle={{ color: '#5754a8' }} to="/projects">
+						Projects
+					</NavLink>
+				</li>
+				<li>
+					<NavLink activeStyle={{ color: '#5754a8' }} to="/blogs">
+						Blogs
+					</NavLink>
+				</li>
+				<li>
+					<NavLink activeStyle={{ color: '#5754a8' }} to="/contact">
+						Contact
+					</NavLink>
+				</li>
+			</ul>
+		</div>
+
+
+		// <div className="nav">
+		// 	<ul>
+		// 		<div className="L_Box" >
+		// 			<Link to="/game">
+		// 				<div className="name">Jouer</div>
+		// 			</Link>
+		// 			<Link to="/">
+		// 				<span className="icon"></span>
+		// 				<FaHome />
+		// 				<div className="name">Acceuil</div>
+		// 			</Link >
+		// 			<Link to="/profile">
+		// 				<span className="icon"></span>
+		// 				<FaUserCircle />
+		// 				<div className="name">User</div>
+		// 			</Link >
+		// 		</div>
+		// 		<div className="R_Box" >
+		// 			<Link to="/login">
+		// 				<span className="icon"></span>
+		// 				<FaComments />
+		// 				<div className="name">Channel</div>
+		// 			</Link>
+		// 			<Link to="/store">
+		// 				<span className="icon"></span>
+		// 				<FaStore />
+		// 				<div className="name">Store</div>
+		// 			</Link>
+		// 		</div>
+		// 	</ul >
+		// </div >
 	)
 }

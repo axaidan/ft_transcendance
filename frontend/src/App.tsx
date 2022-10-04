@@ -10,12 +10,12 @@ export default function App() {
 		<div>
 			<Navbar />
 			<Routes>
-				<Route path='/' element={ <Home />} />
-				<Route path='/login' element={ <Login />} />
-				<Route path='/ladder' element={ <Ladder />} />
-				<Route path='/profile/:id' element={ <Profile />} />
+				<Route path='/' element={<Home />} />
+				<Route path='/login' element={<Login />} />
+				<Route path='/ladder' element={<Ladder />} />
+				<Route path='/profile/:id' element={<Profile />} />
+				<Route path='*' element={<Home />} />
 			</Routes>
-
 		</div>
 	);
 }
