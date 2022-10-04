@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
 import { GetUser } from '../auth/decorator';
 import { JwtGuard } from '../auth/guard';
@@ -21,7 +21,9 @@ export class UserController {
 	// 	return user;
 	// }
 
-	@HttpCode(200)
+
+	@UseGuards(JwtGuard)
+	// @HttpCode(HttpStatus.OK)
 	@Get('me')
 	getme(@GetUser() user: User) {
 		return user;

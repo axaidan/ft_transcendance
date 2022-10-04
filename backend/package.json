@@ -1,7 +1,6 @@
 {
   "name": "back",
   "version": "0.0.1",
-  "proxy": "http://localhost:3000",
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },

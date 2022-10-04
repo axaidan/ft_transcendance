@@ -15,6 +15,7 @@ export default function App() {
 				<Route path='/profile/:id' element={ <Profile />} />
 			</Routes>
 
+
 		</div>
 	);
 }

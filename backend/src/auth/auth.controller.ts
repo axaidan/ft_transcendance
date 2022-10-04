@@ -20,12 +20,11 @@ export class AuthController {
 		await this.authService.signin( req.user.toString() )
 		.then( (res) => {
 			token = res;
+			response.cookie('access_token', token, {
+				expires: new Date(Date.now() + 6000000)
+			});
+			response.redirect("http://localhost:4200");
 		})
-		response.cookie('token', token, {
-			expires: new Date(Date.now() + 6000000),
-			httpOnly: true
-		});
-		response.redirect("http://localhost:4200");
 	}
 
 	@Get('2fa-callback')
