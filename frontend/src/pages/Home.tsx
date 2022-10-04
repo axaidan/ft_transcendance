@@ -7,7 +7,7 @@ export function Home () {
 
 	useEffect( () => {
 		axios.get('http://localhost:3000/user/1')
-			.then((res) => { console.log(res.data); setUser(res.data); })
+			.then((res) => { console.log(res.data); setUser(res.data.login); })
 	}, []);
 
 	return (

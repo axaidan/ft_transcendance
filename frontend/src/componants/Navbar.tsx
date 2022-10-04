@@ -22,12 +22,14 @@ export function Navbar() {
 							<div className="name">LadderBoard</div>
 					</div>
 				</Link>
-				<Link to="/login">
-					<div className="Box" >
+				{/* <Link to="/login"> */}
+				<a href="http://localhost:3000/auth/signin">
+					<div className="Box">
 							<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
-							<div className="name">Channel</div>
+							<div className="name">LOGIN</div>
 					</div>
-				</Link>
+				</a>
+				{/* </Link> */}
 				<Link to="/login">
 					<div className="Box" >
 						<div className="logo"><img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/></div>
