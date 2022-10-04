@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
+import { JwtGuard } from "src/auth/guard";
 
 @Controller('relation')
 export class RelationController {
@@ -22,8 +23,11 @@ export class RelationController {
 		return this.relationService.block_user(user,user_to_check );
 	}
 
-	@Post('list')
-	async list(@Body() {user}) : Promise<User[]>{
+	@UseGuards(JwtGuard)
+	@Get('list')
+	async list(@GetUser('id') user: number) : Promise<User[]>{
+
+		console.log("list test");
 		const array = await this.relationService.list(user);
 		return array;
 	}

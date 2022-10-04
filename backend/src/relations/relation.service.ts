@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { prisma, Relation, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
-import { AchivmentService } from "src/achiv/achiv.service";
+import { AchievementService } from "src/achiv/achiv.service";
 import { identity } from "rxjs";
 import { ConstraintMetadata } from "class-validator/types/metadata/ConstraintMetadata";
 
@@ -9,7 +9,7 @@ import { ConstraintMetadata } from "class-validator/types/metadata/ConstraintMet
 export class RelationService{
 	constructor(
 		private prisma: PrismaService,
-		private achivService: AchivmentService) {}
+		private achivService: AchievementService) {}
 
 	async is_my_friend(userId: string, userIdToCheck: string) {
 		let uid = parseInt(userId, 10);
@@ -37,8 +37,9 @@ export class RelationService{
 
 	}
 
-	async list(userId: string ) : Promise<User[]> {
-		let uid = parseInt(userId, 10);
+	async list(userId: number) : Promise<User[]> {
+	//	let uid = parseInt(userId, 10);
+		let uid = userId;
 
 //		let list = await this.prisma.user.findMany({where: { whoWatchesMe: {every: {userId: uid , relation: 1}}}})
 /*		let list = await this.prisma.relation.findMany({
@@ -65,9 +66,9 @@ export class RelationService{
 		// console.log(relations[0]);
 		// for (let i in relations) {
 		// 	console.log(
-		// 	relations[i].userIWatchdId
+		// 	relations[i].userIWatchId
 		// 	);
-		// 	relationArr.push(relations[i].userIWatchdId);
+		// 	relationArr.push(relations[i].userIWatchId);
 		// }
 		// let list = await this.prisma.user.findMany({
 		// 	where : {
@@ -119,7 +120,7 @@ export class RelationService{
 		else {
 			let newRelation = await this.prisma.relation.create({data: {
 				userId: meUser.id,
-				userIWatchdId: user_to_add.id,	
+				userIWatchId: user_to_add.id,	
 				relation: 2,
 
 			}});
@@ -157,7 +158,7 @@ export class RelationService{
 		else {
 			let newRelation = await this.prisma.relation.create({data: {
 				userId: meUser.id,
-				userIWatchdId: user_to_add.id,	
+				userIWatchId: user_to_add.id,	
 				relation: 1,
 
 			}});
@@ -190,7 +191,7 @@ export class RelationService{
 		else {
 			let newRelation = await this.prisma.relation.create({data: {
 				userId: meUser.id,
-				userIWatchdId: user_to_add.id,	
+				userIWatchId: user_to_add.id,	
 				relation: 0,
 
 			}});

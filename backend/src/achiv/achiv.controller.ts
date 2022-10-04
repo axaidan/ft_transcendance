@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { AchivmentService } from './achiv.service'
+import { AchievementService } from './achiv.service'
 import { AchivDto, LinkDto } from './dto'
 
 @Controller('achiv')
 export class AchivController {
-	constructor(private achivService: AchivmentService) {};
+	constructor(private achivService: AchievementService) {};
 
 	@Post('create')
 	createAchiv(@Body() achivDto: AchivDto){

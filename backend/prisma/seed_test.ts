@@ -1,44 +1,11 @@
-import { PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient()
 
 
 async function main() {
 	
-	const sergent = await prisma.user.upsert({
-		where: {login: 'mlormois'}, 
-		update: {},
-		create: {
-			login: 'mlormois',
-			username: 'lmasturbator',
-		},
-	}) 
 
-	const Axel = await prisma.user.upsert({
-		where: {login: 'axaidan'}, 
-		update: {},
-		create: {
-			login: 'axaidan',
-			username: 'skusku',
-		},
-	}) 
 
-	const Catino = await prisma.user.upsert({
-		where: {login: 'fcatinau'},
-		update: {},
-		create: {
-			login: 'fcatinau',
-			username: 'ouinouin',
-		},
-	})
-
-	const viporten = await prisma.user.upsert({
-		where: {login: 'viporten'},
-		update:{},
-		create:{
-			login: 'viporten',
-			username: 'el beaugausse',
-		},
-	})
 
 	const achiv = await prisma.achievement.upsert({
 		where: {title: '10 in a raw'},
@@ -75,18 +42,6 @@ async function main() {
 			descriptions: 'tu as ajouter ton premier ami',
 		},
 	})
-
-	const game1 = await prisma.game.upsert({
-		where: {id:1},
-		update: {},
-		create: {
-				player1Id: 1,
-				score1: 2,
-				player2Id: 2,
-				score2: 3,
-		},
-	})
-
 }
 
 main()

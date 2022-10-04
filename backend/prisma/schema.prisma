@@ -28,12 +28,12 @@ model User {
 	player2 Game[] @relation("p2")
 
 
-	achviments Achivment[]
+	achievements Achievement[]
 
     @@map("user")
 }
 
-model Achivment{
+model Achievement{
 	id Int @id @default(autoincrement())
 
 	title String @unique
@@ -41,7 +41,7 @@ model Achivment{
 
 	users User [] 
 
-	@@map("achivments")
+	@@map("achievement")
 }
 
 model Relation {
@@ -50,8 +50,8 @@ model Relation {
 	me User @relation("r1",fields: [userId], references: [id], onDelete: Cascade)
 	userId Int
 
-	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
-	userIWatchdId Int
+	userIWatch User @relation("r2",fields: [userIWatchId], references: [id], onDelete: Cascade)
+	userIWatchId Int
 
 	relation Int
 
