@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from 'axios'
+import { useCookies } from "react-cookie";
 import { Login } from './Login';
 
 export function Home() {
@@ -9,13 +10,25 @@ export function Home() {
 		username: string;
 		createdAt: string;
 	}
+	const [cookies] = useCookies();
 
 	const [user, setUser] = useState({ login: 'username', username: '', createdAt: '' });
 	const [achievement, setAchievment] = useState('')
 
 	useEffect(() => {
-		axios.get('http://localhost:3000/user/1')
-			.then((res) => { console.log(res.data); setUser(res.data); })
+		if (cookies.access_token === 'undefined') {
+			setUser('Go check your mails to login.')
+			return;
+		}
+		const config = {
+			headers: {
+				Authorization: `Bearer ${cookies.access_token}`,
+			},
+		};
+		axios.get('http://localhost:3000/user/me', config)
+			.then((res) => {
+				setUser(res.data.login);
+			});
 	}, []);
 
 	useEffect(() => {

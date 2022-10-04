@@ -1,10 +1,8 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { GetUser } from './decorator';
-import { User } from '@prisma/client';
-import axios from 'axios';
 
 @Controller('auth')
 export class AuthController {
@@ -13,18 +11,29 @@ export class AuthController {
 	@UseGuards(FtGuard)
 	@HttpCode(HttpStatus.OK)
 	@Get('signin')
-	signin( @Req() req: Request ) {}
+	signin( @Req() req: Request) { /* NOTHING TO DO HERE, I DONT KNOW */ }
 	
 	@UseGuards(FtGuard)
 	@Get('callback')
-	callback( @Req() req: Request ) {
-		return this.authService.signin( req.user.toString() );
+	async callback( @Req() req: Request, @Res({ passthrough: true }) response: Response ) {
+		let token: string;
+		await this.authService.signin( req.user.toString() )
+		.then( (res) => {
+			token = res;
+			response.cookie('access_token', token, {
+				expires: new Date(Date.now() + 6000000)
+			});
+			response.redirect("http://localhost:4200");
+		})
 	}
 
 	@Get('2fa-callback')
-	twoFaCallback(@Query() query: any) {
-		return {
-			access_token: query.token
-		};
+	twoFaCallback(@Query() query: any, @Res({ passthrough: true }) response: Response) {
+
+		const token = query.token;
+		response.cookie('access_token', token, {
+			expires: new Date(Date.now() + 6000000)
+		});
+		response.redirect("http://localhost:4200");
 	}
 }
