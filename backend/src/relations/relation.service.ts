@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { prisma, Relation, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AchievementService } from "src/achiv/achiv.service";
@@ -11,6 +11,7 @@ export class RelationService{
 		private prisma: PrismaService,
 		private achivService: AchievementService) {}
 
+		/*
 	async is_my_friend(userId: string, userIdToCheck: string) {
 		let uid = parseInt(userId, 10);
 
@@ -28,60 +29,36 @@ export class RelationService{
 
 	}
 
-	async list_block(userId: string) {
-	let uid = parseInt(userId, 10);		
+	*/
 
-	let list = await this.prisma.relation.findMany({where: {userId: uid, relation: 2}});
+	async list_block(userId: number) : Promise<User[]> {
+	let uid = userId		
 
-	return list;
-
+	var userArr : User[] = [];
+	const blockPeople = await this.prisma.relation.findMany({
+		where: {
+			userId: uid,
+			isBlock: 1,
+		},
+		select: {
+			userIWatch: true,
+		}
+	})
+	for (let people in blockPeople) {
+		userArr.push(blockPeople[people].userIWatch);
+	}
+	return userArr;
 	}
 
-	async list(userId: number) : Promise<User[]> {
-	//	let uid = parseInt(userId, 10);
+	async list_friend(userId: number) : Promise<User[]> {
 		let uid = userId;
 
-//		let list = await this.prisma.user.findMany({where: { whoWatchesMe: {every: {userId: uid , relation: 1}}}})
-/*		let list = await this.prisma.relation.findMany({
-			where : { userId: uid, relation:1},
-			select: {userIWatch: {include: { id: true}},
-
-			} }) */
-		// let list: object| null = await this.prisma.relation.findMany({
-		// 	where : { userId: uid},
-		// 	select: {
-		// 		userIWatch: {select : {
-		// 							login:true}}, 
-		// },});
-
-		// let relationArr= [];
-		// const relations: {} = await this.prisma.relation.findMany({
-		// 	where : { userId: uid},
-		// 	// select: {
-			
-		// 	// 	userIWatch: {select: { login:true}},
-		// 	// },},
-		// });
-		// console.log("teste");
-		// console.log(relations[0]);
-		// for (let i in relations) {
-		// 	console.log(
-		// 	relations[i].userIWatchId
-		// 	);
-		// 	relationArr.push(relations[i].userIWatchId);
-		// }
-		// let list = await this.prisma.user.findMany({
-		// 	where : {
-		// 		id: {in : relationArr },
-		// 	},
-		// 	select: {login: true},
-		// });
-		// return list;
-		var userArr : User[] = [];
+	var userArr : User[] = [];
 		const friends = await this.prisma.relation.findMany({
 			where: {
 				userId: uid,
 				relation: 1,
+				isBlock: 0,
 			},
 			select: {
 				userIWatch: true,
@@ -94,51 +71,102 @@ export class RelationService{
 		return userArr;
 	}		
 
-	async block_user(meId: string, user_id_to_add: string) {
-		let uid = parseInt(meId, 10);
-		let uidta = parseInt(user_id_to_add, 10)
-		let meUser = await this.prisma.user.findFirst({where: {id: uid}});
-		let user_to_add = await this.prisma.user.findFirst({where: {id: uidta}});
+	async block_user(meId: number, userId: string) {
+		
+		var blockId = parseInt(userId, 10);
+		
+		var findMe = this.prisma.user.findFirst({where: {id: meId}});
+		var findTarget= this.prisma.user.findFirst({where: {id: blockId}});
 
-		let relation = await this.prisma.relation.findFirst({where: {me: meUser, userIWatch: user_to_add}});
-
+		if (!findMe) {
+			throw new ForbiddenException('u do not exist')
+		}
+		if (!findTarget) {
+			throw new ForbiddenException('your target do not exist')
+		}
+		const relation = await this.prisma.relation.findFirst({
+			where: {
+				userId: meId, 
+				userIWatchId: blockId,
+			},
+		})
 		if (relation) {
-			console.log('relation deja creer');
-			if (relation.relation === 2){
-				console.log('deja ami');
-				return relation;
+			console.log("relation existante");
+			if (relation.isBlock === 1) {
+				console.log("user already block")
+				return 0;
 			}
 			else {
-				console.log("update de la relation");
-				const updateRelation = await this.prisma.relation.update({where: {id: relation.id}, 
-				data: {
-					relation: 2,
-				}})
+				let updateRelation = await this.prisma.relation.update({
+					where : {id: relation.id},
+					data: {
+						isBlock: 1,
+					}
+				});
 				return updateRelation;
 			}
 		}
 		else {
-			let newRelation = await this.prisma.relation.create({data: {
-				userId: meUser.id,
-				userIWatchId: user_to_add.id,	
-				relation: 2,
-
-			}});
-			return newRelation;
+			try {
+				var createBlockRelation = await this.prisma.relation.create({
+					data: {
+						userId: meId,
+						userIWatchId: blockId,
+						relation : 0,
+						isBlock: 1,
+					}
+				});
+			}
+			catch (e) {
+				throw new ForbiddenException('error');
+			}
+			return createBlockRelation;
 		}
-
-		return ;
 	}
 
+	async unblock_user(meId: number, userId: string) {
+		var targetId = parseInt(userId, 10);
 
+		var findMe = this.prisma.user.findFirst({where: {id: meId}});
+		var findTarget= this.prisma.user.findFirst({where: {id: targetId}});
 
-	async add_friend(meId: string, user_id_to_add: string) {
-		let uid = parseInt(meId, 10);
-		let uidta = parseInt(user_id_to_add, 10)
-		let meUser = await this.prisma.user.findFirst({where: {id: uid}});
-		let user_to_add = await this.prisma.user.findFirst({where: {id: uidta}});
+		if (!findMe) {
+			throw new ForbiddenException("me not exist");
+		}
 
-		let relation = await this.prisma.relation.findFirst({where: {me: meUser, userIWatch: user_to_add}});
+		if (!findTarget) {
+			throw new ForbiddenException("user you looking for doesn't exist");
+		}
+
+		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
+		if (relation) {
+			if (relation.isBlock === 1)	{
+				let updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data : {isBlock: 0}})
+				return ;
+			}
+			else 
+				return ;
+		}
+		else {
+			return ;
+		}
+		
+	}
+
+	// verifier partout que le userId existe
+	async add_friend(meId: number, userId: string) {
+		var friendId = parseInt(userId, 10);
+
+			let findMe = await this.prisma.user.findFirst({where: {id: meId}});
+
+		var findNewFriend = await this.prisma.user.findFirst({where: {id: friendId}});
+
+		if (!findMe)
+			throw new ForbiddenException("u do not exist")
+		if (!findNewFriend) {
+			throw new ForbiddenException("friend do not exist")
+		}
+		let relation = await this.prisma.relation.findFirst({where: {me: findMe, userIWatch: findNewFriend}});
 
 		if (relation) {
 			console.log('relation deja creer');
@@ -156,14 +184,18 @@ export class RelationService{
 			}
 		}
 		else {
-			let newRelation = await this.prisma.relation.create({data: {
-				userId: meUser.id,
-				userIWatchId: user_to_add.id,	
-				relation: 1,
-
-			}});
+			try {
+				var newRelation = await this.prisma.relation.create({data: {
+					userId: meId,
+					userIWatchId: friendId,	
+					relation: 1,
+					}});
+				}
+			catch (e) {
+				throw new ForbiddenException('error');
+				}
 			console.log("je creer la relation");
-			var num = meUser.id.toString();
+			var num = meId.toString();
 			let curlyAchiv = await this.achivService.findUserForAchivId(num, "4")
 			if (!curlyAchiv) {
 				console.log("je go faire l'achiv");
@@ -171,10 +203,9 @@ export class RelationService{
 			}
 			return newRelation;
 		}
-
-		return ;
 	}
 
+	/*
 	async add_user(meId: string, user_id_to_add: string) {
 		let uid = parseInt(meId, 10);
 		let uidta = parseInt(user_id_to_add, 10)
@@ -200,6 +231,6 @@ export class RelationService{
 
 		return ;
 	}
-
+	*/
 
 }

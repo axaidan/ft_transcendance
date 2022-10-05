@@ -53,7 +53,8 @@ model Relation {
 	userIWatch User @relation("r2",fields: [userIWatchId], references: [id], onDelete: Cascade)
 	userIWatchId Int
 
-	relation Int
+	relation Int // 0 NONE/ 1 friend 
+	isBlock Int @default(0)
 
 	@@map("relation")
 }
