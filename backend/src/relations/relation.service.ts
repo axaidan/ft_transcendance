@@ -141,7 +141,11 @@ export class RelationService{
 		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
 		if (relation) {
 			if (relation.isBlock === 1)	{
-				let updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data : {isBlock: 0}})
+				if (relation.relation === 1) {
+					let updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data : {isBlock: 0}})
+					return ;
+				}
+				const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}});
 				return ;
 			}
 			else 
@@ -203,6 +207,35 @@ export class RelationService{
 			}
 			return newRelation;
 		}
+	}
+
+	async remove_friend(meId: number, userId: string) {
+		let friendId = parseInt(userId, 10);
+
+		let findMe = await this.prisma.user.findFirst({where: {id: meId} })
+		let findFriend = await this.prisma.user.findFirst({where: {id: friendId}})
+
+		if (!findMe)
+			throw new ForbiddenException('u not exist')
+		if (!findFriend)
+			throw new ForbiddenException('u r friend not exist')
+
+		let relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: friendId}})
+
+		if (relation) {
+			if (relation.relation === 1){
+				if (relation.isBlock === 1) {
+					var updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data: {relation: 0}})
+					return ;
+				}
+				else {
+					const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}})
+					return ;
+				}
+			}
+		}
+		return ;	
+
 	}
 
 	/*

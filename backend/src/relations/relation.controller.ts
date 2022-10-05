@@ -16,6 +16,11 @@ export class RelationController {
 		return this.relationService.add_friend(meId, userId);
 	}
 
+	@UseGuards(JwtGuard)
+	@Post('remove_friend')
+	remove_friend(@GetUser('id') meId: number, @Body() {userId}) {
+		return this.relationService.remove_friend(meId, userId);
+	}
 	/*
 	@Post('add')
 	add_user(@Body() {user, user_to_check}) {
