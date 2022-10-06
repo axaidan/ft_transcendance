@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
@@ -25,7 +25,6 @@ export class RelationController {
 	@UseGuards(JwtGuard)
 	@Post('block_user')
 	block_user(@GetUser('id') meId: number, @Body() {userId}) {
-		console.log("test");
 		return this.relationService.block_user(meId, userId);
 	}
 

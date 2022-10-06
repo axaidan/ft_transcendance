@@ -110,34 +110,35 @@ export class RelationService{
 
 		/* unblock_user*/ 
 	async unblock_user(meId: number, userId: string) {
+		console.log('test unblock')
+		console.log(userId)
 		var targetId = parseInt(userId, 10);
 
-		var findMe = this.prisma.user.findFirst({where: {id: meId}});
-		var findTarget= this.prisma.user.findFirst({where: {id: targetId}});
+		var findMe = await this.prisma.user.findFirst({where: {id: meId}});
+		var findTarget= await this.prisma.user.findFirst({where: {id: targetId}});
 
 		if (!findMe) {
-			throw new ForbiddenException("me not exist");
+			throw new ForbiddenException("me not exist")
 		}
-
 		if (!findTarget) {
-			throw new ForbiddenException("user you looking for doesn't exist");
+			throw new ForbiddenException("user you looking for doesn't exist")
 		}
-
+		console.log("test unbvlovk user");
 		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
 		if (relation) {
 			if (relation.isBlock === 1)	{
 				if (relation.relation === 1) {
 					let updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data : {isBlock: 0}})
-					return ;
+					return updateRelation;
 				}
 				const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}});
-				return ;
+				return deleteRelation;
 			}
 			else 
-				return ;
+				return relation;
 		}
 		else {
-			return ;
+			return relation;
 		}
 		
 	}
@@ -212,15 +213,15 @@ export class RelationService{
 			if (relation.relation === 1){
 				if (relation.isBlock === 1) {
 					var updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data: {relation: 0}})
-					return ;
+					return updateRelation;
 				}
 				else {
 					const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}})
-					return ;
+					return deleteRelation;
 				}
 			}
 		}
-		return ;	
+		return relation;	
 
 	}
 
