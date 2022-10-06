@@ -2,16 +2,16 @@ import { Injectable } from "@nestjs/common"
 import { PrismaService } from "../prisma/prisma.service"
 
 @Injectable()
-export class AchivmentService{
+export class AchievementService{
 	constructor(private prisma: PrismaService) {}
 
 	async createAchiv(AchivDto: any)  {
-		const newAchiv = await this.prisma.achivment.create({data: AchivDto, include: {users: true}});
+		const newAchiv = await this.prisma.achievement.create({data: AchivDto, include: {users: true}});
 		return newAchiv;
 	}
 
 	async getAchiv() { 
-		const achivs = await this.prisma.achivment.findMany({include: {users: true}});
+		const achivs = await this.prisma.achievement.findMany({include: {users: true}});
 		console.log(achivs);
 		return achivs;
 	} 
@@ -22,7 +22,7 @@ export class AchivmentService{
 		let aid = parseInt(achivId, 10);
 		const user = await this.prisma.user.findFirst({ where: {id: uid}});
 
-		const unlock = await this.prisma.achivment.update({where: {id: aid},
+		const unlock = await this.prisma.achievement.update({where: {id: aid},
 		data: {
 			users: {
 				connect:[{id: user.id }]
@@ -38,7 +38,7 @@ export class AchivmentService{
 
 		let soldat = await this.prisma.user.findFirst({where: {id: uid}});
 
-		let achiv = await this.prisma.achivment.findFirst({where: { id: aid }}).users({where: {id: uid}});
+		let achiv = await this.prisma.achievement.findFirst({where: { id: aid }}).users({where: {id: uid}});
 
 		if (!achiv.length)
 		{
