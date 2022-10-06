@@ -6,6 +6,7 @@ import { UserModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
+import { DiscussionModule } from './discussion/discussion.module';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { RelationModule } from './relations/relation.module';
 		MailModule,
 		AchivModule,
 		RelationModule,
+		DiscussionModule,
 	]
 })
 export class AppModule {}
