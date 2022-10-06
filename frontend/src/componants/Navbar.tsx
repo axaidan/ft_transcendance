@@ -1,13 +1,13 @@
-import React, { useCallback } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
 import '../styles/components/Navbar.css';
-import { FaUserCircle, FaHome, FaComments, FaStore } from 'react-icons/fa';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import { useCookies } from "react-cookie";
-import axios from 'axios'
+// import { FaUserCircle, FaHome, FaComments, FaStore } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { AxiosJwt } from "../hooks";
 
 export function Navbar() {
+
+	const axios = AxiosJwt();
 
 	interface IUser {
 		login: string;
@@ -15,23 +15,11 @@ export function Navbar() {
 		createdAt: string;
 	}
 
-	const [cookies] = useCookies();
-
-
 	const [user, setUser] = useState({ login: 'username', username: 'test', createdAt: '' });
 	const [achievement, setAchievment] = useState('')
 
 	useEffect(() => {
-		if (cookies.access_token === 'undefined') {
-			setUser({ login: 'Go check your mails to login.', username: 'default', createdAt: '' })
-			return;
-		}
-		const config = {
-			headers: {
-				Authorization: `Bearer ${cookies.access_token}`,
-			},
-		};
-		axios.get('http://localhost:3000/user/me', config)
+		axios.get('http://localhost:3000/user/me')
 			.then((res) => {
 				setUser(res.data.login);
 			});
@@ -76,7 +64,7 @@ export function Navbar() {
 						</NavLink>
 					</li>
 					<li className="items">
-						<NavLink to='/' className='links'>
+						<NavLink to='/home' className='links'>
 							Home
 						</NavLink>
 					</li>
@@ -87,7 +75,7 @@ export function Navbar() {
 					</li>
 					<div className="items_r">
 						<li className="items">
-							<NavLink to='/' className='links'>
+							<NavLink to='/home' className='links'>
 								Friends
 							</NavLink>
 						</li>

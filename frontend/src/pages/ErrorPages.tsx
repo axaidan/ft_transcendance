@@ -3,9 +3,7 @@ type ErrorProps = {
 	mode: number
 }
 
-
-
-export default function ErrorPages({ mode }:ErrorProps) {
+function ErrorPages({ mode }: ErrorProps) {
 
 
 
@@ -21,5 +19,7 @@ export default function ErrorPages({ mode }:ErrorProps) {
 			<h1>ERROR {mode} </h1>
 		</div>
 	)
-	
+
 }
+
+export default ErrorPages;

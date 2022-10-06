@@ -1,12 +1,10 @@
 import React from 'react';
 import '../styles/components/Friendsbar.css'
 
-const Friendsbar = () => {
+export function Friendsbar() {
 	return (
 		<nav className='Friendsbar'>
 			Hello
 		</nav>
 	);
 };
-
-export default Friendsbar;
