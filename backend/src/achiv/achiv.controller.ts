@@ -1,7 +1,10 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { AchievementService } from './achiv.service'
-import { AchivDto, LinkDto } from './dto'
+import { Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import { AchievementService } from './achiv.service';
+import { AchivDto, LinkDto } from './dto';
+import { JwtGuard } from '../auth/guard';
 
+
+@UseGuards(JwtGuard)
 @Controller('achiv')
 export class AchivController {
 	constructor(private achivService: AchievementService) {};
