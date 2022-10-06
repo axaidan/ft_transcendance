@@ -18,29 +18,30 @@ model User {
 
     login String @unique
     username String? @unique
-
    	email String? @unique
     twoFactorAuth Boolean @default(false)
+
 	whoIWatch Relation[] @relation("r1")
 	whoWatchesMe Relation[] @relation("r2")
 
-	achviments Achivment[]
+	player1 Game[] @relation("p1")
+	player2 Game[] @relation("p2")
+
+
+	achievements Achievement[]
 
     @@map("user")
 }
 
-// model Achievement {
-model Achivment{
+model Achievement{
 	id Int @id @default(autoincrement())
 
 	title String @unique
-  // description String ?
 	descriptions String?
 
 	users User [] 
 
-  // @@map("achievements")
-	@@map("achivments")
+	@@map("achievement")
 }
 
 model Relation {
@@ -49,10 +50,25 @@ model Relation {
 	me User @relation("r1",fields: [userId], references: [id], onDelete: Cascade)
 	userId Int
 
-	userIWatch User @relation("r2",fields: [userIWatchdId], references: [id], onDelete: Cascade)
-	userIWatchdId Int
+	userIWatch User @relation("r2",fields: [userIWatchId], references: [id], onDelete: Cascade)
+	userIWatchId Int
 
-	relation Int
+	relation Int // 0 NONE/ 1 friend 
+	isBlock Int @default(0)
 
 	@@map("relation")
+}
+
+model Game {
+	id Int @id @default(autoincrement())
+
+	player1 User @relation("p1", fields: [player1Id], references: [id])
+	player1Id Int
+	score1 Int
+
+	player2 User @relation("p2", fields: [player2Id], references: [id])
+	player2Id Int
+	score2 Int
+
+	@@map("game")
 }
