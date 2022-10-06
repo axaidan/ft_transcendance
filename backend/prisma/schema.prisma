@@ -31,7 +31,7 @@ model User {
 
 	discussion1 Discussion[] @relation("discussion1")
 	discussion2 Discussion[] @relation("discussion2")
-	discussionMsgs DiscussionMessages[] @relation("discussionMsgs")
+	// discussionMsgs DiscussionMessages[] @relation("discussionMsgs")
 
     @@map("user")
 }
@@ -65,9 +65,10 @@ model Discussion {
 // 	createdAt		DateTime @default(now())
 // 	text			String
 // 	userId			Int
-// 	user			User @relation(fields: [userId], references: [id])
-// 	discussionId	Int
-// 	discussion		Discussion @relation(fields: [discussionId], references: [id])
+ // 	discussionId	Int
+
+// 	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
+// 	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
 
 // 	@@map("discussionMsg")
 // }

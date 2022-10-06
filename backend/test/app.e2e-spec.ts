@@ -7,36 +7,58 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
+import { CreateDiscussionDto } from 'src/discussion/dto/index';
+
+const N = 20;
 
 describe('App e2e', () => {
-  let app: INestApplication;
-  let prisma: PrismaService;
-  let authService: AuthService;
-  
-  let dummyJwt: {access_token: string};
-  let kyleUser: User 
-  let dummyUser: User
-  let hugoUser: User
-  let angelUser: User
+	let app: INestApplication;
+	let prisma: PrismaService;
+	let authService: AuthService;
+	
+	let dummyJwt: {access_token: string};
+	let kyleUser: User 
+	let dummyUser: User
+	let hugoUser: User
+	let angelUser: User
+	let userArr: User[] = [];
 
-  beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    app = moduleRef.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-      })
-    );
+	const seedUsers = async function() {
+		const name: string = "user";
+		const userArr: User[] = [];
+
+		for (let i = 0 ; i < N ; i++) {
+			const login: string = name + `${i}`;
+			const email: string = login + '@student.42.fr';
+			const user: User = await prisma.user.create({
+				data: {
+					login: login,
+					email: email,
+				},
+			});
+			userArr.push(user);
+		}
+		return userArr;
+	}
+
+	beforeAll(async () => {
+		const moduleRef = await Test.createTestingModule({
+		imports: [AppModule],
+		}).compile();
+		app = moduleRef.createNestApplication();
+		app.useGlobalPipes(
+		new ValidationPipe({
+			whitelist: true,
+		})
+	);
     await app.init();
     await app.listen(3333);
     
     prisma = app.get(PrismaService);
     authService = app.get(AuthService);
     await prisma.cleanDb();
-    
-    // DUMMY USER AND JWT INIT
+
+	// DUMMY USER AND JWT INIT
     const	dummyUser = await prisma.user.create({
         data: {
           login: 'dummy',
@@ -44,6 +66,9 @@ describe('App e2e', () => {
         }
       }
     );
+	// USER ARRAY
+	userArr = await seedUsers();
+
 
 	const kyleUser = await prisma.user.create({
 		data: {
@@ -254,12 +279,6 @@ describe('App e2e', () => {
 			relation: 1,
 		},
 	})
-
-
-
-
-
-
 
 	const block8 = await prisma.relation.upsert({
 		where : {id: 8},
@@ -514,5 +533,28 @@ describe('App e2e', () => {
 	//here
 
   });
+
+	describe('Discussion', () => {
+
+		describe('Create', () => {
+			it('VALID - should return 201', () => {
+				const userId = 1;
+				const dto: CreateDiscussionDto = {
+					user2Id: userId
+				};
+				return pactum
+				.spec()
+				.post('/discussion/create')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(201)
+				.expectBodyContains(userId);
+			});
+			
+		});
+
+	});
 
 });
