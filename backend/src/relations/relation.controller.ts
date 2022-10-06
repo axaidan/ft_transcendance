@@ -3,6 +3,8 @@ import { GetUser } from "src/auth/decorator";
 import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
 import { JwtGuard } from "src/auth/guard";
+import { TargetDto } from "./dto";
+import { domainToASCII } from "url";
 
 @UseGuards(JwtGuard)
 @Controller('relation')
@@ -11,23 +13,23 @@ export class RelationController {
 
 
 	@Post('add_friend')
-	add_friend(@GetUser('id') meId: number, @Body() {userId}){
-		return this.relationService.add_friend(meId, userId);
+	add_friend(@GetUser('id') meId: number, @Body() dto: TargetDto){
+		return this.relationService.add_friend(meId, dto.userId);
 	}
 
 	@Post('remove_friend')
-	remove_friend(@GetUser('id') meId: number, @Body() {userId}) {
-		return this.relationService.remove_friend(meId, userId);
+	remove_friend(@GetUser('id') meId: number, @Body() dto: TargetDto) {
+		return this.relationService.remove_friend(meId, dto.userId);
 	}
 	
 	@Post('block_user')
-	block_user(@GetUser('id') meId: number, @Body() {userId}) {
-		return this.relationService.block_user(meId, userId);
+	block_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
+		return this.relationService.block_user(meId, dto.userId);
 	}
 
 	@Post('unblock_user')
-	unblock_user(@GetUser('id') meId: number, @Body() {userId}) {
-		return this.relationService.unblock_user(meId, userId);
+	unblock_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
+		return this.relationService.unblock_user(meId, dto.userId);
 	}
 
 	@Get('list_friend')
