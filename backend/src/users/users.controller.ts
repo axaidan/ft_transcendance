@@ -16,7 +16,6 @@ export class UserController {
 		return this.userService.getAllUser();
 	}
 
-	@UseGuards(JwtGuard)	//	PASS GLOBALLY TO CONTROLLER LATER
 	@Get('me')
 	getme(@GetUser() user: User) {
 		return user;
@@ -27,7 +26,6 @@ export class UserController {
 		return this.userService.getUser(userId);
 	}
 
-	@UseGuards(JwtGuard)	//	PASS GLOBALLY TO CONTROLLER LATER
 	@Patch()
 	editUser(
 		@GetUser('id') userId: number,

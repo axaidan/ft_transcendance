@@ -3,7 +3,11 @@ type ErrorProps = {
 	mode: number
 }
 
+
+
 export default function ErrorPages({ mode }:ErrorProps) {
+
+
 
 	return (
 		<div>
