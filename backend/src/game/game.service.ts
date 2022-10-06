@@ -10,7 +10,9 @@ export class GameService {
     ) {}
 
 
-        async historique(userId: number) : Promise<Game[]> {
+        async historique(uId: string) : Promise<Game[]> {
+			var userId = parseInt(uId, 10);
+
             const arrayGame = await this.prisma.game.findMany({
                 where : {
                     OR: [
@@ -41,8 +43,8 @@ export class GameService {
                 score1: dto.score1,
                 score2: dto.score2,
             }
-           })} 
-        }
+           })
+		} 
         return ;
 
 }
