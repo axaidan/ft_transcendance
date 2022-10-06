@@ -492,7 +492,6 @@ describe('App e2e', () => {
 				.expectStatus(401)
 			});
 		});
-	});
 
 	
 		describe('add_user', () => {
@@ -810,9 +809,9 @@ describe('App e2e', () => {
 				})
 				.expectStatus(403)
 			})
-
-
-
 		})
+	});
 
+
+	//next test here please
 });
