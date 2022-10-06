@@ -1,7 +1,0 @@
-.env
-.env.test
-.env.test.swp
-*.swp
-./backend/node_modules
-./backend/node_modules/
-
