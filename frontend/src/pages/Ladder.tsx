@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
-import { Link } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
+import { AxiosJwt } from '../hooks/AxiosJwt'
 
-const APIURL = 'http://localhost:3000'
 
 export function Ladder () {
+
+	const navigate = useNavigate();
 	const [users, setUsers ] = useState([]);
+	const axios = AxiosJwt();
 
 	useEffect( () => {
-		axios.get( 'http://localhost:3000/user/all' )
+		axios.get( '/user/all')
 			.then((res) => setUsers(res.data))
-			.catch((error) => console.error(error));
+			.catch(() => {
+				navigate('/');
+			});
 	}, []);
-
-	console.log(users)
 
 	return (
 		<div>
