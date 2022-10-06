@@ -29,6 +29,11 @@ export function Navbar() {
 		}
 	}, [])
 
+	// const navLinkStyle = ({ isActive }: boolean) => {
+	// 	return isActive ? 'active' : 'links';
+	// }
+
+
 	return (
 		<nav className="navbar">
 			{(toggleMenu || largeur > 700) && (
