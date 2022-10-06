@@ -21,13 +21,6 @@ export class RelationController {
 	remove_friend(@GetUser('id') meId: number, @Body() {userId}) {
 		return this.relationService.remove_friend(meId, userId);
 	}
-	/*
-	@Post('add')
-	add_user(@Body() {user, user_to_check}) {
-		return this.relationService.add_user(user, user_to_check);
-	}
-	*/
-
 	
 	@UseGuards(JwtGuard)
 	@Post('block_user')
@@ -46,22 +39,17 @@ export class RelationController {
 	@Get('list_friend')
 	async list(@GetUser('id') user: number) : Promise<User[]>{
 
-		console.log("list test");
 		const array = await this.relationService.list_friend(user);
 		return array;
 	}
 
 	@UseGuards(JwtGuard)
 	@Get('list_block')
-	list_block(@GetUser('id') user: number) {
-		return this.relationService.list_block(user);
+	async list_block(@GetUser('id') user: number) : Promise<User[]> {
+		const array = await this.relationService.list_block(user);
+		return array;
 	}
 
-	/*
-	@Post('is_friend')
-	is_my_friend(@Body() {user, user_to_check}) {
-		return this.relationService.is_my_friend(user,user_to_check  )
-	}
-	*/
+
 
 }
