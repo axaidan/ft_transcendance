@@ -101,7 +101,7 @@ a:hover span:nth-child(4) {
 	transition-delay: 0.75s;
 }
 
-nav {
+.navbar {
 	height: 50px;
 	background: linear-gradient(45deg, #020912, #091720);
 	border-bottom: 2px solid #16222a;

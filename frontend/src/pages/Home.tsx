@@ -12,7 +12,7 @@ export function Home() {
 	// }
 	const [cookies] = useCookies();
 
-	// const [user, setUser] = useState('{ login: 'username', username: '', createdAt: '' }');
+	// const [user, setUser] = useState({ login: 'username', username: '', createdAt: '' });
 	const [user, setUser] = useState('username');
 	const [achievement, setAchievment] = useState('')
 
