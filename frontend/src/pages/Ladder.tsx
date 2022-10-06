@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
-import { Link } from "react-router-dom";
-
-const APIURL = 'http://localhost:3000'
+import { useCookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios'
 
 export function Ladder () {
+
+	const navigate = useNavigate();
 	const [users, setUsers ] = useState([]);
+	const [ cookies ] = useCookies();
+
+	const jwtToken = cookies.access_token;
+	const jwtConfig = {
+		headers: {
+			Authorization: `Bearer ${jwtToken}`,
+		}
+	}
 
 	useEffect( () => {
-		axios.get( 'http://localhost:3000/user/all' )
+		axios.get( 'http://localhost:3000/user/all', jwtConfig)
 			.then((res) => setUsers(res.data))
-			.catch((error) => console.error(error));
+			.catch(() => {
+				navigate('/');
+			});
 	}, []);
 
 	console.log(users)

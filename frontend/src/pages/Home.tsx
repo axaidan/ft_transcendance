@@ -1,27 +1,32 @@
+import React from "react";
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import { useCookies } from "react-cookie";
+import { useNavigate } from 'react-router-dom'
 
 export function Home () {
-	
-	const [ user, setUser ] = useState('username');
+
+	const navigate = useNavigate();
 	const [ cookies ] = useCookies();
+	const [ user, setUser ] = useState('username');
 	
 	useEffect( () => {
-		if (cookies.access_token === 'undefined') {
-			setUser('Go check your mails to login.')
-			return ;
-		}
-		const config = {
+		const API_URL = "http://localhost:3000"
+		const jwtToken = cookies.access_token;
+		const jwtConfig = {
 			headers: {
-				Authorization: `Bearer ${cookies.access_token}`,
-			},
-		};
-		axios.get('http://localhost:3000/user/me', config)
-			.then((res) => {
-				setUser(res.data.login);
-			});
+				Authorization: `Bearer ${jwtToken}`,
+			}
+		}
+		axios.get(API_URL + "/user/me", jwtConfig)
+		.then((res) => {
+			setUser (res.data.login);
+		})
+		.catch(() => {
+			navigate('/');
+		});
 	}, []);
+
 
 	return (
 		<div>
@@ -29,3 +34,4 @@ export function Home () {
 		</div>
 	)
 }
+
