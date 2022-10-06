@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { useCookies } from "react-cookie";
 import axios from 'axios'
+import { AxiosJwt } from "../hooks/AxiosJwt";
 
 export function Navbar() {
 
@@ -15,26 +16,14 @@ export function Navbar() {
 		createdAt: string;
 	}
 
-	const [cookies] = useCookies();
-
-
-	const [user, setUser] = useState({ login: 'username', username: 'test', createdAt: '' });
-	const [achievement, setAchievment] = useState('')
+	const [user, setUser] = useState('username');
+	const request = AxiosJwt();
 
 	useEffect(() => {
-		if (cookies.access_token === 'undefined') {
-			setUser({ login: 'Go check your mails to login.', username: 'default', createdAt: '' })
-			return;
-		}
-		const config = {
-			headers: {
-				Authorization: `Bearer ${cookies.access_token}`,
-			},
-		};
-		axios.get('http://localhost:3000/user/me', config)
+		request.get("/user/me")
 			.then((res) => {
 				setUser(res.data.login);
-			});
+			})
 	}, []);
 
 	const [toggleMenu, setToggleMenu] = useState(false);
@@ -76,13 +65,13 @@ export function Navbar() {
 						</NavLink>
 					</li>
 					<li className="items">
-						<NavLink to='/' className='links'>
+						<NavLink to='/home' className='links'>
 							Home
 						</NavLink>
 					</li>
 					<li className="items">
 						<NavLink to='/profile/:id' className='links'>
-							{user.login}
+							{user}
 						</NavLink>
 					</li>
 					<div className="items_r">
@@ -102,8 +91,13 @@ export function Navbar() {
 							</NavLink>
 						</li>
 					</div>
+					<div className="user_log">
+						<div className="avatar">
+							<FaUserCircle />
+						</div>
+						{user}
+					</div>
 				</ul >
-
 			)
 			}
 			<button onClick={toggleNavResponsive} className="btn">BTN</button>

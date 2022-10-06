@@ -102,6 +102,9 @@ a:hover span:nth-child(4) {
 }
 
 .navbar {
+	position: fixed;
+	top: 0;
+	width: 100%;
 	height: 50px;
 	background: linear-gradient(45deg, #020912, #091720);
 	border-bottom: 2px solid #16222a;
@@ -159,10 +162,24 @@ a:hover span:nth-child(4) {
 	display: flex;
 	color: #f1f1f1;
 	cursor: pointer;
+	margin-right: 25px;
 }
 
 .btn {
 	display: none;
+}
+
+.user_log {
+	color: #fff;
+	width: 220px;
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+.avatar {
+	width: 50px;
+	animation:
 }
 
 @media screen and (max-height: 700px) {
