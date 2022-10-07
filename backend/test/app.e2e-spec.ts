@@ -36,6 +36,7 @@ describe('App e2e', () => {
 			const user: User = await prisma.user.create({
 				data: {
 					login: login,
+					username: login,
 					email: email,
 				},
 			});
@@ -640,7 +641,17 @@ describe('App e2e', () => {
 		describe('Retrieve GET /discussion/', () => {
 			console.log(prisma);
 			// seedDiscussions(userArr);
-			it('HAS DISCUSSIONS', () => {
+			it('VALID - HAS DISCUSSIONS - should return 200', () => {
+				return pactum
+				.spec()
+				.get('/discussion')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.expectStatus(200)
+				.expectBodyContains(dummyUser.id)
+				.inspect();
+
 			});
 
 		});	// DESCRIVE (DISCUSSION/RETRIEVE)

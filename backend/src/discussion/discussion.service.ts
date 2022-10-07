@@ -10,16 +10,31 @@ export class DiscussionService {
         private prisma: PrismaService
     ) {}
 
-    async create(userId: number, dto: CreateDiscussionDto) : Promise<Discussion> {
-        if (await this.exists(userId, dto.user2Id) === true)
+    // POST /discussion/create
+    async create(currentUserId: number, dto: CreateDiscussionDto) : Promise<Discussion> {
+        if (await this.exists(currentUserId, dto.user2Id) === true)
             throw new HttpException('Discussion already exists', 400); 
         const discussion = await this.prisma.discussion.create({
             data: {
-                user1Id: userId,
+                user1Id: currentUserId,
                 user2Id: dto.user2Id,
             }
         });
         return discussion;
+    }
+
+    // GET /discussion
+    async getDiscussions(currentUserId: number) : Promise<Discussion[]> {
+        const discussions: Discussion[] = await this.prisma.discussion.findMany({
+            where: {
+                OR: [ { user1Id: currentUserId }, { user2Id: currentUserId } ]
+            },
+            include: {
+                user1: { select: { username: true, /*avatar: true,*/ } },
+                user2: { select: { username: true, /*avatar: true,*/ } }
+            }
+        }); 
+        return discussions;
     }
 
     async exists(user1Id: number, user2Id: number) : Promise<boolean> {
@@ -30,7 +45,7 @@ export class DiscussionService {
                 ]}
         });
         if (search.length === 0)
-            return false;
+            return (false);
         return (true);
     }
 }

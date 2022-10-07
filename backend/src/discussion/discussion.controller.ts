@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
@@ -13,7 +13,12 @@ export class DiscussionController {
     ) {}
 
     @Post('create')
-    create(@GetUser('id') userId: number, @Body() dto: CreateDiscussionDto) {
-        return this.discService.create(userId, dto);
+    create(@GetUser('id') currentUserId: number, @Body() dto: CreateDiscussionDto, ) {
+        return this.discService.create(currentUserId, dto);
+    }
+
+    @Get()
+    getDiscussions(@GetUser('id') currentUserId: number) {
+        return this.discService.getDiscussions(currentUserId);
     }
 }
