@@ -6,16 +6,12 @@ import bg_welcomer from '../assets/video/bg_welcomer_loop.webm'
 const Welcomer = () => {
 
 
-
 	return (
 		<div>
-			<video src={bg_welcomer} loop autoPlay>
-
-			</video>
-
+			<video src={bg_welcomer}  autoPlay loop muted className='bg_video' />
 			<nav className="login-container">
 				<a href="http://localhost:3000/auth/signin">
-					<button>LOGIN</button>
+					<button className='login-btn'>LOGIN</button>
 				</a>
 			</nav>
 		</div>
