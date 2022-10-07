@@ -1,0 +1,30 @@
+.bg_video {
+	width: 111vw;
+	height: 100vh;
+	object-fit: cover;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: -1;
+}
+
+.login-container {
+	width: 500px;
+	height: 100vh;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background-color: rgba(255, 255, 255, 0.514);
+	border: 1px solid black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.login-btn {
+	height: 40px;
+	width: 100px;
+}

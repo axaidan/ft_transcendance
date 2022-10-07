@@ -1,0 +1,33 @@
+.container-profile {
+}
+
+.container-info-profile {
+	display: flex;
+}
+
+.container-history {
+	width: 600px;
+	border: 1px solid black;
+}
+
+.li-game {
+	margin: 15px;
+	display: flex;
+	justify-content: space-around;
+}
+
+
+.container-nav-option {
+	display: flex;
+	width: calc(100vw - 220px);
+	justify-content: space-between;
+	align-items: center;
+}
+
+
+.btn-friend, .btn-block {
+	height: 30px;
+	width: 30px;
+	margin-right: 15px;
+
+}
