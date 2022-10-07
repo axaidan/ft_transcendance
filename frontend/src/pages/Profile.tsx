@@ -14,7 +14,10 @@ export function Profile() {
 
 	useEffect(() => {
 		axios.get('/user/' + id)
-		.catch(() => { navigate('/home'); });
+		.then( (res) => {
+			if (!res.data)
+				navigate('/404');
+		})
 	}, [history]);
 
 	return (

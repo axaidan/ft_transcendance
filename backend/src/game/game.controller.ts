@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
 import { GameService } from "./game.service";
 import { Game } from "@prisma/client";
 import { CreateGameDto, HistoriqueDto } from "./dto";
@@ -15,9 +15,9 @@ export class GameController {
 		}
 	
 
-    @Get('historique')
-    async historique(@Body() dto: HistoriqueDto){
-        return this.gameService.historique(dto.userId);
+    @Get('historique/:id')
+    async historique(@Param('id', ParseIntPipe) userId: number){
+        return this.gameService.historique( userId );
     }
 
     async createGame(@Body() dto: CreateGameDto) {

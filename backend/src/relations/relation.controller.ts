@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
@@ -11,15 +11,14 @@ import { domainToASCII } from "url";
 export class RelationController {
 	constructor(private relationService: RelationService) {}
 
-
-	@Post('add_friend')
-	add_friend(@GetUser('id') meId: number, @Body() dto: TargetDto){
-		return this.relationService.add_friend(meId, dto.userId);
+	@Get('add_friend/:id')
+	add_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number){
+		return this.relationService.add_friend(meId, cible_id);
 	}
 
-	@Post('remove_friend')
-	remove_friend(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.remove_friend(meId, dto.userId);
+	@Get('remove_friend/:id')
+	remove_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number) {
+		return this.relationService.remove_friend(meId, cible_id);
 	}
 	
 	@Post('block_user')

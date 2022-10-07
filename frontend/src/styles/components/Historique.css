@@ -1,0 +1,27 @@
+.container-history {
+	width: 600px;
+	border: 1px solid black;
+}
+
+.li-game {
+	margin: 15px;
+	display: grid;
+	justify-content: space-between;
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 10px;
+}
+
+.container-score {
+	display: flex;
+	justify-content: space-around;
+}
+
+.center_box {
+	display: flex;
+	justify-content: center;
+	text-decoration: none;
+}
+
+.center_box:hover, .center_box:visited {
+	color: currentColor;
+}
