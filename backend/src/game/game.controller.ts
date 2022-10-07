@@ -1,15 +1,15 @@
 import { Body, Controller, Get } from "@nestjs/common";
 import { GameService } from "./game.service";
 import { Game } from "@prisma/client";
-import { CreateGameDto } from "./dto";
+import { CreateGameDto, HistoriqueDto } from "./dto";
 
 @Controller('game')
 export class GameController {
     constructor (private gameService: GameService) {}
 
     @Get('historique')
-    async historique(@Body() {userId}) : Promise<Game[]>  {
-        return this.gameService.historique(userId);
+    async historique(@Body() dto: HistoriqueDto){
+        return this.gameService.historique(dto.userId);
     }
 
     async createGame(@Body() dto: CreateGameDto) {

@@ -17,3 +17,10 @@ export class CreateGameDto {
     @IsNumber()
     score2: number;
 }
+
+export class HistoriqueDto {
+	@IsNotEmpty()
+	@IsNumber()
+	userId: number;
+
+}
