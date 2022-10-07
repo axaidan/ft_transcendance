@@ -16,5 +16,6 @@ export const AxiosJwt = () => {
         post: (url: string, data = {}, options = {}) => axios.post(API_URL + url, data, { ...defaultOptions, ...options }),
         put: (url: string, data: string, options = {}) => axios.put(API_URL + url, data, { ...defaultOptions, ...options }),
         delete: (url: string, options = {}) => axios.delete(API_URL + url, { ...defaultOptions, ...options }),
+		patch: (url: string, options = {}) => axios.delete(API_URL + url, { ...defaultOptions, ...options }),
     };
 };
