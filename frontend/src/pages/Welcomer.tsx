@@ -5,7 +5,6 @@ import bg_welcomer from '../assets/video/bg_welcomer_loop.webm'
 
 const Welcomer = () => {
 
-
 	return (
 		<div>
 			<video src={bg_welcomer}  autoPlay loop muted className='bg_video' />

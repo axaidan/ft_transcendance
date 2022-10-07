@@ -50,14 +50,13 @@ export class RelationService{
 		for (let friend in friends) {
 			userArr.push(friends[friend].userIWatch);
 		}
-		console.log(userArr);
 		return userArr;
 	}		
 
 		/* block_user*/ 
-	async block_user(meId: number, userId: string) {
+	async block_user(meId: number, userId: number) {
 		
-		var blockId = parseInt(userId, 10);
+		var blockId = userId; 
 		
 		var findMe = this.prisma.user.findFirst({where: {id: meId}});
 		var findTarget= this.prisma.user.findFirst({where: {id: blockId}});
@@ -75,9 +74,7 @@ export class RelationService{
 			},
 		})
 		if (relation) {
-			console.log("relation existante");
 			if (relation.isBlock === 1) {
-				console.log("user already block")
 				return 0;
 			}
 			else {
@@ -109,42 +106,41 @@ export class RelationService{
 	}
 
 		/* unblock_user*/ 
-	async unblock_user(meId: number, userId: string) {
-		var targetId = parseInt(userId, 10);
+	async unblock_user(meId: number, userId: number) {
+		var targetId = userId;
 
-		var findMe = this.prisma.user.findFirst({where: {id: meId}});
-		var findTarget= this.prisma.user.findFirst({where: {id: targetId}});
+		var findMe = await this.prisma.user.findFirst({where: {id: meId}});
+		var findTarget= await this.prisma.user.findFirst({where: {id: targetId}});
 
 		if (!findMe) {
-			throw new ForbiddenException("me not exist");
+			throw new ForbiddenException("me not exist")
 		}
-
 		if (!findTarget) {
-			throw new ForbiddenException("user you looking for doesn't exist");
+			throw new ForbiddenException("user you looking for doesn't exist")
 		}
-
+		console.log("test unbvlovk user");
 		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
 		if (relation) {
 			if (relation.isBlock === 1)	{
 				if (relation.relation === 1) {
 					let updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data : {isBlock: 0}})
-					return ;
+					return updateRelation;
 				}
 				const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}});
-				return ;
+				return deleteRelation;
 			}
 			else 
-				return ;
+				return relation;
 		}
 		else {
-			return ;
+			return relation;
 		}
 		
 	}
 
 		/* add_friend*/ 
-	async add_friend(meId: number, userId: string) {
-		var friendId = parseInt(userId, 10);
+	async add_friend(meId: number, userId: number) {
+		var friendId = userId;
 
 			let findMe = await this.prisma.user.findFirst({where: {id: meId}});
 
@@ -158,13 +154,10 @@ export class RelationService{
 		let relation = await this.prisma.relation.findFirst({where: {me: findMe, userIWatch: findNewFriend}});
 
 		if (relation) {
-			console.log('relation deja creer');
 			if (relation.relation === 1){
-				console.log('deja ami');
 				return relation;
 			}
 			else {
-				console.log("update de la relation");
 				const updateRelation = await this.prisma.relation.update({where: {id: relation.id}, 
 				data: {
 					relation: 1,
@@ -183,11 +176,9 @@ export class RelationService{
 			catch (e) {
 				throw new ForbiddenException('error');
 				}
-			console.log("je creer la relation");
 			var num = meId.toString();
 			let curlyAchiv = await this.achivService.findUserForAchivId(num, "4")
 			if (!curlyAchiv) {
-				console.log("je go faire l'achiv");
 				this.achivService.updateAchiv(num, "4");
 			}
 			return newRelation;
@@ -195,8 +186,8 @@ export class RelationService{
 	}
 
 	/* remove_friend */
-	async remove_friend(meId: number, userId: string) {
-		let friendId = parseInt(userId, 10);
+	async remove_friend(meId: number, userId: number) {
+		let friendId = userId;
 
 		let findMe = await this.prisma.user.findFirst({where: {id: meId} })
 		let findFriend = await this.prisma.user.findFirst({where: {id: friendId}})
@@ -212,15 +203,15 @@ export class RelationService{
 			if (relation.relation === 1){
 				if (relation.isBlock === 1) {
 					var updateRelation = await this.prisma.relation.update({where: {id: relation.id}, data: {relation: 0}})
-					return ;
+					return updateRelation;
 				}
 				else {
 					const deleteRelation = await this.prisma.relation.delete({where: {id: relation.id}})
-					return ;
+					return deleteRelation;
 				}
 			}
 		}
-		return ;	
+		return relation;	
 
 	}
 

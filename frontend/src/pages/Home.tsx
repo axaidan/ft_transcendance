@@ -23,7 +23,9 @@ export function Home() {
 		<div>
 			<Navbar />
 			<Friendsbar />
-			<h1>{user}</h1>
+			<div className='container-home'>
+			
+			</div>
 		</div>
 	)
 }

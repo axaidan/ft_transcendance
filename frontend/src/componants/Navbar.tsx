@@ -18,10 +18,12 @@ export function Navbar() {
 	const [user, setUser] = useState({ login: 'username', username: 'test', createdAt: '' });
 	const [achievement, setAchievment] = useState('')
 
+	console.log(user);
+
 	useEffect(() => {
 		axios.get('http://localhost:3000/user/me')
 			.then((res) => {
-				setUser(res.data.login);
+				setUser(res.data);
 			});
 	}, []);
 
@@ -69,7 +71,7 @@ export function Navbar() {
 						</NavLink>
 					</li>
 					<li className="items">
-						<NavLink to='/profile/:id' className='links'>
+						<NavLink to={'/profile/1' } className='links'>
 							{user.login}
 						</NavLink>
 					</li>
