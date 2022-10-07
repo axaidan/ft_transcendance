@@ -7,6 +7,7 @@ import { MailModule } from './mail/mail.module';
 import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
+import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 
 @Module({
 	imports: [
@@ -20,6 +21,7 @@ import { DiscussionModule } from './discussion/discussion.module';
 		AchivModule,
 		RelationModule,
 		DiscussionModule,
+		DiscussionMessageModule,
 	]
 })
 export class AppModule {}

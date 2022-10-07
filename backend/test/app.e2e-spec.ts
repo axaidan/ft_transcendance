@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { User } from '@prisma/client';
+import { Discussion, User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,7 +8,7 @@ import { DiscussionService } from 'src/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
-import { CreateDiscussionDto } from 'src/discussion/dto/index';
+import { DiscussionDto } from 'src/discussion/dto/index';
 
 const N = 20;
 
@@ -25,6 +25,7 @@ describe('App e2e', () => {
 	let angelUser: User
 	let userArr: User[] = [];
 	let jwtArr: {access_token: string}[] = [];
+	let discArr: Discussion[];
 
 	const seedUsers = async function() {
 		const name: string = "user";
@@ -61,31 +62,58 @@ describe('App e2e', () => {
 	// user[0 - 9)] ALL HAVE DISCUSSIONS
 	// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
 		let i = 1;
+		let arr: Discussion[] = [];
+		let disc: Discussion;
 		for ( ; i < 2 ; i++) {
-			const discussion = await prisma.discussion.create({
+			disc = await prisma.discussion.create({
 				data: {
 					user1Id: dummyUser.id, 
 					user2Id: users[i].id,
 				}
 			});
+			arr.push(disc);
 		}
 		for ( ; i < 5 ; i++) {
-			await prisma.discussion.create({
+			disc = await prisma.discussion.create({
 				data: {
 					user1Id: users[i].id,
 					user2Id: dummyUser.id, 
 				}
 			});
+			arr.push(disc);
 		}
 		for ( ; i < N / 2 ; i++) {
-			await prisma.discussion.create({
+			disc = await prisma.discussion.create({
 				data: {
 					user1Id: users[i].id,
 					user2Id: users[i - 1].id
 				}
 			});
+			arr.push(disc);
 		}
+		return arr;
+	}
 
+	const seedDiscussionMessages = async function(users: User[]) {
+		// 5 MESSAGES dummyUser => user0
+		for (let i = 0 ; i < 5 ; i++) {
+			await prisma.discussionMessage.create({
+				data: {
+					userId: dummyUser.id,
+					discussionId: discArr[0].id,
+					text: "message from dummy " + i,
+				}
+			});
+		}
+		for (let i = 0 ; i < 5 ; i++) {
+			await prisma.discussionMessage.create({
+				data: {
+					userId: userArr[1].id,
+					discussionId: discArr[0].id,
+					text: "message from user1 " + i,
+				}
+			});
+		}
 	}
 
 	beforeAll(async () => {
@@ -108,19 +136,20 @@ describe('App e2e', () => {
 		// DUMMY USER AND JWT INIT
 		dummyUser = await prisma.user.create({
 			data: {
-			login: 'dummy',
-			username: 'dummy',
-			email: 'dummy@student.42.fr',
+				login: 'dummy',
+				username: 'dummy',
+				email: 'dummy@student.42.fr',
 			}
-		}
-		);
+		});
 
 		// USER ARRAY SEED
 		userArr = await seedUsers();
 		// CURRENT USERS JWTs SEED
 		jwtArr = await seedJwts(userArr)
 		// DISCUSSIONS SEED
-		seedDiscussions(userArr);
+		discArr = await seedDiscussions(userArr);
+		// DISCUSSION MESSAGES SEED
+		seedDiscussionMessages(userArr);
 
 		dummyJwt = await authService.signToken(dummyUser.id, dummyUser.login);
 		// SET baseUrl FOR PACTUM
@@ -507,11 +536,11 @@ describe('App e2e', () => {
 			.spec()
 			.patch('/user')
 			.withHeaders({
-			Authorization: `Bearer ${dummyJwt.access_token}`,
+				Authorization: `Bearer ${dummyJwt.access_token}`,
 			})
 			.withBody(dto)
 			.expectStatus(400)
-			.inspect();
+			// .inspect();
 			// .expectBodyContains('null');
 		});
 
@@ -593,7 +622,7 @@ describe('App e2e', () => {
 		describe('Create POST /discussion/create', () => {
 			it('VALID - should 201', () => {
 				const userId = userArr[0].id;
-				const dto: CreateDiscussionDto = {
+				const dto: DiscussionDto = {
 					user2Id: userId,
 				};
 				return pactum
@@ -647,7 +676,7 @@ describe('App e2e', () => {
 
 			it('NO JWT - should 401', () => {
 				const userId = userArr[0].id;
-				const dto: CreateDiscussionDto = {
+				const dto: DiscussionDto = {
 					user2Id: userId,
 				};
 				return pactum
@@ -663,7 +692,7 @@ describe('App e2e', () => {
 			
 			it('ALREADY EXISTS - should 400', () => {
 				const userId = userArr[0].id;
-				const dto: CreateDiscussionDto = {
+				const dto: DiscussionDto = {
 					user2Id: userId,
 				};
 				return pactum
@@ -741,6 +770,47 @@ describe('App e2e', () => {
 			});
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
+
+		describe('Retrieve Msgs GET /discussion/:id', () => {
+			it('VALID - NO MSGS', () => {
+				return pactum
+				.spec()
+				.get(`/discussion/${dummyUser.id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(200)
+				.expectBodyContains([])
+				.expectJsonLength(0)
+				// .inspect()
+			});
+
+			it('VALID - HAS MSGS', () => {
+				return pactum
+				.spec()
+				.get(`/discussion/${dummyUser.id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectStatus(200)
+				.expectJsonLength(10)
+				// .inspect()
+			});
+
+			it('VALID - NO CONV - should 200 EMPTY ARR', () => {
+				return pactum
+				.spec()
+				.get(`/discussion/${dummyUser.id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[10].access_token}`,
+				})
+				.expectStatus(200)
+				.expectJsonLength(0)
+				// .inspect()
+			});
+		}); // DESCRIBE (DISCUSSION/:ID)
+
+
 
 	});	// DESCRIBE(DISCUSSION)
 

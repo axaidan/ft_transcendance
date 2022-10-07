@@ -31,7 +31,7 @@ model User {
 
 	discussion1 Discussion[] @relation("discussion1")
 	discussion2 Discussion[] @relation("discussion2")
-	// discussionMsgs DiscussionMessages[] @relation("discussionMsgs")
+	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
     @@map("user")
 }
@@ -55,23 +55,23 @@ model Discussion {
 	user1		User @relation(name: "discussion1", fields: [user1Id], references: [id], onDelete: Cascade)
 	user2		User @relation(name: "discussion2", fields: [user2Id], references: [id], onDelete: Cascade)
 	
-	// messages	DiscussionMessage[]
+	messages	DiscussionMessage[]
 
 	@@map("discussion")
 }
 
-// model DiscussionMessage {
-// 	id				Int @id @default(autoincrement())
-// 	createdAt		DateTime @default(now())
-// 	text			String
-// 	userId			Int
- // 	discussionId	Int
+model DiscussionMessage {
+	id				Int @id @default(autoincrement())
+	createdAt		DateTime @default(now())
+	text			String
+	userId			Int
+ 	discussionId	Int
 
-// 	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
-// 	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
+	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
 
-// 	@@map("discussionMsg")
-// }
+	@@map("discussionMessage")
+}
 
 model Relation {
 	id Int @id @default(autoincrement())

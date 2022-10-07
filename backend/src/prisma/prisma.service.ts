@@ -21,6 +21,6 @@ export class PrismaService extends PrismaClient {
 			this.relation.deleteMany(),
 			this.game.deleteMany(),
 			this.user.deleteMany(),
-		])
+		]);
 	}
 }

@@ -1,6 +1,6 @@
 import { IsInt } from "class-validator";
 
-export class CreateDiscussionDto {
+export class DiscussionDto {
 
     @IsInt()
     user2Id: number;
