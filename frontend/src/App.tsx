@@ -4,8 +4,6 @@ import { Home, Login, Profile, Ladder } from "./pages";
 import ErrorPages from "./pages/ErrorPages";
 import Welcomer from "./pages/Welcomer";
 
-
-
 export default function App() {
 	return (
 		<div>

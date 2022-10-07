@@ -1,34 +1,35 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
-import './Profile.css';
+import { AxiosJwt } from '../hooks/AxiosJwt'
 import { useParams } from "react-router";
+import { Navbar, Friendsbar, NavOption, History } from '../componants'
+import { useNavigate, useLocation } from "react-router-dom";
+import '../styles/pages/Profile.css'
 
-export function Idcard () {
+export function Profile() {
+    const history = useLocation()
+	const axios = AxiosJwt();
+	const navigate = useNavigate();
+	const { id } = useParams<string>();
+	const userId = parseInt(id!);
+
+	useEffect(() => {
+		axios.get('/user/' + id)
+		.then( (res) => {
+			if (!res.data)
+				navigate('/404');
+		})
+	}, [history]);
+
 	return (
-		<div>
-			<div className='photo'>
-				<img alt='0' src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/42_Logo.svg/2048px-42_Logo.svg.png"/>
+		<>
+			<Navbar />
+			<Friendsbar />
+			<div className='container-profile'>
+				<NavOption userId={ userId }/>
+				<div className='container-info-profile'>
+					<History userId={ userId } />
+				</div>
 			</div>
-		</div>
-	)
-}
-
-export function Profile () {
-
-	const [ user, setUser ] = useState('username');
-	const { id } = useParams();
-
-	console.log(id);
-
-	useEffect( () => {
-		axios.get('http://localhost:3000/user/' + id)
-			.then((res) => setUser(res.data.login))
-	}, []);
-
-	return (
-		<div className='profile'>
-			<Idcard />
-			<div>{user}</div>
-		</div>
+		</>
 	)
 }
