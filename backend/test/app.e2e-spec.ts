@@ -1,94 +1,94 @@
-	import { INestApplication, ValidationPipe } from '@nestjs/common';
-	import { Test } from '@nestjs/testing';
-	import { User } from '@prisma/client';
-	import * as pactum from 'pactum';
-	import { AuthService } from 'src/auth/auth.service';
-	import { PrismaService } from 'src/prisma/prisma.service';
-	import { DiscussionService } from 'src/discussion/discussion.service';
-	import { UserService } from '../src/users/users.service';
-	import { AppModule } from '../src/app.module';
-	import { EditUserDto } from 'src/users/dto/edit-user.dto';
-	import { CreateDiscussionDto } from 'src/discussion/dto/index';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { User } from '@prisma/client';
+import * as pactum from 'pactum';
+import { AuthService } from 'src/auth/auth.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { DiscussionService } from 'src/discussion/discussion.service';
+import { UserService } from '../src/users/users.service';
+import { AppModule } from '../src/app.module';
+import { EditUserDto } from 'src/users/dto/edit-user.dto';
+import { CreateDiscussionDto } from 'src/discussion/dto/index';
 
-	const N = 20;
+const N = 20;
 
-	describe('App e2e', () => {
-		let app: INestApplication;
-		let prisma: PrismaService;
-		let authService: AuthService;
-		let discService: DiscussionService;
-		
-		let dummyJwt: {access_token: string};
-		let dummyUser: User
-		let kyleUser: User 
-		let hugoUser: User
-		let angelUser: User
-		let userArr: User[] = [];
-		let jwtArr: {access_token: string}[] = [];
+describe('App e2e', () => {
+	let app: INestApplication;
+	let prisma: PrismaService;
+	let authService: AuthService;
+	let discService: DiscussionService;
+	
+	let dummyJwt: {access_token: string};
+	let dummyUser: User
+	let kyleUser: User 
+	let hugoUser: User
+	let angelUser: User
+	let userArr: User[] = [];
+	let jwtArr: {access_token: string}[] = [];
 
-		const seedUsers = async function() {
-			const name: string = "user";
-			const userArr: User[] = [];
+	const seedUsers = async function() {
+		const name: string = "user";
+		const userArr: User[] = [];
 
-			for (let i = 0 ; i < N ; i++) {
-				const login: string = name + `${i}`;
-				const email: string = login + '@student.42.fr';
-				const user: User = await prisma.user.create({
-					data: {
-						login: login,
-						username: login,
-						email: email,
-					},
-				});
-				userArr.push(user);
-			}
-			return userArr;
+		for (let i = 0 ; i < N ; i++) {
+			const login: string = name + `${i}`;
+			const email: string = login + '@student.42.fr';
+			const user: User = await prisma.user.create({
+				data: {
+					login: login,
+					username: login,
+					email: email,
+				},
+			});
+			userArr.push(user);
+		}
+		return userArr;
+	}
+
+	const seedJwts = async function(users: User[]) : Promise<{access_token: string}[]>{
+		const jwts: {access_token: string}[] = [];
+
+		for (let i = 0 ; i < N ; i++) {
+			const jwt = await authService.signToken(users[i].id, users[i].login);
+			jwts.push(jwt);
+		}
+		return jwts;
+	}
+
+	const seedDiscussions = async function(users: User[]) {
+	// FOR N === 20
+	// dummyUser HAS 5 Discussion, 3 WHERE user1Id, 2 WHERE user2Id
+	// user[0 - 9)] ALL HAVE DISCUSSIONS
+	// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
+		let i = 1;
+		for ( ; i < 2 ; i++) {
+			const discussion = await prisma.discussion.create({
+				data: {
+					user1Id: dummyUser.id, 
+					user2Id: users[i].id,
+				}
+			});
+		}
+		for ( ; i < 5 ; i++) {
+			await prisma.discussion.create({
+				data: {
+					user1Id: users[i].id,
+					user2Id: dummyUser.id, 
+				}
+			});
+		}
+		for ( ; i < N / 2 ; i++) {
+			await prisma.discussion.create({
+				data: {
+					user1Id: users[i].id,
+					user2Id: users[i - 1].id
+				}
+			});
 		}
 
-		const seedJwts = async function(users: User[]) : Promise<{access_token: string}[]>{
-			const jwts: {access_token: string}[] = [];
+	}
 
-			for (let i = 0 ; i < N ; i++) {
-				const jwt = await authService.signToken(users[i].id, users[i].login);
-				jwts.push(jwt);
-			}
-			return jwts;
-		}
-
-		const seedDiscussions = async function(users: User[]) {
-		// FOR N === 20
-		// dummyUser HAS 5 Discussion, 3 WHERE user1Id, 2 WHERE user2Id
-		// user[0 - 9)] ALL HAVE DISCUSSIONS
-		// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
-			let i = 1;
-			for ( ; i < 2 ; i++) {
-				const discussion = await prisma.discussion.create({
-					data: {
-						user1Id: dummyUser.id, 
-						user2Id: users[i].id,
-					}
-				});
-			}
-			for ( ; i < 5 ; i++) {
-				await prisma.discussion.create({
-					data: {
-						user1Id: users[i].id,
-						user2Id: dummyUser.id, 
-					}
-				});
-			}
-			for ( ; i < N / 2 ; i++) {
-				await prisma.discussion.create({
-					data: {
-						user1Id: users[i].id,
-						user2Id: users[i - 1].id
-					}
-				});
-			}
-
-		}
-
-		beforeAll(async () => {
+	beforeAll(async () => {
 			const moduleRef = await Test.createTestingModule({
 			imports: [AppModule],
 			}).compile();
