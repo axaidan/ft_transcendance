@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { DiscussionService } from 'src/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
@@ -15,13 +16,15 @@ describe('App e2e', () => {
 	let app: INestApplication;
 	let prisma: PrismaService;
 	let authService: AuthService;
+	let discService: DiscussionService;
 	
 	let dummyJwt: {access_token: string};
-	let kyleUser: User 
 	let dummyUser: User
+	let kyleUser: User 
 	let hugoUser: User
 	let angelUser: User
 	let userArr: User[] = [];
+	let jwtArr: {access_token: string}[] = [];
 
 	const seedUsers = async function() {
 		const name: string = "user";
@@ -39,6 +42,50 @@ describe('App e2e', () => {
 			userArr.push(user);
 		}
 		return userArr;
+	}
+
+	const seedJwts = async function(users: User[]) : Promise<{access_token: string}[]>{
+		const jwts: {access_token: string}[] = [];
+
+		for (let i = 0 ; i < N ; i++) {
+			const jwt = await authService.signToken(users[i].id, users[i].login);
+			jwts.push(jwt);
+		}
+		return jwts;
+	}
+
+
+	const seedDiscussions = async function(users: User[]) {
+	// FOR N === 20
+	// dummyUser HAS 5 Discussion, 3 WHERE user1Id, 2 WHERE user2Id
+	// user[0 - 9)] ALL HAVE DISCUSSIONS
+	// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
+		let i = 1;
+		for ( ; i < 3 ; i++) {
+			const discussion = await prisma.discussion.create({
+				data: {
+					user1Id: dummyUser.id, 
+					user2Id: users[i].id,
+				}
+			});
+		}
+		for ( ; i < 5 ; i++) {
+			await prisma.discussion.create({
+				data: {
+					user1Id: users[i].id,
+					user2Id: dummyUser.id, 
+				}
+			});
+		}
+		for ( ; i < N / 2 ; i++) {
+			await prisma.discussion.create({
+				data: {
+					user1Id: users[i].id,
+					user2Id: users[i - 1].id
+				}
+			});
+		}
+
 	}
 
 	beforeAll(async () => {
@@ -59,243 +106,247 @@ describe('App e2e', () => {
     await prisma.cleanDb();
 
 	// DUMMY USER AND JWT INIT
-    const	dummyUser = await prisma.user.create({
+    dummyUser = await prisma.user.create({
         data: {
           login: 'dummy',
           email: 'dummy@student.42.fr',
         }
       }
     );
-	// USER ARRAY
+
+	// USER ARRAY SEED
 	userArr = await seedUsers();
-
-
-	const kyleUser = await prisma.user.create({
-		data: {
-			login: 'kyle',
-			email: 'kyle@student.42.fr'
-		}
-	  }
-	);
- 
-	const hugoUser = await prisma.user.create({
-		data: {
-			login: 'hugo',
-			email: 'hugo@student.42.fr'
-		}
-	  }
-	);  
-	
-	const angelUser = await prisma.user.create({
-		data: {
-			login: 'angel',
-			email: 'angel@student.42.fr'
-		}
-	  }
-	);
-
-
-
-
-	const achiv = await prisma.achievement.upsert({
-		where: {title: '10 in a raw'},
-		update: {}, 
-		create: {
-			title: '10 in a raw',
-			descriptions: 'you play 10 game in a raw',
-		},
-	})
-
-	const achiv1 = await prisma.achievement.upsert({
-		where: {title: 'login'},
-		update: {}, 
-		create: {
-			title: 'login',
-			descriptions: 'you log for the first time',
-		},
-	})
-
-	const achiv2 = await prisma.achievement.upsert({
-		where: {title: 'first win'},
-		update: {}, 
-		create: {
-			title: 'first win',
-			descriptions: 'gg well played',
-		},
-	})
-
-	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'un curly'},
-		update: {}, 
-		create: {
-			title: 'tiens un curly',
-			descriptions: 'tu as ajouter ton premier ami',
-		},
-	})
-
-	const game1 = await prisma.game.upsert({
-		where: {id:1},
-		update: {},
-		create: {
-				player1Id: 1,
-				score1: 2,
-				player2Id: 2,
-				score2: 3,
-		},
-	})
-
-	const game2 = await prisma.game.upsert({
-		where: {id:2},
-		update: {},
-		create: {
-				player1Id: 1,
-				score1: 2,
-				player2Id: 3,
-				score2: 3,
-		},
-	})
-
-	const game3 = await prisma.game.upsert({
-		where: {id:3},
-		update: {},
-		create: {
-				player1Id: 2,
-				score1: 2,
-				player2Id: 3,
-				score2: 3,
-		},
-	})
-
-	const game4 = await prisma.game.upsert({
-		where: {id:4},
-		update: {},
-		create: {
-				player1Id: 1,
-				score1: 3,
-				player2Id: 3,
-				score2: 1,
-		},
-	})
-
-	const game5 = await prisma.game.upsert({
-		where: {id:5},
-		update: {},
-		create: {
-				player1Id: 2,
-				score1: 2,
-				player2Id: 3,
-				score2: 1,
-		},
-	})
-
-	const game6 = await prisma.game.upsert({
-		where: {id:6},
-		update: {},
-		create: {
-				player1Id: 4,
-				score1: 3,
-				player2Id: 2,
-				score2: 1,
-		},
-	})
-
-	const game7 = await prisma.game.upsert({
-		where: {id:7},
-		update: {},
-		create: {
-				player1Id: 2,
-				score1: 1,
-				player2Id: 4,
-				score2: 3,
-		},
-	})
-
-	const friend1 = await prisma.relation.upsert({
-		where : {id: 1},
-		update: {},
-		create: {
-			userId: 1 ,
-			userIWatchId: 2,
-			relation: 1,
-		},
-	})
-
-	const friend2 = await prisma.relation.upsert({
-		where : {id: 2},
-		update: {},
-		create: {
-			userId: 1 ,
-			userIWatchId: 3,
-			relation: 1,
-		},
-	})
-
-	const friend3 = await prisma.relation.upsert({
-		where : {id: 3},
-		update: {},
-		create: {
-			userId: 1 ,
-			userIWatchId: 4,
-			relation: 1,
-		},
-	})
-
-	const friend4 = await prisma.relation.upsert({
-		where : {id: 4},
-		update: {},
-		create: {
-			userId: 4 ,
-			userIWatchId: 1,
-			relation: 1,
-		},
-	})
-
-	const friend5 = await prisma.relation.upsert({
-		where : {id: 5},
-		update: {},
-		create: {
-			userId: 4 ,
-			userIWatchId: 2,
-			relation: 1,
-		},
-	})
-
-	const friend6 = await prisma.relation.upsert({
-		where : {id: 6},
-		update: {},
-		create: {
-			userId: 3 ,
-			userIWatchId: 4,
-			relation: 1,
-		},
-	})
-
-	const friend7 = await prisma.relation.upsert({
-		where : {id: 7},
-		update: {},
-		create: {
-			userId: 3 ,
-			userIWatchId: 2,
-			relation: 1,
-		},
-	})
-
-	const block8 = await prisma.relation.upsert({
-		where : {id: 8},
-		update: {},
-		create: {
-			userId: 4 ,
-			userIWatchId: 3,
-			relation: 2,
-		},
-	})
-
+	// CURRENT USERS JWTs SEED
+	jwtArr = await seedJwts(userArr)
+	// DISCUSSIONS SEED
+	seedDiscussions(userArr);
 
     dummyJwt = await authService.signToken(dummyUser.id, dummyUser.login);
     // SET baseUrl FOR PACTUM
     pactum.request.setBaseUrl('http://localhost:3333');
     // STORE JwtAccessToken IN PACTUM FOR REUSE- NOT WORKING
     // pactum.spec().stores('userAt', 'dummyJwt.access_token');
+
+
+	// const kyleUser = await prisma.user.create({
+	// 	data: {
+	// 		login: 'kyle',
+	// 		email: 'kyle@student.42.fr'
+	// 	}
+	//   }
+	// );
+ 
+	// const hugoUser = await prisma.user.create({
+	// 	data: {
+	// 		login: 'hugo',
+	// 		email: 'hugo@student.42.fr'
+	// 	}
+	//   }
+	// );  
+	
+	// const angelUser = await prisma.user.create({
+	// 	data: {
+	// 		login: 'angel',
+	// 		email: 'angel@student.42.fr'
+	// 	}
+	//   }
+	// );
+
+
+
+
+	// const achiv = await prisma.achievement.upsert({
+	// 	where: {title: '10 in a raw'},
+	// 	update: {}, 
+	// 	create: {
+	// 		title: '10 in a raw',
+	// 		descriptions: 'you play 10 game in a raw',
+	// 	},
+	// })
+
+	// const achiv1 = await prisma.achievement.upsert({
+	// 	where: {title: 'login'},
+	// 	update: {}, 
+	// 	create: {
+	// 		title: 'login',
+	// 		descriptions: 'you log for the first time',
+	// 	},
+	// })
+
+	// const achiv2 = await prisma.achievement.upsert({
+	// 	where: {title: 'first win'},
+	// 	update: {}, 
+	// 	create: {
+	// 		title: 'first win',
+	// 		descriptions: 'gg well played',
+	// 	},
+	// })
+
+	// const achiv3 = await prisma.achievement.upsert({
+	// 	where: {title: 'un curly'},
+	// 	update: {}, 
+	// 	create: {
+	// 		title: 'tiens un curly',
+	// 		descriptions: 'tu as ajouter ton premier ami',
+	// 	},
+	// })
+
+	// const game1 = await prisma.game.upsert({
+	// 	where: {id:1},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 1,
+	// 			score1: 2,
+	// 			player2Id: 2,
+	// 			score2: 3,
+	// 	},
+	// })
+
+	// const game2 = await prisma.game.upsert({
+	// 	where: {id:2},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 1,
+	// 			score1: 2,
+	// 			player2Id: 3,
+	// 			score2: 3,
+	// 	},
+	// })
+
+	// const game3 = await prisma.game.upsert({
+	// 	where: {id:3},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 2,
+	// 			score1: 2,
+	// 			player2Id: 3,
+	// 			score2: 3,
+	// 	},
+	// })
+
+	// const game4 = await prisma.game.upsert({
+	// 	where: {id:4},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 1,
+	// 			score1: 3,
+	// 			player2Id: 3,
+	// 			score2: 1,
+	// 	},
+	// })
+
+	// const game5 = await prisma.game.upsert({
+	// 	where: {id:5},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 2,
+	// 			score1: 2,
+	// 			player2Id: 3,
+	// 			score2: 1,
+	// 	},
+	// })
+
+	// const game6 = await prisma.game.upsert({
+	// 	where: {id:6},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 4,
+	// 			score1: 3,
+	// 			player2Id: 2,
+	// 			score2: 1,
+	// 	},
+	// })
+
+	// const game7 = await prisma.game.upsert({
+	// 	where: {id:7},
+	// 	update: {},
+	// 	create: {
+	// 			player1Id: 2,
+	// 			score1: 1,
+	// 			player2Id: 4,
+	// 			score2: 3,
+	// 	},
+	// })
+
+	// const friend1 = await prisma.relation.upsert({
+	// 	where : {id: 1},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 1 ,
+	// 		userIWatchId: 2,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend2 = await prisma.relation.upsert({
+	// 	where : {id: 2},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 1 ,
+	// 		userIWatchId: 3,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend3 = await prisma.relation.upsert({
+	// 	where : {id: 3},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 1 ,
+	// 		userIWatchId: 4,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend4 = await prisma.relation.upsert({
+	// 	where : {id: 4},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 4 ,
+	// 		userIWatchId: 1,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend5 = await prisma.relation.upsert({
+	// 	where : {id: 5},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 4 ,
+	// 		userIWatchId: 2,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend6 = await prisma.relation.upsert({
+	// 	where : {id: 6},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 3 ,
+	// 		userIWatchId: 4,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const friend7 = await prisma.relation.upsert({
+	// 	where : {id: 7},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 3 ,
+	// 		userIWatchId: 2,
+	// 		relation: 1,
+	// 	},
+	// })
+
+	// const block8 = await prisma.relation.upsert({
+	// 	where : {id: 8},
+	// 	update: {},
+	// 	create: {
+	// 		userId: 4 ,
+	// 		userIWatchId: 3,
+	// 		relation: 2,
+	// 	},
+	// })
 
   });
 
@@ -494,53 +545,50 @@ describe('App e2e', () => {
 
     });
 
-	describe('Relation', () => {
-		describe('list_friend', () => {
+// 	describe('Relation', () => {
+// 		describe('list_friend', () => {
   
-			var list : User[] = [];
-			list.push(kyleUser)
-			list.push(hugoUser)
-			list.push(angelUser)
-			it('VALID USER - should list friend of current user', () => {
-			  return pactum
-			  .spec()
-			  .get('/relation/list_friend')
-			  .withHeaders({
-				   Authorization: `Bearer ${dummyJwt.access_token}`,
-			   })
-			  .expectStatus(200)
-//			  .expectBodyContains()
-//			  .inspect();
-			});  
+// 			var list : User[] = [];
+// 			list.push(kyleUser)
+// 			list.push(hugoUser)
+// 			list.push(angelUser)
+// 			it('VALID USER - should list friend of current user', () => {
+// 			  return pactum
+// 			  .spec()
+// 			  .get('/relation/list_friend')
+// 			  .withHeaders({
+// 				   Authorization: `Bearer ${dummyJwt.access_token}`,
+// 			   })
+// 			  .expectStatus(200)
+// //			  .expectBodyContains()
+// //			  .inspect();
+// 			});  
 
-			it('Invalide user - should ret error', () => {
-				return pactum
-				.spec()
-			  .get('/relation/list_friend')
-			  .withHeaders({
-				   Authorization: `Bearer `,
-			   })
-			  .expectStatus(401)
-			});
+// 			it('Invalide user - should ret error', () => {
+// 				return pactum
+// 				.spec()
+// 			  .get('/relation/list_friend')
+// 			  .withHeaders({
+// 				   Authorization: `Bearer `,
+// 			   })
+// 			  .expectStatus(401)
+// 			});
 
-		  });
+// 		  });
 
-
-
-
-	});
+// 	});	//	DESCRIBE(RELATION)
 
 	//here
 
-  });
+  });	//	DESCRIBE(USER)
 
 	describe('Discussion', () => {
 
-		describe('Create', () => {
+		describe('Create POST /discussion/create', () => {
 			it('VALID - should return 201', () => {
-				const userId = 1;
+				const userId = userArr[0].id;
 				const dto: CreateDiscussionDto = {
-					user2Id: userId
+					user2Id: userId,
 				};
 				return pactum
 				.spec()
@@ -550,11 +598,53 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(201)
-				.expectBodyContains(userId);
+				.expectBodyContains(userId)
+				.expectBodyContains(dummyUser.id)
+				// .inspect();
+			});
+
+			it('NO JWT - should return 401', () => {
+				const userId = userArr[0].id;
+				const dto: CreateDiscussionDto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion/create')
+				// .withHeaders({
+				// 	Authorization: `Bearer ${dummyJwt.access_token}`,
+				// })
+				.withBody(dto)
+				.expectStatus(401)
+				// .inspect();
 			});
 			
-		});
+			it('ALREADY EXISTS - should return 400', () => {
+				const userId = userArr[0].id;
+				const dto: CreateDiscussionDto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion/create')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(400)
+				// .inspect();
+			});
+		});	// DESCRIBE(DISCUSSION/CREATE)
 
-	});
+
+		describe('Retrieve GET /discussion/', () => {
+			console.log(prisma);
+			// seedDiscussions(userArr);
+			it('HAS DISCUSSIONS', () => {
+			});
+
+		});	// DESCRIVE (DISCUSSION/RETRIEVE)
+
+	});	// DESCRIBE(DISCUSSION)
 
 });

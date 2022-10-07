@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Discussion } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto } from './dto';
@@ -10,7 +10,9 @@ export class DiscussionService {
         private prisma: PrismaService
     ) {}
 
-    async create(userId: number, dto: CreateDiscussionDto) : Promise<Discussion>{
+    async create(userId: number, dto: CreateDiscussionDto) : Promise<Discussion> {
+        if (await this.exists(userId, dto.user2Id) === true)
+            throw new HttpException('Discussion already exists', 400); 
         const discussion = await this.prisma.discussion.create({
             data: {
                 user1Id: userId,
@@ -18,5 +20,17 @@ export class DiscussionService {
             }
         });
         return discussion;
+    }
+
+    async exists(user1Id: number, user2Id: number) : Promise<boolean> {
+        const search: Discussion[] = await this.prisma.discussion.findMany({
+            where: { OR: [
+                    { user1Id: user1Id, user2Id: user2Id },
+                    { user1Id: user2Id, user2Id: user1Id }
+                ]}
+        });
+        if (search.length === 0)
+            return false;
+        return (true);
     }
 }

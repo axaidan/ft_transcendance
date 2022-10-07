@@ -4,6 +4,7 @@ import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
 import { CreateDiscussionDto } from './dto';
 
+@UseGuards(JwtGuard)
 @Controller('discussion')
 export class DiscussionController {
     
@@ -11,7 +12,6 @@ export class DiscussionController {
         private discService: DiscussionService
     ) {}
 
-    @UseGuards(JwtGuard)
     @Post('create')
     create(@GetUser('id') userId: number, @Body() dto: CreateDiscussionDto) {
         return this.discService.create(userId, dto);
