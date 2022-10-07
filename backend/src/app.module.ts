@@ -8,6 +8,7 @@ import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -22,6 +23,7 @@ import { DiscussionMessageModule } from './discussion-message/discussion-message
 		RelationModule,
 		DiscussionModule,
 		DiscussionMessageModule,
+		GameModule,
 	]
 })
 export class AppModule {}

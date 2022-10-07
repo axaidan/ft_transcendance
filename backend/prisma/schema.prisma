@@ -90,6 +90,7 @@ model Relation {
 
 model Game {
 	id Int @id @default(autoincrement())
+    createAt DateTime @default(now())
 
 	player1 User @relation("p1", fields: [player1Id], references: [id])
 	player1Id Int

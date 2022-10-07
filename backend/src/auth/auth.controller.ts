@@ -23,6 +23,9 @@ export class AuthController {
 			response.cookie('access_token', token, {
 				expires: new Date(Date.now() + 6000000)
 			});
+			response.redirect("http://localhost:4200/home");
+		})
+		.catch( (e) => {
 			response.redirect("http://localhost:4200");
 		})
 	}
@@ -34,6 +37,6 @@ export class AuthController {
 		response.cookie('access_token', token, {
 			expires: new Date(Date.now() + 6000000)
 		});
-		response.redirect("http://localhost:4200");
+		response.redirect("http://localhost:4200/home");
 	}
 }

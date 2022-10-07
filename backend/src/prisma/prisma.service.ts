@@ -18,6 +18,7 @@ export class PrismaService extends PrismaClient {
 		return this.$transaction([
 			this.discussion.deleteMany(),
 			this.achievement.deleteMany(),
+			this.game.deleteMany(),
 			this.relation.deleteMany(),
 			this.game.deleteMany(),
 			this.user.deleteMany(),

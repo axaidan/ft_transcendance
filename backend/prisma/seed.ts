@@ -40,6 +40,42 @@ async function main() {
 		},
 	})
 
+	const wluong = await prisma.user.upsert({
+		where: {login: 'wluong'},
+		update:{},
+		create:{
+			login: 'wluong',
+			username: 'le chinois',
+		},
+	})
+
+	const rmechety = await prisma.user.upsert({
+		where: {login: 'rmechety'},
+		update:{},
+		create:{
+			login: 'rmechety',
+			username: 'Magreb Warrior',
+		},
+	})
+
+	const lchristo = await prisma.user.upsert({
+		where: {login: 'lchristo'},
+		update:{},
+		create:{
+			login: 'lchristo',
+			username: 'M.Muscle',
+		},
+	})
+
+	const riblanc = await prisma.user.upsert({
+		where: {login: 'riblanc'},
+		update:{},
+		create:{
+			login: 'riblanc',
+			username: 'StaffNewGen',
+		},
+	})
+
 	const achiv = await prisma.achievement.upsert({
 		where: {title: '10 in a raw'},
 		update: {}, 
