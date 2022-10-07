@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ConsoleLogger, ForbiddenException, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { Game } from "@prisma/client";
 import { CreateGameDto } from "./dto";
@@ -24,10 +24,13 @@ export class GameService {
                 },
                 take : 10,
 				select : {
-					player1 : true,
-					player2 : true,
+					score1: true,
+					player1 : {select : {id: true,username: true,},},
+					score2: true,
+					player2 : {select : {id: true, username: true},},
 				}
-            },);
+
+				},);
             return arrayGame;
         }
 
