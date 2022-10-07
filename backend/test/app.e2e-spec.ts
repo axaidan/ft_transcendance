@@ -609,6 +609,42 @@
 				// .inspect();
 			});
 
+			it('NON VALID DTO- should 201', () => {
+				const userId = userArr[0].id;
+				const dto = {
+					// user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion/create')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(400)
+				// .expectBodyContains(userId)
+				// .expectBodyContains(dummyUser.id)
+				.inspect();
+			});
+
+			it('NO DTO- should 201', () => {
+				const userId = userArr[0].id;
+				const dto = {
+					// user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion/create')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				// .withBody(dto)
+				.expectStatus(400)
+				// .expectBodyContains(userId)
+				// .expectBodyContains(dummyUser.id)
+				.inspect();
+			});
+
 			it('NO JWT - should 401', () => {
 				const userId = userArr[0].id;
 				const dto: CreateDiscussionDto = {
@@ -646,7 +682,6 @@
 		describe('Retrieve GET /discussion/', () => {
 		
 			it('VALID - HAS DISCUSSIONS - should 200', () => {
-				console.log("== TEST - user[0].username = " + userArr[0].username);
 				return pactum
 				.spec()
 				.get('/discussion')
@@ -680,7 +715,7 @@
 				.expectStatus(200)
 				.expectBodyContains([])
 				.expectJsonLength(0)
-				.inspect();
+				// .inspect();
 			});
 			
 			it('NO JWT - should 401', () => {
@@ -705,7 +740,7 @@
 				// .inspect();
 			});
 
-		});	// DESCRIVE (DISCUSSION/RETRIEVE)
+		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
 	});	// DESCRIBE(DISCUSSION)
 
