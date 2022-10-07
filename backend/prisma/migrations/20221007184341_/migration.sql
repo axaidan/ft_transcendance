@@ -21,11 +21,33 @@ CREATE TABLE "achievement" (
 );
 
 -- CreateTable
+CREATE TABLE "discussion" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user1Id" INTEGER NOT NULL,
+    "user2Id" INTEGER NOT NULL,
+
+    CONSTRAINT "discussion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "discussionMessage" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "text" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "discussionId" INTEGER NOT NULL,
+
+    CONSTRAINT "discussionMessage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "relation" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "userIWatchId" INTEGER NOT NULL,
     "relation" INTEGER NOT NULL,
+    "isBlock" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "relation_pkey" PRIMARY KEY ("id")
 );
@@ -33,6 +55,7 @@ CREATE TABLE "relation" (
 -- CreateTable
 CREATE TABLE "game" (
     "id" SERIAL NOT NULL,
+    "createAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "player1Id" INTEGER NOT NULL,
     "score1" INTEGER NOT NULL,
     "player2Id" INTEGER NOT NULL,
@@ -64,6 +87,18 @@ CREATE UNIQUE INDEX "_AchievementToUser_AB_unique" ON "_AchievementToUser"("A", 
 
 -- CreateIndex
 CREATE INDEX "_AchievementToUser_B_index" ON "_AchievementToUser"("B");
+
+-- AddForeignKey
+ALTER TABLE "discussion" ADD CONSTRAINT "discussion_user1Id_fkey" FOREIGN KEY ("user1Id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "discussion" ADD CONSTRAINT "discussion_user2Id_fkey" FOREIGN KEY ("user2Id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "discussionMessage" ADD CONSTRAINT "discussionMessage_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "discussionMessage" ADD CONSTRAINT "discussionMessage_discussionId_fkey" FOREIGN KEY ("discussionId") REFERENCES "discussion"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "relation" ADD CONSTRAINT "relation_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

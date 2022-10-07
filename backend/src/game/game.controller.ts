@@ -17,7 +17,7 @@ export class GameController {
 
     @Get('historique/:id')
     async historique(@Param('id', ParseIntPipe) userId: number){
-        return this.gameService.historique( userId );
+        return this.gameService.history( userId );
     }
 
     async createGame(@Body() dto: CreateGameDto) {
