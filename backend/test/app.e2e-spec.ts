@@ -498,25 +498,18 @@ describe('App e2e', () => {
 			it('Should do nothing, already friend with user I try to add', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization: `Bearer ${(dummyJwt.access_token)}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
-
 			it('Should throw forbidden exception, userId invalid', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/' + -2131)
 				.withHeaders({
 					Authorization: `Bearer ${(dummyJwt.access_token)}`,
-				})
-				.withBody({
-					userId: -213,
 				})
 				.expectStatus(403);
 			});
@@ -525,12 +518,9 @@ describe('App e2e', () => {
 			it('Should do Error, bad bearer token', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization: `Bearer `,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectBodyContains("")
 				.expectStatus(401)
@@ -556,12 +546,9 @@ describe('App e2e', () => {
 			it('remove a friend relation' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -569,12 +556,9 @@ describe('App e2e', () => {
 			it('Should do nothing, bad Bearer token' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer 3r2qe432`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(401)
 			});
@@ -582,12 +566,9 @@ describe('App e2e', () => {
 			it('Should do nothing, bad userId', () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + 938293812389123891)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: 342391037812903812,
 				})
 				.expectStatus(403)
 			});
@@ -607,12 +588,9 @@ describe('App e2e', () => {
 			it('remove a friend that not your friend ' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -632,12 +610,9 @@ describe('App e2e', () => {
 			it('remove a friend ' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + kyleUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: kyleUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -645,12 +620,9 @@ describe('App e2e', () => {
 			it('remove a friend ' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + angelUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: angelUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -663,18 +635,15 @@ describe('App e2e', () => {
 				   Authorization: `Bearer ${dummyJwt.access_token}`,
 			   })
 			  .expectStatus(200)
-			  .expectBodyContains('')
+			  .expectBody([])
 			}); 
 
 			it('remove a friend ' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + -32312)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: -21,
 				})
 				.expectStatus(403)
 			});
@@ -699,12 +668,9 @@ describe('App e2e', () => {
 			it ('should block a user ', () => {
 				return  pactum
 				.spec()
-				.post('/relation/block_user')
+				.post('/relation/block_user/' + hugoUser.id) 
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			})
@@ -722,12 +688,9 @@ describe('App e2e', () => {
 			it ('should do nothin, wrong bearer token', () => {
 				return pactum
 				.spec()
-				.post('/relation/block_user')
+				.post('/relation/block_user/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer 3281321`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(401)
 			}) 
@@ -735,12 +698,9 @@ describe('App e2e', () => {
 			it ('should do nothin, wrong userId in body', () => {
 				return pactum
 				.spec()
-				.post('/relation/block_user')
+				.post('/relation/block_user/' + 38193829)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: 92312312,
 				})
 				.expectStatus(403)
 			}) 
@@ -749,12 +709,9 @@ describe('App e2e', () => {
 			it ('shoudl unblock user', () => {
 				return pactum
 				.spec()
-				.post('/relation/unblock_user')
+				.post('/relation/unblock_user/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			})
@@ -773,12 +730,9 @@ describe('App e2e', () => {
 			it ('should block, not true test', () => {
 				return pactum
 				.spec()
-				.post('/relation/block_user')
+				.post('/relation/block_user/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			})
@@ -786,12 +740,9 @@ describe('App e2e', () => {
 			it ('should fail, invalide bearer token', ()=> {
 				return pactum 
 				.spec()
-				.post('/relation/unblock_user')
+				.post('/relation/unblock_user/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer 8234713`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(401)
 			})
@@ -800,12 +751,9 @@ describe('App e2e', () => {
 			it ('should fail, invalide body userid invalid', ()=> {
 				return pactum 
 				.spec()
-				.post('/relation/unblock_user')
+				.post('/relation/unblock_user/' + 32134)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: -212121212,
 				})
 				.expectStatus(403)
 			})

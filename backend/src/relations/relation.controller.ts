@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
@@ -12,24 +12,24 @@ export class RelationController {
 	constructor(private relationService: RelationService) {}
 
 
-	@Post('add_friend')
-	add_friend(@GetUser('id') meId: number, @Body() dto: TargetDto){
-		return this.relationService.add_friend(meId, dto.userId);
+	@Post('add_friend/:id')
+	add_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number){
+		return this.relationService.add_friend(meId, userId);
 	}
 
-	@Post('remove_friend')
-	remove_friend(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.remove_friend(meId, dto.userId);
+	@Post('remove_friend/:id')
+	remove_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.remove_friend(meId, userId);
 	}
 	
-	@Post('block_user')
-	block_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.block_user(meId, dto.userId);
+	@Post('block_user/:id')
+	block_user(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.block_user(meId, userId);
 	}
 
-	@Post('unblock_user')
-	unblock_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.unblock_user(meId, dto.userId);
+	@Post('unblock_user/:id')
+	unblock_user(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.unblock_user(meId, userId);
 	}
 
 	@Get('list_friend')
