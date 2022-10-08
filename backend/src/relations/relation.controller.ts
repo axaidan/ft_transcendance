@@ -45,4 +45,15 @@ export class RelationController {
 		return array;
 	}
 
+	@Get('is_friend/:id')
+	async is_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_friend(meId, userId);
+
+	}
+
+	@Get('is_block/:id')
+	async is_block(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_block(meId, userId);
+	}
+
 }
