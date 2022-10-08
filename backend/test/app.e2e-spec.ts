@@ -498,12 +498,9 @@ describe('App e2e', () => {
 			it('Should do nothing, already friend with user I try to add', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization: `Bearer ${(dummyJwt.access_token)}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -511,12 +508,9 @@ describe('App e2e', () => {
 			it('Should throw forbidden exception, userId invalid', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/-213')
 				.withHeaders({
 					Authorization: `Bearer ${(dummyJwt.access_token)}`,
-				})
-				.withBody({
-					userId: -213,
 				})
 				.expectStatus(403);
 			});
@@ -525,12 +519,9 @@ describe('App e2e', () => {
 			it('Should do Error, bad bearer token', () => {
 				return pactum
 				.spec()
-				.post('/relation/add_friend')
+				.post('/relation/add_friend/1')
 				.withHeaders({
 					Authorization: `Bearer `,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectBodyContains("")
 				.expectStatus(401)
@@ -556,12 +547,9 @@ describe('App e2e', () => {
 			it('remove a friend relation' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -569,12 +557,9 @@ describe('App e2e', () => {
 			it('Should do nothing, bad Bearer token' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer 3r2qe432`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(401)
 			});
@@ -582,12 +567,9 @@ describe('App e2e', () => {
 			it('Should do nothing, bad userId', () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/342391037812903812')
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: 342391037812903812,
 				})
 				.expectStatus(403)
 			});
@@ -607,12 +589,9 @@ describe('App e2e', () => {
 			it('remove a friend that not your friend ' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: hugoUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -629,28 +608,22 @@ describe('App e2e', () => {
 			  .expectBodyContains(angelUser)
 			}); 
 
-			it('remove a friend ' , () => {
+			it('remove a friend kyleUser' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + kyleUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: kyleUser.id,
 				})
 				.expectStatus(201)
 			});
 
-			it('remove a friend ' , () => {
+			it('remove a friend angelUser' , () => {
 				return pactum
 				.spec()
-				.post('/relation/remove_friend')
+				.post('/relation/remove_friend/' + angelUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: angelUser.id,
 				})
 				.expectStatus(201)
 			});
@@ -666,18 +639,6 @@ describe('App e2e', () => {
 			  .expectBodyContains('')
 			}); 
 
-			it('remove a friend ' , () => {
-				return pactum
-				.spec()
-				.post('/relation/remove_friend')
-				.withHeaders({
-					Authorization:  `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody({
-					userId: -21,
-				})
-				.expectStatus(403)
-			});
 
 			/* SHOULD DO A Function to see relation and do a test to see if relation got delete after unfriend
 			it ('should have delete some relation')

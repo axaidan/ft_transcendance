@@ -4,19 +4,18 @@ import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
 import { JwtGuard } from "src/auth/guard";
 import { TargetDto } from "./dto";
-import { domainToASCII } from "url";
 
 @UseGuards(JwtGuard)
 @Controller('relation')
 export class RelationController {
 	constructor(private relationService: RelationService) {}
 
-	@Get('add_friend/:id')
+	@Post('add_friend/:id')
 	add_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number){
 		return this.relationService.add_friend(meId, cible_id);
 	}
 
-	@Get('remove_friend/:id')
+	@Post('remove_friend/:id')
 	remove_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number) {
 		return this.relationService.remove_friend(meId, cible_id);
 	}
