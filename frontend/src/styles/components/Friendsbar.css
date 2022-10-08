@@ -20,11 +20,10 @@ body {
 	background-position: 50% 50%;
 }
 
-.user_info {
-	top: 0px;
+.user_info ul {
 	position: absolute;
+	top: 0px;
 	height: 60px;
+	width: 100%;
 	border-bottom: 3px solid #16222a;
 }
-
-.friends_list {}

@@ -22,7 +22,10 @@ const Friendsbar = () => {
 		<nav className='Friendsbar'>
 			<ul>
 				<div className='user_info'>
-					{user}
+					<ul>
+						social
+						<li>add</li>
+					</ul>
 				</div>
 				<div className='friends_list'>
 					You don't have friends yet

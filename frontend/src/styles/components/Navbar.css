@@ -15,7 +15,7 @@ body {
 	position: relative;
 	display: inline-block;
 	padding: 15px, 30px;
-	color: #fff;
+	color: #938f75;
 	text-transform: uppercase;
 	letter-spacing: 4px;
 	text-decoration: none;
@@ -124,30 +124,30 @@ a:hover span:nth-child(4) {
 	position: relative;
 	margin: 0;
 	padding: 0;
-	border-bottom: 2px #fff;
+	border-top: 2px solid #3c3224;
 	font-family: 'Friz Quadrata Std Bold';
 }
 
 .links {
-	color: #fff;
+	color: #938f75;
 	text-decoration: none;
 	transition: text-shadow 0.2s ease-in-out;
 }
 
 .links:hover {
-	padding-bottom: 37%;
 	border-width: 100%;
 	text-shadow: 0 30px 20px #fff;
 	overflow: hidden;
 }
 
 .items {
-	margin-right: 10px;
+	margin-right: 20px;
 	margin-left: 20px;
 	color: #f1f1f1;
 	cursor: pointer;
 	text-transform: uppercase;
 }
+
 
 .items:visited {
 	text-decoration: none;
@@ -209,9 +209,17 @@ a:hover span:nth-child(4) {
 
 .online {
 	color: green;
-	text-decoration: underline;
+	text-transform: capitalize;
 	font-size: smaller;
 	font-style: italic;
+}
+
+.status_circle {
+	top: 18px;
+	right: 170px;
+	color: green;
+	position: absolute;
+	font-size: 200%;
 }
 
 @media screen and (max-height: 700px) {
