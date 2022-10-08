@@ -2,6 +2,7 @@ import React from "react";
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { useEffect, useState } from "react"
 import { useNavigate } from 'react-router-dom'
+import { Navbar, Friendsbar } from '../componants'
 
 export function Home() {
 	const navigate = useNavigate();
@@ -20,7 +21,11 @@ export function Home() {
 
 	return (
 		<div>
-			<h1>{user}</h1>
+			<Navbar />
+			<Friendsbar />
+			<div className='container-home'>
+			
+			</div>
 		</div>
 	)
 }

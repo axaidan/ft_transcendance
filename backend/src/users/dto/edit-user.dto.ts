@@ -7,9 +7,9 @@ export class EditUserDto {
     @MaxLength(320) // OFFICIAL EMAIL ADDRESS MAX LENGTH
     email?: string;
 
-    @ValidateIf(username => username === '')
     @IsString()
     @IsOptional()
+    @IsNotEmpty()
     @MinLength(3)
     @MaxLength(20)
     username?: string;

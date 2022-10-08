@@ -15,11 +15,6 @@ export class UserService {
 	}
 
 	async editUser(userId: number, dto: EditUserDto) {
-		if ('username' in dto && dto.username === '') {
-			// console.log('editUser() - set dto.username to null');
-			dto.username = null;
-		}
-		// console.log(dto);
 		const user = await this.prisma.user.update({
 			where: {
 				id: userId,
