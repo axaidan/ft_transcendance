@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { AxiosJwt } from '../hooks/AxiosJwt'
-import { Navbar, Friendsbar } from '../componants'
+import { Navbar } from '../componants'
+import Friendsbar from '../componants/Friendsbar';
 
 
 export function Ladder() {

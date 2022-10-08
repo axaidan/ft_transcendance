@@ -22,7 +22,7 @@ export function Navbar() {
 	useEffect(() => {
 		request.get("/user/me")
 			.then((res) => {
-				setUser(res.data.login);
+				setUser(res.data.username);
 			})
 	}, []);
 
@@ -71,7 +71,7 @@ export function Navbar() {
 					</li>
 					<li className="items">
 						<NavLink to='/profile/:id' className='links'>
-							{user}
+							profile
 						</NavLink>
 					</li>
 					<div className="items_r">
@@ -93,9 +93,15 @@ export function Navbar() {
 					</div>
 					<div className="user_log">
 						<div className="avatar">
-							<FaUserCircle />
+							<img className="picture" src='https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/88c6ac91-e30a-4c67-a92d-e8178abac9bd/devdlvv-6a12f604-4c12-4b6a-9fc3-b70090b6bdd3.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzg4YzZhYzkxLWUzMGEtNGM2Ny1hOTJkLWU4MTc4YWJhYzliZFwvZGV2ZGx2di02YTEyZjYwNC00YzEyLTRiNmEtOWZjMy1iNzAwOTBiNmJkZDMucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.eufR74FOEIghEPVNdTOuEREFJRd3puhZgnXxj5WjkU4' alt='' width='34' height='34'></img>
+
 						</div>
-						{user}
+						<div className="status">
+							{user}
+							<div className="online">
+								online
+							</div>
+						</div>
 					</div>
 				</ul >
 			)

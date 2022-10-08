@@ -10,8 +10,7 @@ import Welcomer from "./pages/Welcomer";
 export default function App() {
 	return (
 		<div>
-			<Navbar />
-			<Friendsbar />
+
 			<Routes>
 				<Route path='/' element={<Welcomer />} />
 				<Route path='/home' element={<Home />} />

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useEffect } from 'react';
-import { Navbar, Friendsbar } from '../componants'
+import { Navbar } from '../componants'
+import Friendsbar from '../componants/Friendsbar';
 
 export function Login() {
 

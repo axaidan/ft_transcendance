@@ -153,6 +153,10 @@ a:hover span:nth-child(4) {
 	text-decoration: none;
 }
 
+.items:hover {
+	scale: 1.1;
+}
+
 .items_r {
 	font-family: 'Friz Quadrata Std Bold';
 	font-style: normal;
@@ -178,7 +182,36 @@ a:hover span:nth-child(4) {
 }
 
 .avatar {
+	height: 100%;
 	width: 50px;
+	background-image: url('../../assets/images/avatar-border.png');
+	background-size: 50px;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+}
+
+.avatar:hover {
+	border-radius: 50%;
+	box-shadow: 1px 0px 20px #fff;
+	transition: 0.2s ease-in-out;
+}
+
+.picture {
+
+	border-radius: 50%;
+}
+
+.status {
+	margin-right: auto;
+	align-items: flex-start;
+}
+
+.online {
+	color: green;
+	text-decoration: underline;
+	font-size: smaller;
+	font-style: italic;
 }
 
 @media screen and (max-height: 700px) {
