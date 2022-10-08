@@ -13,11 +13,11 @@ export default function App() {
 			<Navbar />
 			<Friendsbar />
 			<Routes>
+				<Route path='/' element={<Welcomer />} />
 				<Route path='/home' element={<Home />} />
 				<Route path='/login' element={<Login />} />
 				<Route path='/ladder' element={<Ladder />} />
 				<Route path='/profile/:id' element={<Profile />} />
-				<Route path='/' element={<Welcomer />} />
 				<Route path='*' element={<ErrorPages mode={404} />} />
 			</Routes>
 		</div>
