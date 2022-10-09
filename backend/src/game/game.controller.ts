@@ -11,13 +11,13 @@ export class GameController {
 	@Post('hist')
 		async hist(@Body() {userId}){ 
 			var nbr = parseInt(userId, 10);
-			return this.gameService.historique(nbr);
+			return this.gameService.history(nbr);
 		}
 	
 
     @Get('historique/:id')
     async historique(@Param('id', ParseIntPipe) userId: number){
-        return this.gameService.historique( userId );
+        return this.gameService.history( userId );
     }
 
     async createGame(@Body() dto: CreateGameDto) {

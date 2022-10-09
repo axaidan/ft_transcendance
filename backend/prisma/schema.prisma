@@ -26,9 +26,12 @@ model User {
 
 	player1 Game[] @relation("p1")
 	player2 Game[] @relation("p2")
-
-
+	
 	achievements Achievement[]
+
+	discussion1 Discussion[] @relation("discussion1")
+	discussion2 Discussion[] @relation("discussion2")
+	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
     @@map("user")
 }
@@ -41,7 +44,43 @@ model Achievement{
 
 	users User [] 
 
+	path String
+
 	@@map("achievement")
+}
+
+model Avatar {
+	id Int @id @default(autoincrement())
+	
+	title String @unique
+
+	path String
+}
+
+model Discussion {
+	id			Int @id @default(autoincrement())
+	createdAt	DateTime @default(now())
+	user1Id		Int
+	user2Id		Int 
+	user1		User @relation(name: "discussion1", fields: [user1Id], references: [id], onDelete: Cascade)
+	user2		User @relation(name: "discussion2", fields: [user2Id], references: [id], onDelete: Cascade)
+	
+	messages	DiscussionMessage[]
+
+	@@map("discussion")
+}
+
+model DiscussionMessage {
+	id				Int @id @default(autoincrement())
+	createdAt		DateTime @default(now())
+	text			String
+	userId			Int
+ 	discussionId	Int
+
+	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
+	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+	@@map("discussionMessage")
 }
 
 model Relation {

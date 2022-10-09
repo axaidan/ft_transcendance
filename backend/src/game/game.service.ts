@@ -10,7 +10,7 @@ export class GameService {
     ) {}
 
 
-        async historique(userId: number) {
+        async history(userId: number) {
 
             const arrayGame = await this.prisma.game.findMany({
                 where : {

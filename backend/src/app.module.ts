@@ -6,6 +6,8 @@ import { UserModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
+import { DiscussionModule } from './discussion/discussion.module';
+import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
 
 @Module({
@@ -19,6 +21,8 @@ import { GameModule } from './game/game.module';
 		MailModule,
 		AchivModule,
 		RelationModule,
+		DiscussionModule,
+		DiscussionMessageModule,
 		GameModule,
 	]
 })

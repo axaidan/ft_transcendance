@@ -10,24 +10,25 @@ import { TargetDto } from "./dto";
 export class RelationController {
 	constructor(private relationService: RelationService) {}
 
+
 	@Post('add_friend/:id')
-	add_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number){
-		return this.relationService.add_friend(meId, cible_id);
+	add_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number){
+		return this.relationService.add_friend(meId, userId);
 	}
 
 	@Post('remove_friend/:id')
-	remove_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) cible_id: number) {
-		return this.relationService.remove_friend(meId, cible_id);
+	remove_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.remove_friend(meId, userId);
 	}
 	
-	@Post('block_user')
-	block_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.block_user(meId, dto.userId);
+	@Post('block_user/:id')
+	block_user(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.block_user(meId, userId);
 	}
 
-	@Post('unblock_user')
-	unblock_user(@GetUser('id') meId: number, @Body() dto: TargetDto) {
-		return this.relationService.unblock_user(meId, dto.userId);
+	@Post('unblock_user/:id')
+	unblock_user(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) {
+		return this.relationService.unblock_user(meId, userId);
 	}
 
 	@Get('list_friend')
@@ -41,6 +42,17 @@ export class RelationController {
 	async list_block(@GetUser('id') user: number) : Promise<User[]> {
 		const array = await this.relationService.list_block(user);
 		return array;
+	}
+
+	@Get('is_friend/:id')
+	async is_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_friend(meId, userId);
+
+	}
+
+	@Get('is_block/:id')
+	async is_block(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_block(meId, userId);
 	}
 
 }
