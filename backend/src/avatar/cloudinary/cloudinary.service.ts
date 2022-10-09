@@ -17,4 +17,21 @@ export class CloudinaryService {
       toStream(file.buffer).pipe(upload);
     });
   }
+
+  async getTag(pbId: string) {
+
+	console.log(pbId);
+	var test = v2.image(pbId, { format: "JPG", crop: "fill", width: 1000, height: 749 });
+	console.log(test)
+	return test;
+	let tag = v2.image(pbId, {
+		transformation: [
+			{ width: 250, height: 250, gravity: 'faces', crop: 'thumb' },
+			{ radius: 'max' },
+		  ],
+	})
+	console.log(tag);
+	return tag;
+  }
+  
 }

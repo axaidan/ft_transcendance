@@ -12,4 +12,9 @@ export class AvatarService {
 	console.log(ret);
 	return ret;
   }
+
+  async getTag(public_id: string) {
+	let ret = await this.cloudinary.getTag(public_id);
+	return ret;
+  }
 }
