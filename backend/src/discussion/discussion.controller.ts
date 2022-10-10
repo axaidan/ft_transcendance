@@ -13,6 +13,7 @@ export class DiscussionController {
         private discService: DiscussionService
     ) {}
 
+    // MAYBE USELESS
     @Post('create')
     create(@GetUser('id') currentUserId: number, @Body() dto: DiscussionDto, ) {
         return this.discService.create(currentUserId, dto);
@@ -27,7 +28,6 @@ export class DiscussionController {
         @Param('userid', ParseIntPipe) user2Id: number
         ) {
         const discId: number = await this.discService.findIdByUserId(currentUserId, user2Id);
-        // console.log('=== getMessages() discId === ' + discId);
         if (!discId) {
             return [];
         }

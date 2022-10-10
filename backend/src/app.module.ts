@@ -9,9 +9,22 @@ import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
+import { AppController } from './app.controller';
+
+// CHAT FRONT TESTS - BEGIN
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { AlertController } from './alert/alert.controller';
+import { AlertGateway } from './alert/alert.gateway';
+// CHAT FRONT TESTS - END
 
 @Module({
 	imports: [
+		// CHAT FRONT TESTS - BEGIN
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'static_chat_front_test'),
+		}),
+		// CHAT FRONT TESTS - END
 		ConfigModule.forRoot({
 			isGlobal: true,
 		}),
@@ -24,6 +37,8 @@ import { GameModule } from './game/game.module';
 		DiscussionModule,
 		DiscussionMessageModule,
 		GameModule,
-	]
+	],
+	providers: [AlertGateway],
+	controllers: [AppController, AlertController]
 })
 export class AppModule {}

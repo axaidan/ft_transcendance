@@ -13,6 +13,7 @@ export class DiscussionService {
     ) {}
 
     // POST /discussion/create
+    // MAYBE USELESS
     async create(currentUserId: number, dto: DiscussionDto) : Promise<Discussion> {
         if (await this.exists(currentUserId, dto.user2Id) === true)
             throw new HttpException('Discussion already exists', 400); 
@@ -50,17 +51,8 @@ export class DiscussionService {
         });
         return messages;
     }
-
-    // async getMessagesbyLogin(discussionId: string) : Promise<DiscussionMessage[]> {
-    //     const messages: DiscussionMessage[] = await this.prisma.discussionMessage.findMany({
-    //         where: {
-    //             discussionId: discussionId,
-    //         },
-    //     });
-    //     return messages;
-    // }
     
-    async findIdByUserId(currentUserId: number, user2Id: number) : Promise<number> {
+    async findIdByUserId(currentUserId: number, user2Id: number) /*: Promise<number> */ {
         const discussion = await this.prisma.discussion.findFirst({
             where: {
                 OR: [

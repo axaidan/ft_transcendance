@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { dirname, join } from 'path';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -20,6 +22,12 @@ async function bootstrap() {
 	SwaggerModule.setup('api', app, document);
 
 	app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+	// // CHAT TESTS - BEGIN
+	// const app = await NestFactory.create<NestExpressApplication>(AppModule);
+	// app.useStaticAssets(join(__dirname, '..', 'static_chat_front_test' ))
+	// // CHAT TESTS - END
+
 	await app.listen(3000);
 }
 
