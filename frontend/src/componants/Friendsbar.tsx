@@ -1,10 +1,14 @@
 import React from 'react';
 import '../styles/components/Friendsbar.css'
 
-export function Friendsbar() {
+type FriendbarProps = {
+	userId: number;
+}
+
+export function Friendsbar({ userId }:FriendbarProps ) {
 	return (
 		<nav className='Friendsbar'>
-			Hello
+			{userId}
 		</nav>
 	);
 };

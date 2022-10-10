@@ -1,41 +1,20 @@
 // Extern:
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 
 // Intern:
-import { AxiosJwt } from '../hooks/AxiosJwt'
-import { Navbar, Friendsbar, NavOption, History } from '../componants'
+import { IUser } from "../types";
 
 // Assets:
 import '../styles/pages/Profile.css'
 
 export function Profile()
 {
-	const axios = AxiosJwt();
-    const history = useLocation();
-	const navigate = useNavigate();
-	const { id } = useParams<string>();
-	const userId = parseInt(id!);
-
-	useEffect(() => {
-		axios.get('/user/' + id)
-		.then( (res) => {
-			if (!res.data)
-				navigate('/404');
-		})
-	}, [history]);
+	let user:IUser = useOutletContext();
 
 	return (
 		<>
-			<Navbar />
-			<Friendsbar />
-			<div className='container-profile'>
-				<NavOption userId={ userId }/>
-				<div className='container-info-profile'>
-					<History userId={ userId } />
-				</div>
-			</div>
+			<p>page profile de: {user.username}</p>
 		</>
 	)
 }

@@ -1,19 +1,35 @@
+// Extern:
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Home, Login, Profile, Ladder } from "./pages";
-import ErrorPages from "./pages/ErrorPages";
-import Welcomer from "./pages/Welcomer";
+
+// Intern:
+import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store } from "./pages";
+import { MyNavProfile, OthNavProfile, History, Friends, Collection } from "./componants";
 
 export default function App() {
 	return (
 		<div>
 			<Routes>
-				<Route path='/home' element={<Home />} />
-				<Route path='/login' element={<Login />} />
-				<Route path='/ladder' element={<Ladder />} />
-				<Route path='/profile/:id' element={<Profile />} />
-				<Route path='/' element={<Welcomer />} />
-				<Route path='*' element={<ErrorPages mode={404} />} />
+				<Route path='/'		element={ <Welcomer /> }/>
+				<Route path='/home' element={ <Home /> }>
+					<Route index		 element={ <Acceuil />}/>
+					<Route path='ladder' element={ <Ladder />  }/>
+					<Route path='me' element={ <MyNavProfile /> }>
+						<Route index			 element={ <Profile /> }/>
+						<Route path="history" element={ <History /> }/>
+						<Route path="friend"	 element={ <Friends /> }/>
+						<Route path="collection" element={ <Collection /> }/>
+						<Route path="achievement" element={ <Collection /> }/>
+					</Route>
+					<Route path=':id' element={ <OthNavProfile /> }>
+						<Route index		  element={ <Profile /> }/>
+						<Route path="history" element={ <History /> }/>
+						<Route path="achievement" element={ <Collection /> }/>
+					</Route>
+					<Route path='channel' element={ <Channel /> }/>
+					<Route path='store'	  element={ <Store />   }/>
+				</Route>
+				<Route path='*' element={<ErrorPages mode={404} />}/>
 			</Routes>
 		</div>
 	);

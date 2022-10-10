@@ -11,3 +11,16 @@ export type IGame = {
 		username: string;
 	};
 };
+
+export const DflGame = {
+	score1: 0,
+	player1: {
+		id: 0,
+		username: "username",
+	},
+	score2: 0,
+	player2: {
+		id: 0,
+		username: "username"
+	},	
+}
