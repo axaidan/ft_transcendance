@@ -1,0 +1,66 @@
+.navbar {
+	display: flex;
+	height: 100px;
+}
+
+.nav_links {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	height: 100%;
+	width: 100%;
+}
+
+.items_left {
+	display: flex;
+	align-items: center;
+	margin-right: auto;
+	position: relative;
+}
+
+.items_right {
+	display: flex;
+	margin-left: auto;
+	position: relative;
+	align-items: center;
+}
+
+
+
+.items {
+	margin: 20px;
+}
+
+.play {
+	margin: 80px;
+}
+
+.nav_user {
+	display: flex;
+	color: aliceblue;
+	width: 220px;
+}
+
+.avatar {
+	display: flex;
+	width: 100px;
+	align-items: center;
+	justify-content: center;
+}
+
+.nav_user_info {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	justify-content: center;
+}
+
+.nickname {
+	height: 100%;
+	margin-left: 10px;
+}
+
+.status {
+	height: 100%;
+	margin-left: 10px;
+}

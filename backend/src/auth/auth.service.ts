@@ -32,7 +32,7 @@ export class AuthService {
 								// WINDOW POP-UP
 		}
 
-		console.log(token.access_token);
+		// console.log(token.access_token);
 		return token.access_token ;
 
 	}

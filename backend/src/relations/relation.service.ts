@@ -118,7 +118,7 @@ export class RelationService{
 		if (!findTarget) {
 			throw new ForbiddenException("user you looking for doesn't exist")
 		}
-		console.log("test unbvlovk user");
+		// console.log("test unbvlovk user");
 		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
 		if (relation) {
 			if (relation.isBlock === 1)	{
@@ -214,6 +214,56 @@ export class RelationService{
 		return relation;	
 
 	}
+
+	async is_friend(meId: number, userId: number): Promise<boolean>{
+		let findMe = await this.prisma.user.findFirst({where: {id: meId}});
+		let findTarget = await this.prisma.user.findFirst({where: {id: userId}});
+
+		if (!findMe) {
+			throw new ForbiddenException('u not exit')
+			return false;
+		}
+
+		if (!findTarget) {
+			throw new ForbiddenException('u r friend not exit')
+			return false;
+		}
+	
+		let relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: userId}});
+		if (relation) {
+			if (relation.relation === 1) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
+
+	async is_block(meId: number, userId: number): Promise<boolean>{
+		let findMe = await this.prisma.user.findFirst({where: {id: meId}});
+		let findTarget = await this.prisma.user.findFirst({where: {id: userId}});
+
+		if (!findMe) {
+			throw new ForbiddenException('u not exit')
+			return false;
+		}
+
+		if (!findTarget) {
+			throw new ForbiddenException('u r friend not exit')
+			return false;
+		}
+	
+		let relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: userId}});
+		if (relation) {
+			if (relation.isBlock === 1) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+
 
 
 

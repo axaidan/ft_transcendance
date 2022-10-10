@@ -4,7 +4,6 @@ import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
 import { JwtGuard } from "src/auth/guard";
 import { TargetDto } from "./dto";
-import { domainToASCII } from "url";
 
 @UseGuards(JwtGuard)
 @Controller('relation')
@@ -43,6 +42,17 @@ export class RelationController {
 	async list_block(@GetUser('id') user: number) : Promise<User[]> {
 		const array = await this.relationService.list_block(user);
 		return array;
+	}
+
+	@Get('is_friend/:id')
+	async is_friend(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_friend(meId, userId);
+
+	}
+
+	@Get('is_block/:id')
+	async is_block(@GetUser('id') meId: number, @Param('id', ParseIntPipe) userId: number) : Promise<boolean>{
+		return this.relationService.is_block(meId, userId);
 	}
 
 }

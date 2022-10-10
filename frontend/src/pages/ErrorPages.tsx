@@ -1,21 +1,9 @@
-
-type ErrorProps = {
-	mode: number
-}
+import { ErrorProps } from '../types'
 
 function ErrorPages({ mode }: ErrorProps) {
 
-
-
 	return (
 		<div>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
-			<h1>ERROR {mode} </h1>
 			<h1>ERROR {mode} </h1>
 		</div>
 	)

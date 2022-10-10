@@ -29,13 +29,13 @@ export function NavOption( { userId }: NavOptionProps ) {
 	function AddFriend( cibleId: number) {
 		axios.post('/relation/add_friend/' + cibleId)
 		.then((res) => { setResponse(res.data); })
-		.catch((e) => { alert(e); })
+		.catch((e) => { setResponse(e); })
 	}
 	
 	function RemoveFriend( cibleId: number) {
 		axios.post('/relation/remove_friend/' + cibleId)
 		.then((res) => { setResponse(res.data); })
-		.catch((e) => { alert(e); })
+		.catch((e) => { setResponse(e); })
 	}
 
 	return (

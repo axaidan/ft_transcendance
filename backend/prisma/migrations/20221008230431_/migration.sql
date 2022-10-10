@@ -16,8 +16,18 @@ CREATE TABLE "achievement" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
     "descriptions" TEXT,
+    "path" TEXT NOT NULL,
 
     CONSTRAINT "achievement_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Avatar" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+
+    CONSTRAINT "Avatar_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -81,6 +91,9 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "achievement_title_key" ON "achievement"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Avatar_title_key" ON "Avatar"("title");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_AchievementToUser_AB_unique" ON "_AchievementToUser"("A", "B");

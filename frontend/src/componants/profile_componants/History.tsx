@@ -1,37 +1,26 @@
+// Extern:
 import React, { useEffect, useState } from "react";
-import { AxiosJwt } from '../../hooks/AxiosJwt'
 import { Link, useNavigate, useLocation } from "react-router-dom";
+
+// Intern:
+import { AxiosJwt } from '../../hooks/AxiosJwt'
+import { HistoryProps, IGame } from '../../types'
+
+// Assets:
 import '../../styles/components/Historique.css'
 
-type HistoryProps = {
-	userId: number;
-}
 
-type IHistorique = {
-	score1: number;
-	player1: {
-		id: number;
-		username: string;
-	};
-	score2: number;
-	player2: {
-		id: number;
-		username: string;
-	};
-};
-
-export function History({ userId }: HistoryProps) {
+export function History({ userId }: HistoryProps)
+{
 	const axios = AxiosJwt();
 	const refresh = useLocation();
 	const navigate = useNavigate();
-	const [ games, setGames ] = useState<IHistorique[]>([]);
+	const [ games, setGames ] = useState<IGame[]>([]);
 
 	useEffect(() => {
 		axios.get("/game/historique/" + userId )
 		.then( (res) => { setGames( res.data ); })
 		.catch((e) => { navigate('/404'); })
-
-
 	}, [refresh])
 
 	return (

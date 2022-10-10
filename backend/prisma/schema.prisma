@@ -44,7 +44,17 @@ model Achievement{
 
 	users User [] 
 
+	path String
+
 	@@map("achievement")
+}
+
+model Avatar {
+	id Int @id @default(autoincrement())
+	
+	title String @unique
+
+	path String
 }
 
 model Discussion {
