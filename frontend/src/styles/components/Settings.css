@@ -1,0 +1,16 @@
+.container-settings {
+    position: fixed;
+    top: 10vh;
+    left: 0;
+    width: calc(100vw - 220px);
+    height: 90vh;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-form-settings {
+    background-color: white;
+    border: 1px solid black;
+}

@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { AxiosJwt } from '../../hooks/AxiosJwt'
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import ReplaceProfileBodyPage from "../../hooks/ReplaceProfileBodyPage";
 
 type NavOptionProps = {
 	userId: number;
 }
-
-
 
 export function NavOption( { userId }: NavOptionProps ) {
 
@@ -25,6 +24,8 @@ export function NavOption( { userId }: NavOptionProps ) {
 	useEffect(() => {
 		console.log(response)
 	}, [response])
+
+
 
 	function AddFriend( cibleId: number) {
 		axios.post('/relation/add_friend/' + cibleId)
@@ -46,8 +47,7 @@ export function NavOption( { userId }: NavOptionProps ) {
 			<div>
 				<button className='btn-friend' onClick={ () => AddFriend( user.id ) } />
 				<button className='btn-block' onClick={ () => RemoveFriend( user.id )} />
-				<button className='btn-friend' onClick={ () => AddFriend( user.id ) } />
-				<button className='btn-block' onClick={ () => RemoveFriend( user.id )} />
+				<button className='btn-friend' onClick={ () => ReplaceProfileBodyPage({ mode:"settings" }) } />
 			</div>
 		</nav>
 	)

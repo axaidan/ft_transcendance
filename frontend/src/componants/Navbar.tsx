@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import '../styles/components/Navbar.css';
 import { useState, useEffect } from 'react';
 import { AxiosJwt } from "../hooks";
+import { Setting } from "./profile_componants/Setting";
 
 export function Navbar() {
 
@@ -49,6 +50,11 @@ export function Navbar() {
 	}, [])
 
 
+	const [isShown, setIsShown] = useState(false);
+
+	const handleClick = () => {
+		setIsShown(true);
+	};
 
 	return (
 		<nav className="navbar">
@@ -90,9 +96,12 @@ export function Navbar() {
 								Store
 							</NavLink>
 						</li>
+						{/* <li className="items" >
+     						<button onClick={handleClick}>Click</button>
+							{ isShown && <Setting /> }
+						</li> */}
 					</div>
 				</ul >
-
 			)
 			}
 			<button onClick={toggleNavResponsive} className="btn">BTN</button>

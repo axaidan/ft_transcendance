@@ -143,3 +143,4 @@ main()
 		await prisma.$disconnect()
 		process.exit()
 	})
+}
