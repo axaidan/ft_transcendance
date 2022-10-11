@@ -8,6 +8,8 @@ import { AxiosResponse } from "axios";
 import { Friendsbar, Navbar } from '../componants'
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { IUser, DflUser } from "../types";
+import io, { Socket } from 'socket.io-client';
+import { useCookies } from "react-cookie";
 
 // Assets:
 import '../styles/pages/Home.css'
@@ -16,7 +18,16 @@ export function Home() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState<IUser>(DflUser);
 	const [userId, setUserId] = useState<number>(0)
+	const [ cookies ] = useCookies();
+	const [socket, setSocket] = useState<Socket>();
+	
 	const axios = AxiosJwt();
+	const jwtToken = cookies.access_token;
+	
+	useEffect(() => {
+		const newSocket = io(`http://localhost:3000`, { extraHeaders: { Authorization: `Bearer ${jwtToken}`}});
+		setSocket(newSocket);
+	}, [setSocket]);
 
 	useEffect(() => {
 		axios.get("/user/me")
@@ -29,6 +40,7 @@ export function Home() {
 
 	return (
 		<div>
+			{ socket ? <div>U ARE CONNECTED</div> : <></>}
 			<Navbar me={user} />
 
 			{/* 	WALTER:
