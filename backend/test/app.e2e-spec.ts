@@ -807,7 +807,6 @@ describe('App e2e', () => {
 			it('remove a friend that not your friend ' , () => {
 				return pactum
 				.spec()
-
 				.post('/relation/remove_friend/' + hugoUser.id)
 				.withHeaders({
 					Authorization:  `Bearer ${dummyJwt.access_token}`,
@@ -827,7 +826,7 @@ describe('App e2e', () => {
 			  .expectBodyContains(angelUser)
 			}); 
 
-			it('remove a friend ' , () => {
+			it('remove a friend kyleUser' , () => {
 				return pactum
 				.spec()
 				.post('/relation/remove_friend/' + kyleUser.id)
@@ -837,7 +836,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 			});
 
-			it('remove a friend ' , () => {
+			it('remove a friend angelUser' , () => {
 				return pactum
 				.spec()
 				.post('/relation/remove_friend/' + angelUser.id)

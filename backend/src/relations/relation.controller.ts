@@ -4,7 +4,6 @@ import { RelationService } from "./relation.service";
 import { User } from "@prisma/client";
 import { JwtGuard } from "src/auth/guard";
 import { TargetDto } from "./dto";
-import { domainToASCII } from "url";
 
 @UseGuards(JwtGuard)
 @Controller('relation')

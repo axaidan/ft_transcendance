@@ -1,10 +1,22 @@
 import React from 'react';
 import '../styles/components/Friendsbar.css'
+import PropTypes from "prop-types"
 
-export function Friendsbar() {
+
+// ICI ON AURA DU SOCKET A FAIRE! 
+// pour les amis connecter
+
+
+type FriendbarProps = {
+	userId: number;
+}
+
+export function Friendsbar({ userId }:FriendbarProps ) {
+
+
 	return (
 		<nav className='Friendsbar'>
-			Hello
+			<p color="black" > {userId} </p>
 		</nav>
 	);
 };

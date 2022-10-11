@@ -1,56 +1,54 @@
+// Extern:
 import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation, useOutletContext, useParams } from "react-router-dom";
+
+// Intern:
 import { AxiosJwt } from '../../hooks/AxiosJwt'
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { DflUser, IGame, IUser } from '../../types'
+import { AxiosResponse } from "axios";
+
+// Assets:
 import '../../styles/components/Historique.css'
 
-type HistoryProps = {
-	userId: number;
+
+type GameProps = {
+	game: IGame;
 }
 
-type IHistorique = {
-	score1: number;
-	player1: {
-		id: number;
-		username: string;
-	};
-	score2: number;
-	player2: {
-		id: number;
-		username: string;
-	};
-};
+function Game({ game }:GameProps ) {
+	return (
+		<li>
+			<Link to={"/home/" + game.player1.id}>
+				<p>{game.player1.username}</p>
+			</Link>
+			<p>{game.score1}</p>
+			<p>{game.score2}</p>
+			<Link to={"/home/" + game.player2.id}>
+				<p>{game.player2.username}</p>
+			</Link>
+		</li>
+	)
+}
 
-export function History({ userId }: HistoryProps) {
+export function History()
+{
 	const axios = AxiosJwt();
-	const refresh = useLocation();
-	const navigate = useNavigate();
-	const [ games, setGames ] = useState<IHistorique[]>([]);
+	const user: IUser = useOutletContext()
+	const [ games, setGames ] = useState<IGame[]>([])
 
 	useEffect(() => {
-		axios.get("/game/historique/" + userId )
-		.then( (res) => { setGames( res.data ); })
-		.catch((e) => { navigate('/404'); })
-
-
-	}, [refresh])
+		axios.get('/game/historique/' + user.id)
+		.then((res:AxiosResponse<IGame[]>) => { setGames(res.data) });
+	}, [])
 
 	return (
 		<div className='container-history'>
-		{games!.map((game: any) => (
-			<div key={game.id} className='li-game'>
-				<Link to={'/profile/' + game.player1.id} className='center_box'>
-					<div>{game.player1.username}</div>
-				</Link>
-				<div className='container-score'>
-					<div>{game.score1}</div>
-					<div>{game.score2}</div>
-				</div>
-				<Link to={'/profile/' + game.player2.id} className='center_box'>
-					<div>{game.player2.username}</div>
-				</Link>
-			</div>
-		))}
-	</div>
+			<h1>HISTORIQUE DE: {user.username}</h1>
+			<ul>
+				{games.map(( game: IGame, index: number ) => (
+					<Game key={index} game={game} />
+				))}
+			</ul>
+		</div>
 	)
-
 }

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import { useCookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
 import { AxiosJwt } from '../hooks/AxiosJwt'
-import { Navbar, Friendsbar } from '../componants'
-
 
 export function Ladder() {
 
@@ -21,11 +18,9 @@ export function Ladder() {
 
 	return (
 		<div>
-			<Navbar />
-			<Friendsbar />
 			<ul>
 				{users.map((user: any) => (
-					<Link to={"/profile/" + user.id} >
+					<Link to={"/home/" + user.id} >
 						<li key={user.id}>{user.login}</li>
 					</Link>
 				))}

@@ -3,28 +3,17 @@ import { NavLink } from "react-router-dom";
 import '../styles/components/Navbar.css';
 import { useState, useEffect } from 'react';
 import { AxiosJwt } from "../hooks";
+import { IUser } from "../types";
+import { isConstructorDeclaration } from "typescript";
 
-export function Navbar() {
+type NavProps = {
+	me: IUser;
+}
+
+export function Navbar({ me }:NavProps ) {
 
 	const axios = AxiosJwt();
-
-	interface IUser {
-		login: string;
-		username: string;
-		createdAt: string;
-	}
-
-	const [user, setUser] = useState({ login: 'username', username: 'test', createdAt: '' });
-	const [achievement, setAchievment] = useState('')
-
-	console.log(user);
-
-	useEffect(() => {
-		axios.get('/user/me')
-			.then((res) => {
-				setUser(res.data);
-			});
-	}, []);
+	const [achievement, setAchievment] = useState('');
 
 	const [toggleMenu, setToggleMenu] = useState(false);
 	const [largeur, setLargeur] = useState(window.innerWidth);
@@ -70,23 +59,23 @@ export function Navbar() {
 						</NavLink>
 					</li>
 					<li className="items">
-						<NavLink to={'/profile/1' } className='links'>
-							{user.login}
+						<NavLink to={'/home/me' } className='links'>
+							{me.login}
 						</NavLink>
 					</li>
 					<div className="items_r">
 						<li className="items">
-							<NavLink to='/home' className='links'>
-								Friends
+							<NavLink to='/home/ladder' className='links'>
+								Ladder
 							</NavLink>
 						</li>
 						<li className="items">
-							<NavLink to='/' className='links'>
+							<NavLink to='/home/channel' className='links'>
 								Channels
 							</NavLink>
 						</li>
 						<li className="items" >
-							<NavLink to='/' className='links'>
+							<NavLink to='/home/store' className='links'>
 								Store
 							</NavLink>
 						</li>
