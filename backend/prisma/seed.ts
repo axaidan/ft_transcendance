@@ -9,7 +9,7 @@ async function main() {
 		update: {},
 		create: {
 			login: 'mlormois',
-			username: 'lmasturbator',
+			username: 'Sergent',
 		},
 	}) 
 
@@ -36,7 +36,7 @@ async function main() {
 		update:{},
 		create:{
 			login: 'viporten',
-			username: 'el beaugausse',
+			username: 'Raled',
 		},
 	})
 

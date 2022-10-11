@@ -18,7 +18,7 @@ type FriendbarProps = {
 
 export function Friendsbar({ userId, socket }: FriendbarProps) {
 	const [friends, setFriends] = useState<IUser[]>([]);
-	const [connectFriends, setConnectFriends] = useState<IUser[]>([])
+	// const [connectFriends, setConnectFriends] = useState<IUser[]>([])
 
 	const axios = AxiosJwt();
 
@@ -27,43 +27,43 @@ export function Friendsbar({ userId, socket }: FriendbarProps) {
 			.then((res: AxiosResponse<IUser[]>) => { setFriends(res.data) });
 	}, []);
 
-	useEffect(() => {
-		const connectedListener = (connectId: number) => {
-			const isFriend = friends.find(user => {
-				return (user.id === connectId);
-			})
-			setConnectFriends(current => [...current, isFriend!]);
-		}
+	// useEffect(() => {
+	// 	const connectedListener = (connectId: number) => {
+	// 		const isFriend = friends.find(user => {
+	// 			return (user.id === connectId);
+	// 		})
+	// 		setConnectFriends(current => [...current, isFriend!]);
+	// 	}
 
-		const disconnectedListener = (disconnectId: number) => {
-			const isFriend = friends.find(user => {
-				return (user.id === disconnectId);
-			})
-			setConnectFriends((prevMessages) => {
-				const newMessages = { ...prevMessages };
-				delete newMessages[isFriend!.id];
-				return newMessages;
-			});
-		};
+	// 	const disconnectedListener = (disconnectId: number) => {
+	// 		const isFriend = friends.find(user => {
+	// 			return (user.id === disconnectId);
+	// 		})
+	// 		setConnectFriends((prevMessages) => {
+	// 			const newMessages = { ...prevMessages };
+	// 			delete newMessages[isFriend!.id];
+	// 			return newMessages;
+	// 		});
+	// 	};
 
-		socket.on('loginToClient', (connectId: number) => {
-			const isFriend = friends.find(user => {
-				return (user.id === connectId);
-			})
-			setConnectFriends(current => [...current, isFriend!]);
-		});
+	// 	socket.on('loginToClient', (connectId: number) => {
+	// 		const isFriend = friends.find(user => {
+	// 			return (user.id === connectId);
+	// 		})
+	// 		setConnectFriends(current => [...current, isFriend!]);
+	// 	});
 		
-		socket.on('logoutToClient', disconnectedListener);
+	// 	socket.on('logoutToClient', disconnectedListener);
 
-		return () => {
-			socket.off('loginToClient', connectedListener);
-			socket.off('logoutToClient', disconnectedListener);
-		};
-	}, [socket]);
+	// 	return () => {
+	// 		socket.off('loginToClient', connectedListener);
+	// 		socket.off('logoutToClient', disconnectedListener);
+	// 	};
+	// }, [socket]);
 
 	return (
 		<nav className='Friendsbar'>
-			{connectFriends.map((friend: IUser) => (
+			{friends.map((friend: IUser) => (
 				<div>{friend.username}</div>
 			))}
 		</nav>
