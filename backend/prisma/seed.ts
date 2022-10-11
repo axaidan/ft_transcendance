@@ -4,6 +4,66 @@ const prisma = new PrismaClient()
 
 async function main() {
 	
+	const publicAvatarAxel = await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg'},
+		update: {},
+		create: {
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg',
+			is_public: true,
+		}
+	}) 
+	
+	const publicAvatarMlormois = await prisma.avatar.upsert({
+		where: {url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'
+		}
+	}) 
+	
+	const publicAvatarvictor= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg'
+		}
+	}) 
+		
+	const publicAvatarSmile= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg'
+		}
+	}) 
+	
+		
+	const publicAvatarFurry= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'
+		}
+	}) 
+	
+
+/*
+	const publicAvatar2 = await prisma.avatar.upsert({
+		where: {url: ''},
+		update: {},
+		create: {
+			is_pubic: true,
+			url: ''
+		}
+	}) 
+
+	*/
+
+
 	const sergent = await prisma.user.upsert({
 		where: {login: 'mlormois'}, 
 		update: {},
