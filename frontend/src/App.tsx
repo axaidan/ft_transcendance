@@ -3,7 +3,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 // Intern:
-import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store } from "./pages";
+import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest } from "./pages";
 import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./componants";
 
 export default function App() {
@@ -30,6 +30,7 @@ export default function App() {
 					<Route path='store'	  element={ <Store />   }/>
 				</Route>
 				<Route path='*' element={<ErrorPages mode={404} />}/>
+				<Route path='/signinTest' element={ <WelcomerTest /> } />
 			</Routes>
 		</div>
 	);
