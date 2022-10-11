@@ -9,6 +9,7 @@ import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
+import { AppGateway } from './app.gateway';
 
 @Module({
 	imports: [
@@ -25,6 +26,6 @@ import { GameModule } from './game/game.module';
 		DiscussionMessageModule,
 		GameModule,
 	],
-	providers: []
+	providers: [AppGateway]
 })
 export class AppModule {}

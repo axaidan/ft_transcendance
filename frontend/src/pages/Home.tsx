@@ -24,10 +24,7 @@ export function Home() {
 	const axios = AxiosJwt();
 	const jwtToken = cookies.access_token;
 	
-	useEffect(() => {
-		const newSocket = io(`http://localhost:3000`, { extraHeaders: { Authorization: `Bearer ${jwtToken}`}});
-		setSocket(newSocket);
-	}, [setSocket]);
+
 
 	useEffect(() => {
 		axios.get("/user/me")
@@ -37,6 +34,13 @@ export function Home() {
 		 })
 		.catch(() => { navigate('/'); });
 	}, []);
+
+	useEffect(() => {
+		const newSocket = io(`http://localhost:3000`, { extraHeaders: 
+		{ Authorization: `Bearer ${jwtToken}` }});
+		newSocket.emit('loginToServer', user.id);
+		setSocket(newSocket);
+	}, [setSocket]);
 
 	return (
 		<div>

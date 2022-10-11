@@ -3,23 +3,23 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'discussionNs' })
-export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
+export class DiscussionGateway /*implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect*/ {
 
   @WebSocketServer() wss: Server;
 
   private logger: Logger = new Logger('DiscussionGateway');
 
-  afterInit(server: Server) {
-    this.logger.log('Initialized')
-  }
+  // afterInit(server: Server) {
+  //   this.logger.log('Initialized')
+  // }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client ${client.id} CONNECTED`)
-  }
+  // handleConnection(client: Socket, ...args: any[]) {
+  //   this.logger.log(`Client ${client.id} CONNECTED`)
+  // }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client ${client.id} DISCONNECTED`)
-  }
+  // handleDisconnect(client: Socket) {
+  //   this.logger.log(`Client ${client.id} DISCONNECTED`)
+  // }
 
   @SubscribeMessage('message')
   handleMessage(client: Socket, payload: any): string {
