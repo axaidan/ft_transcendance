@@ -270,7 +270,6 @@ async function main() {
 	})
 
 
-
 	const game1 = await prisma.game.upsert({
 		where: {id:1},
 		update: {},

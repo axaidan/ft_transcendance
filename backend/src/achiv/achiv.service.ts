@@ -54,15 +54,29 @@ export class AchievementService{
 
 	async listUnlockAchiv(meId: number) {
 		var findMe = await this.prisma.user.findFirst({where: {id: meId},
-		select: {
-			achievements: true,
-		}})
+		})
 
 		if (!findMe)
 			throw new ForbiddenException('u not exist');
 
-		var list = await this.prisma.achievement.findMany({where: {users: {where: {id : findMe.id}}}})
-		return findMe;
+		var list = await this.prisma.achievement.findMany({
+			where: {users: {some: findMe}},
+		})
+		return list;
+	}
+
+	async listLockAchiv(meId: number) {
+		var findMe = await this.prisma.user.findFirst({where: {id: meId},
+		})
+
+		if (!findMe)
+			throw new ForbiddenException('u not exist');
+
+		var list = await this.prisma.achievement.findMany({
+			where: {users: {none: findMe}},
+		})
+		return list;
+	
 	}
 
 	deleteAchiv = (AchivDto: any) => {}

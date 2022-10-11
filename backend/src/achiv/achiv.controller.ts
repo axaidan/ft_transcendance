@@ -30,13 +30,13 @@ export class AchivController {
 		return this.achivService.listUnlockAchiv(userId);
 	}
 
-	/*
+
 
 	@Get('list_lock')
+	@UseGuards(JwtGuard)
 	listLockAchiv(@GetUser('id') userId:number) {
 		return this.achivService.listLockAchiv(userId);
 	}
-	*/
 
 	@Get('findAchivForUser')
 	findUserForAchivIda(@Body() dto:LinkDto) {
