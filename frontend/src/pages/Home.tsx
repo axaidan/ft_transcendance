@@ -55,7 +55,7 @@ export function Home() {
 
 			<div className='container-body'>
 				<Outlet context={ user } />
-				<Friendsbar userId={userId}/>
+				<Friendsbar userId={userId} socket={socket!}/>
 			</div>
 		</div>
 	)
