@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { GetUser } from "src/auth/decorator";
 import { JwtGuard } from "src/auth/guard";
@@ -25,8 +25,17 @@ export class AvatarController {
 	}
 
 
-	@Get('tag')
-	getTag(@Body() public_id:string ) {
-		return this.avatarService.getTag(public_id);
+	@Get('list')	
+	@UseGuards(JwtGuard)
+	list_avatar(@GetUser('id') meId: number) {
+		return this.avatarService.list_avatar(meId);
 	}
+
+	@Delete('delete')
+	@UseGuards(JwtGuard)
+	remove_avatar(@GetUser('id') meId: number) {
+		return this.avatarService.remove_avatar(meId);
+	}
+
+
 }

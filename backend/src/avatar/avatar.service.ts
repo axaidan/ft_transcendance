@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import { v2 } from 'cloudinary';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
 
@@ -15,6 +16,9 @@ export class AvatarService {
       throw new BadRequestException('Invalid file type.');
     });
 
+	if (owner.avatarId) {
+		await this.remove_avatar(userId);
+	}
 
 	let newAvatar = await this.prisma.avatar.upsert({where: { url: ret.url},
 		update: {},
@@ -66,8 +70,14 @@ export class AvatarService {
 	return  list;
   }
 
-  async getTag(public_id: string) {
-	let ret = await this.cloudinary.getTag(public_id);
-	return ret;
+  async remove_avatar(userId: number) {
+	var me = await this.prisma.user.findFirst({where: { id: userId}})
+
+	var avatar = await this.prisma.avatar.findFirst({where: {id: me.avatarId}});
+	
+	if (!avatar) {
+		v2.uploader.destroy(avatar.public_id);
+	}
   }
+
 }
