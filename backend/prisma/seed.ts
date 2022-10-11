@@ -369,7 +369,20 @@ async function main() {
 	})
 
 
-
+	//	FAKE USERS SEED
+	for (let i = 0 ; i < 10 ; i++) {
+		await prisma.user.upsert( {
+		where: {id: 9 + i},
+			update: {},
+			create: {
+				id: 9 + i,
+				login: `user${i}`,
+				username: `USERNAME${i}`,
+				email: `user${i}@student.42.fr`,
+				twoFactorAuth: false,
+			}
+		});
+	}
 
 }
 
