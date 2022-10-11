@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { ForbiddenException, Injectable } from "@nestjs/common"
 import { PrismaService } from "../prisma/prisma.service"
 
 @Injectable()
@@ -50,6 +50,19 @@ export class AchievementService{
 		}
 		return  achiv;
 
+	}
+
+	async listUnlockAchiv(meId: number) {
+		var findMe = await this.prisma.user.findFirst({where: {id: meId},
+		select: {
+			achievements: true,
+		}})
+
+		if (!findMe)
+			throw new ForbiddenException('u not exist');
+
+		var list = await this.prisma.achievement.findMany({where: {users: {where: {id : findMe.id}}}})
+		return findMe;
 	}
 
 	deleteAchiv = (AchivDto: any) => {}
