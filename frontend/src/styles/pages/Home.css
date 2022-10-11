@@ -1,3 +1,8 @@
 .container-body {
+	color: aliceblue;
 	display: flex;
+}
+
+.bg_video {
+	background-color: black;
 }

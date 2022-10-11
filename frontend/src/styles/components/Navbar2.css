@@ -13,7 +13,7 @@
 	border-top: 1px solid #785a28;
 	overflow: hidden;
 	top: 0;
-	position: fixed;
+	/* position: fixed; */
 	width: 100%;
 	align-items: center;
 }
@@ -57,13 +57,12 @@
 	background-position-y: 0px;
 	background-position-x: 50%;
 	text-shadow: 0px 40px 20px white;
-
 }
 
 .items {
 	height: 100%;
-	margin-left: 7px;
-	margin-right: 7px;
+	margin-left: 8px;
+	margin-right: 8px;
 	list-style: none;
 	align-items: center;
 }

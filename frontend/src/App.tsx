@@ -12,7 +12,7 @@ export default function App() {
 			<Routes>
 				<Route path='/' element={<Welcomer />} />
 				<Route path='/home' element={<Home />}>
-					<Route index element={<Acceuil />} />
+					<Route path='acceuil' element={<Acceuil />} />
 					<Route path='ladder' element={<Ladder />} />
 					<Route path='me' element={<MyNavProfile />}>
 						<Route index element={<Profile />} />

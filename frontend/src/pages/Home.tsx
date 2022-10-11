@@ -11,25 +11,25 @@ import { IUser, DflUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
+import { Navbar2 } from '../componants/Navbar2';
+import bg_website from '../assets/videos/bg_website.webm'
 
 export function Home() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState<IUser>(DflUser);
-	const [userId, setUserId] = useState<number>(0)
 	const axios = AxiosJwt();
 
 	useEffect(() => {
 		axios.get("/user/me")
 			.then((res: AxiosResponse<IUser>) => {
 				setUser(res.data);
-				setUserId(res.data.id);
 			})
 			.catch(() => { navigate('/'); });
 	}, []);
 
 	return (
 		<div>
-			<Navbar me={user} />
+			<Navbar2 me={user} />
 
 			{/* 	WALTER:
 				Ici tu doit t'arranger pour que
@@ -38,8 +38,9 @@ export function Home() {
 			*/}
 
 			<div className='container-body'>
+				<video src={bg_website} autoPlay loop muted className='bg_video' />
 				<Outlet context={user} />
-				<Friendsbar userId={userId} />
+				<Friendsbar userId={user.id} />
 			</div>
 		</div>
 	)

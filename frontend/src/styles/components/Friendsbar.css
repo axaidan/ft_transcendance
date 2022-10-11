@@ -8,9 +8,9 @@ body {
 	display: flex;
 	flex-direction: column;
 	width: 220px;
-	height: 100%;
+	height: 100vh;
 	top: 110px;
-	position: fixed;
+	/* position: fixed; */
 	right: 0;
 	border-left: 3px solid #16222a;
 	background-color: #020912;
@@ -18,6 +18,7 @@ body {
 	background-repeat: no-repeat;
 	background-image: url('../lol-ressources/poro_sad.png');
 	background-position: 50% 50%;
+	margin-left: auto;
 }
 
 .user_info ul {
