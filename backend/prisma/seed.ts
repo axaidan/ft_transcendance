@@ -173,7 +173,7 @@ async function main() {
 	})
 
 	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'un curly'},
+		where: {title: 'tiens un curly'},
 		update: {}, 
 		create: {
 			title: 'tiens un curly',
