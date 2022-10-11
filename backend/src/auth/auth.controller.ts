@@ -1,8 +1,9 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
 import { Request, Response } from 'express';
 import { GetUser } from './decorator';
+import { SigninTestDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,5 +39,24 @@ export class AuthController {
 			expires: new Date(Date.now() + 6000000)
 		});
 		response.redirect("http://localhost:4200/home");
+	}
+
+	@Post('signin-test')
+	async signinTest(
+		@Body() dto: SigninTestDto,
+		@Res({ passthrough: true }) response: Response
+		) {
+		let token: string;
+		await this.authService.signinTest( dto.login )
+		.then( (res) => {
+			token = res;
+			response.cookie('access_token', token, {
+				expires: new Date(Date.now() + 6000000)
+			});
+			response.redirect("http://localhost:4200/home");
+		})
+		.catch( (e) => {
+			response.redirect("http://localhost:4200");
+		})
 	}
 }

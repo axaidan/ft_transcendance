@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
 import { MailService } from '../mail/mail.service';
+import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -43,4 +44,22 @@ export class AuthService {
 		const token = await this.jwt.signAsync(payload, {expiresIn: '30m', secret: secret});
 		return { access_token: token };
 	}
+
+
+	//	FAKE-USER-BEGIN !!!
+	async signinTest( login: string ) {
+		let user = await this.prisma.user.findFirst({ where: { login: login }});
+		if (!user) {
+			throw new NotFoundException(`TEST SIGNIN FAILED - USER ${login} NOT FOUND`);
+		};
+		const token = await this.signToken( user.id, user.login ); 
+		if (user.twoFactorAuth === true) {
+			this.mailService.sendLoginToken(user, token.access_token);
+			return undefined;	// SHOULD RETURN INFO TO MAKE A
+								// "CHECK YOUR MAIL TO LOGIN"
+								// WINDOW POP-UP
+		}
+		return token.access_token ;
+	}
+	//	FAKE-USER-END !!!
 }
