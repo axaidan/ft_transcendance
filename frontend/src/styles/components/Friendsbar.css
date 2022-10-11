@@ -4,7 +4,6 @@ body {
 }
 
 .Friendsbar {
-	color: #fff;
 	display: flex;
 	flex-direction: column;
 	width: 220px;
