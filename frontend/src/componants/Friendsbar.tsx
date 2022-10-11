@@ -18,7 +18,7 @@ const ConnectSocket = () => {
 	const [ cookies ] = useCookies();
 	const jwtToken = cookies.access_token;
 
-	const socketDiscution = io("http://localhost/3000/discussionNs", {
+	const socketDiscution = io("http://localhost:3000/discussionNs", {
 		extraHeaders: {
 			Authorization: `Bearer ${jwtToken}`
 		}
