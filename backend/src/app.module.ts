@@ -24,6 +24,7 @@ import { GameModule } from './game/game.module';
 		DiscussionModule,
 		DiscussionMessageModule,
 		GameModule,
-	]
+	],
+	providers: []
 })
 export class AppModule {}
