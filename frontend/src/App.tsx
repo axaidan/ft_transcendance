@@ -4,7 +4,7 @@ import { Routes, Route } from "react-router-dom";
 
 // Intern:
 import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store } from "./pages";
-import { MyNavProfile, OthNavProfile, History, Friends, Collection } from "./componants";
+import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./componants";
 
 export default function App() {
 	return (
@@ -19,10 +19,10 @@ export default function App() {
 						<Route path="history" element={ <History /> }/>
 						<Route path="friend"	 element={ <Friends /> }/>
 						<Route path="collection" element={ <Collection /> }/>
-						<Route path="achievement" element={ <Collection /> }/>
+						<Route path="achievement" element={ <Achievement /> }/>
 					</Route>
 					<Route path=':id' element={ <OthNavProfile /> }>
-						<Route index		  element={ <Profile /> }/>
+						<Route index element={ <Profile /> }/>
 						<Route path="history" element={ <History /> }/>
 						<Route path="achievement" element={ <Collection /> }/>
 					</Route>

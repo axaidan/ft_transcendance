@@ -69,16 +69,16 @@ export function Navbar({ me }:NavProps ) {
 								Ladder
 							</NavLink>
 						</li>
-						{/* <li className="items">
-							<NavLink to='/' className='links'>
+						<li className="items">
+							<NavLink to='/home/channel' className='links'>
 								Channels
 							</NavLink>
 						</li>
 						<li className="items" >
-							<NavLink to='/' className='links'>
-								Ladder
+							<NavLink to='/home/store' className='links'>
+								Store
 							</NavLink>
-						</li> */}
+						</li>
 					</div>
 				</ul >
 

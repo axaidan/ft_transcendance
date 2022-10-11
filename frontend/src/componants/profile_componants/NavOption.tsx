@@ -31,16 +31,28 @@ export function NavOption( { userId }: NavOptionProps ) {
 		// .catch((e) => { setResponse(e); })
 	}
 
+	function AddBlock( cibleId: number) {
+		axios.post('/relation/add_block/' + cibleId)
+		// .then((res) => { setResponse(res.data); })
+		// .catch((e) => { setResponse(e); })
+	}
+
+	function RemoveBlock( cibleId: number) {
+		axios.post('/relation/remove_block/' + cibleId)
+		// .then((res) => { setResponse(res.data); })
+		// .catch((e) => { setResponse(e); })
+	}
+
 	return (
 		<nav className='container-nav-option'>
 			<div>
 				<p>{user.login}, {user.id}, {user.username}</p>
 			</div>
 			<div>
-				<button className='btn-friend' onClick={ () => AddFriend( user.id ) } />
-				<button className='btn-block' onClick={ () => RemoveFriend( user.id )} />
-				<button className='btn-friend' onClick={ () => AddFriend( user.id ) } />
-				<button className='btn-block' onClick={ () => RemoveFriend( user.id )} />
+				<button className='btn-friend' onClick={ () => AddFriend( user.id ) } >f+</button>
+				<button className='btn-block' onClick={ () => RemoveFriend( user.id )} >f-</button>
+				<button className='btn-friend' onClick={ () => AddBlock( user.id ) } >b+</button>
+				<button className='btn-block' onClick={ () => RemoveBlock( user.id )} >b-</button>
 			</div>
 		</nav>
 	)
