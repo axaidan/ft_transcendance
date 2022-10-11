@@ -1,4 +1,4 @@
-body {
+/* body {
 	margin: 0px;
 	padding: 0px;
 }
@@ -21,8 +21,6 @@ body {
 	text-decoration: none;
 	font-size: 25px;
 	overflow: hidden;
-	/* box-shadow: 0 0 20px rgb(240, 6, 6); */
-	/* background: rgb(129, 3, 3); */
 	transition: 0.2s;
 	padding-top: 8px;
 	padding-left: 8px;
@@ -250,4 +248,4 @@ a:hover span:nth-child(4) {
 		color: #333;
 		cursor: pointer;
 	}
-}
+} */

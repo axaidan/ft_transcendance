@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import Friendsbar from "../componants/Friendsbar";
 import bg_website from '../assets/videos/bg_website.webm'
 import '../styles/pages/Home.css'
-// import { Navbar2 } from '../componants/Navbar2';
-import { Navbar } from "../componants";
+import { Navbar2 } from '../componants/Navbar2';
 
 export function Home() {
 	const navigate = useNavigate();
@@ -25,7 +24,7 @@ export function Home() {
 
 	return (
 		<div >
-			<Navbar />
+			<Navbar2 />
 			<Friendsbar />
 			<video src={bg_website} autoPlay loop muted className='bg_video' />
 			<div className='container-home'>

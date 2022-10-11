@@ -28,9 +28,14 @@ export function Navbar2() {
 
 	const [toggleMenu, setToggleMenu] = useState(false);
 	const [largeur, setLargeur] = useState(window.innerWidth);
+	const [toggleStatus, setToggleStatus] = useState(true);
 
 	const toggleNavResponsive = () => {
 		setToggleMenu(!toggleMenu);
+	}
+
+	const toggleUserStatus = () => {
+		setToggleStatus(!toggleStatus);
 	}
 
 	useEffect(() => {
@@ -48,7 +53,11 @@ export function Navbar2() {
 		}
 	}, [])
 
+	const location = useLocation();
 
+	const { pathname } = location;
+
+	const splitLocation = pathname.split("/");
 
 	return (
 		<div className="navbar">
@@ -56,51 +65,61 @@ export function Navbar2() {
 				<div className="items_left">
 					<li className="play">
 						<NavLink to='/game'>
-							Play
+							<div className="play_div">
+								<button className="play_btn">
+									Play
+								</button>
+							</div>
 						</NavLink>
 					</li>
-					<li className="items">
+					<li className={splitLocation[1] === "" ? "active" : "items"}>
 						<NavLink to='/home'>
 							Home
 						</NavLink>
 					</li>
-					<li className="items">
+					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
 						<NavLink to='/profile'>
 							profile
 						</NavLink>
 					</li>
 				</div>
 				<div className="items_right">
-					<li className="items">
-						<NavLink to='/'>
+					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
+						<NavLink to='/friends'>
 							Friends
 						</NavLink>
 					</li>
-					<li className="items">
-						<NavLink to='/'>
+					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
+						<NavLink to='/channels'>
 							Channels
 						</NavLink>
 					</li>
-					<li className="items" >
-						<NavLink to='/'>
+					<li className={splitLocation[1] === "" ? "items_active" : "items"} >
+						<NavLink to='/store'>
 							Store
 						</NavLink>
 					</li>
 				</div>
 				<div className="nav_user">
 					<div className="avatar">
-						photo
+						<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' className="user_icon">
+						</img>
 					</div>
 					<div className="nav_user_info">
 						<div className="nickname">
-							walter
+							{user}
 						</div>
-						<div className="status">
-							online
+						<div className={toggleStatus === true ? "online" : "absent"}>
+							<button onClick={toggleUserStatus} className={toggleStatus === true ? "btn_online" : "btn_abs"}>
+								◉
+							</button>
+							{toggleStatus === true ? 'online' : "absent"}
 						</div>
 					</div>
 				</div>
 			</ul >
 		</div>
+
+
 	);
 }
