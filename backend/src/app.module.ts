@@ -9,6 +9,7 @@ import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
+import { AvatarModule } from './avatar/avatar.module';
 
 @Module({
 	imports: [
@@ -24,6 +25,7 @@ import { GameModule } from './game/game.module';
 		DiscussionModule,
 		DiscussionMessageModule,
 		GameModule,
+		AvatarModule,
 	]
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ CREATE TABLE "user" (
     "username" TEXT,
     "email" TEXT,
     "twoFactorAuth" BOOLEAN NOT NULL DEFAULT false,
+    "avatarId" INTEGER,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -25,7 +26,9 @@ CREATE TABLE "achievement" (
 CREATE TABLE "Avatar" (
     "id" SERIAL NOT NULL,
     "title" TEXT NOT NULL,
-    "path" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "is_public" BOOLEAN NOT NULL,
+    "public_id" INTEGER NOT NULL,
 
     CONSTRAINT "Avatar_pkey" PRIMARY KEY ("id")
 );
@@ -100,6 +103,9 @@ CREATE UNIQUE INDEX "_AchievementToUser_AB_unique" ON "_AchievementToUser"("A", 
 
 -- CreateIndex
 CREATE INDEX "_AchievementToUser_B_index" ON "_AchievementToUser"("B");
+
+-- AddForeignKey
+ALTER TABLE "user" ADD CONSTRAINT "user_avatarId_fkey" FOREIGN KEY ("avatarId") REFERENCES "Avatar"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "discussion" ADD CONSTRAINT "discussion_user1Id_fkey" FOREIGN KEY ("user1Id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

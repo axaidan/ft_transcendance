@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Discussion, User } from '@prisma/client';
+import { Achievement, Discussion, User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -26,6 +26,7 @@ describe('App e2e', () => {
 	let userArr: User[] = [];
 	let jwtArr: {access_token: string}[] = [];
 	let discArr: Discussion[];
+	let achievArr: Achievement[];
 
 	const seedUsers = async function() {
 		const name: string = "user";
@@ -116,6 +117,148 @@ describe('App e2e', () => {
 		}
 	}
 
+	const seedAchievements = async function() {
+		const arr: Achievement[] = [];
+		const achiv0 = await prisma.achievement.upsert({
+			where: {title: 'HelloWorld'},
+			update: {}, 
+			create: {
+				title: 'HelloWorld',
+				descriptions: 'You logged in for the first time!',
+				path: 'fa-solid fa-earth-europe',
+			},
+		})
+
+		const achiv1 = await prisma.achievement.upsert({
+			where: {title: 'Birth of a Legend'},
+			update: {}, 
+			create: {
+				title: 'Birth of a Legend',
+				descriptions: 'You won your first game!',
+				path: 'fa-solid fa-award',
+			},
+		})
+
+		const achiv2 = await prisma.achievement.upsert({
+			where: {title: 'Played 3 games'},
+			update: {}, 
+			create: {
+				title: 'Played 3 games',
+				descriptions: 'You played three games!',
+				path: 'fa-solid fa-question',
+			},
+		})
+
+		const achiv3 = await prisma.achievement.upsert({
+			where: {title: 'Tiens, un curly!'},
+			update: {}, 
+			create: {
+				title: 'Tiens, un curly!',
+				descriptions: 'You added your first friend!',
+				path: 'fa-solid fa-user-group',
+			},
+		})
+
+
+		const achiv4 = await prisma.achievement.upsert({
+			where: {title: 'U there, shut up!'},
+			update: {}, 
+			create: {
+				title: 'U there, shut up!',
+				descriptions: 'You blocked a user for the first time!',
+				path: 'fa-solid fa-person-harassing',
+			},
+		})
+
+
+		const achiv5 = await prisma.achievement.upsert({
+			where: {title: 'Social Club is Open'},
+			update: {}, 
+			create: {
+				title: 'Social Club is Open',
+				descriptions: 'You joined your first Channel!',
+				path: 'fa-solid fa-martini-glass-citrus',
+			},
+		})
+
+
+		const achiv6 = await prisma.achievement.upsert({
+			where: {title: 'Houston, do you read me?'},
+			update: {}, 
+			create: {
+				title: 'Houston, do you read me?',
+				descriptions: 'You sent your first private message!',
+				path: 'fa-regular fa-envelope',
+			},
+		})
+
+
+		const achiv7 = await prisma.achievement.upsert({
+			where: {title: 'Custom Username!'},
+			update: {}, 
+			create: {
+				title: 'Custom Username!',
+				descriptions: 'You edited your username!',
+				path: 'fa-solid fa-fingerprint',
+			},
+		})
+
+
+		const achiv8 = await prisma.achievement.upsert({
+			where: {title: 'Custom Master!'},
+			update: {}, 
+			create: {
+				title: 'Custom Master!',
+				descriptions: 'You uploaded a customized Avatar!',
+				path: 'fa-solid fa-satellite-dish',
+			},
+		})
+
+
+		const achiv9 = await prisma.achievement.upsert({
+			where: {title: 'Here is my Kingdom!'},
+			update: {}, 
+			create: {
+				title: 'Here is my Kingdom!',
+				descriptions: 'You created a Channel!',
+				path: 'fa-solid fa-podcast',
+			},
+		})
+
+
+		const achiv10 = await prisma.achievement.upsert({
+			where: {title: 'Ragnarok'},
+			update: {}, 
+			create: {
+				title: 'Ragnarok',
+				descriptions: 'You deleted a Channel!',
+				path: 'fa-solid fa-explosion',
+			},
+		})
+
+		const achiv11 = await prisma.achievement.upsert({
+			where: {title: 'Platinum'},
+			update: {}, 
+			create: {
+				title: 'Platinum',
+				descriptions: 'You unlocked all Achievements!',
+				path: 'fa-solid fa-trophy',
+			},
+		});
+		arr.push(achiv1);
+		arr.push(achiv2);
+		arr.push(achiv3);
+		arr.push(achiv4);
+		arr.push(achiv5);
+		arr.push(achiv6);
+		arr.push(achiv7);
+		arr.push(achiv8);
+		arr.push(achiv9);
+		arr.push(achiv10);
+		arr.push(achiv11);
+		return arr;
+	}
+
 	beforeAll(async () => {
 			const moduleRef = await Test.createTestingModule({
 			imports: [AppModule],
@@ -150,6 +293,9 @@ describe('App e2e', () => {
 		discArr = await seedDiscussions(userArr);
 		// DISCUSSION MESSAGES SEED
 		seedDiscussionMessages(userArr);
+		// ACHIEVEMENT SEED
+		achievArr = await seedAchievements();
+
 
 		kyleUser = await prisma.user.create({
 			data: {
@@ -175,132 +321,6 @@ describe('App e2e', () => {
 		  }
 		);
 	
-	const achiv0 = await prisma.achievement.upsert({
-		where: {title: 'HelloWorld'},
-		update: {}, 
-		create: {
-			title: 'HelloWorld',
-			descriptions: 'you login for the first time',
-			path: 'fa-solid fa-earth-europe',
-		},
-	})
-
-	const achiv1 = await prisma.achievement.upsert({
-		where: {title: 'begin of a legend'},
-		update: {}, 
-		create: {
-			title: 'begin of a legend',
-			descriptions: 'you win your first game',
-			path: 'fa-solid fa-award',
-		},
-	})
-
-	const achiv2 = await prisma.achievement.upsert({
-		where: {title: 'play 3 game'},
-		update: {}, 
-		create: {
-			title: 'play 3 game',
-			descriptions: 'do you realy like the game?',
-			path: 'fa-solid fa-question',
-		},
-	})
-
-	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'un curly'},
-		update: {}, 
-		create: {
-			title: 'tiens un curly',
-			descriptions: 'tu as ajouter ton premier ami',
-			path: 'fa-solid fa-user-group',
-		},
-	})
-
-
-	const achiv4 = await prisma.achievement.upsert({
-		where: {title: 'U there, shutup!'},
-		update: {}, 
-		create: {
-			title: 'U there, shutup!',
-			descriptions: 'you block a user',
-			path: 'fa-solid fa-person-harassing',
-		},
-	})
-
-
-	const achiv5 = await prisma.achievement.upsert({
-		where: {title: 'social club is open'},
-		update: {}, 
-		create: {
-			title: 'social club is open',
-			descriptions: 'tu as rejoins une groupe',
-			path: 'fa-solid fa-martini-glass-citrus',
-		},
-	})
-
-
-	const achiv6 = await prisma.achievement.upsert({
-		where: {title: 'huston do you ear me'},
-		update: {}, 
-		create: {
-			title: 'huston do you ear me',
-			descriptions: 'tu as envoyer ton premier message',
-			path: 'fa-regular fa-envelope',
-		},
-	})
-
-
-	const achiv7 = await prisma.achievement.upsert({
-		where: {title: 'you have chose your name'},
-		update: {}, 
-		create: {
-			title: 'you have chose your name',
-			descriptions: 'add a speudo',
-			path: 'fa-solid fa-fingerprint',
-		},
-	})
-
-
-	const achiv8 = await prisma.achievement.upsert({
-		where: {title: 'custom master'},
-		update: {}, 
-		create: {
-			title: 'custom master',
-			descriptions: 'download a avatar',
-			path: 'fa-solid fa-satellite-dish',
-		},
-	})
-
-
-	const achiv9 = await prisma.achievement.upsert({
-		where: {title: 'here is my kingdom'},
-		update: {}, 
-		create: {
-			title: 'here is my kingdom',
-			descriptions: 'creer un chanel',
-			path: 'fa-solid fa-podcast',
-		},
-	})
-
-
-	const achiv10 = await prisma.achievement.upsert({
-		where: {title: 'ragnarok'},
-		update: {}, 
-		create: {
-			title: 'ragnarok',
-			descriptions: 'delete un chanel',
-			path: 'fa-solid fa-explosion',
-		},
-	})
-
-	const achiv11 = await prisma.achievement.upsert({
-		where: {title: 'platine'},
-		update: {}, 
-		create: {
-			title: 'platine',
-			descriptions: 'all success unlock',
-			path: 'fa-solid fa-trophy',
-		},
-	})
 
 
 		const game1 = await prisma.game.upsert({

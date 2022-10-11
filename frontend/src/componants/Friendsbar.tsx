@@ -1,36 +1,22 @@
 import React from 'react';
-import '../styles/components/Friendsbar.css';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import axios from 'axios'
-import { AxiosJwt } from "../hooks/AxiosJwt";
+import '../styles/components/Friendsbar.css'
+import PropTypes from "prop-types"
 
-const Friendsbar = () => {
 
-	const [user, setUser] = useState('username');
-	const [avatar, setAvatar] = useState('');
-	const request = AxiosJwt();
+// ICI ON AURA DU SOCKET A FAIRE! 
+// pour les amis connecter
 
-	useEffect(() => {
-		request.get("/user/me")
-			.then((res) => {
-				setUser(res.data.login);
-			})
-	}, []);
+
+type FriendbarProps = {
+	userId: number;
+}
+
+export function Friendsbar({ userId }: FriendbarProps) {
+
 
 	return (
 		<nav className='Friendsbar'>
-			<ul>
-				<div className='user_info'>
-					<ul>
-						social
-						<li>add</li>
-					</ul>
-				</div>
-				<div className='friends_list'>
-					You don't have friends yet
-				</div>
-			</ul>
+			<p color="black" > {userId} </p>
 		</nav>
 	);
 };

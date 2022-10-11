@@ -3,8 +3,7 @@ import React from "react";
 import '../styles/pages/Welcomer.css'
 import bg_welcomer from '../assets/videos/bg_welcomer_loop.webm'
 
-const Welcomer = () => {
-
+export const Welcomer = () => {
 	return (
 		<div>
 			<video src={bg_welcomer} autoPlay loop muted className='bg_video' />
@@ -15,7 +14,4 @@ const Welcomer = () => {
 			</nav>
 		</div>
 	);
-
 }
-
-export default Welcomer;

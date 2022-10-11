@@ -1,6 +1,6 @@
 import { ErrorProps } from '../types'
 
-function ErrorPages({ mode }: ErrorProps) {
+export function ErrorPages({ mode }: ErrorProps) {
 
 	return (
 		<div>
@@ -9,5 +9,3 @@ function ErrorPages({ mode }: ErrorProps) {
 	)
 
 }
-
-export default ErrorPages;
