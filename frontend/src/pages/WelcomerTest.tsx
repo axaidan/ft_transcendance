@@ -1,13 +1,7 @@
 import { useState } from "react"
-
-import axios from "axios";
-
 import '../styles/pages/WelcomerTest.css'
-import { useNavigate } from "react-router";
 
 export function WelcomerTest() {
-
-
 	return (
 		<div className="body">
 			<a className="user-select" href="http://localhost:3000/auth/signin-test?login=user0">user0</a>
