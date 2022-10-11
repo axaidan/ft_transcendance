@@ -1,3 +1,3 @@
 export * from './Navbar'
 export * from './Friendsbar'
-export * from './profile_componants'
+export * from './profile_components'

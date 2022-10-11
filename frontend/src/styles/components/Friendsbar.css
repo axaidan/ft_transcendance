@@ -16,7 +16,7 @@ body {
 	background-color: #020912;
 	justify-content: center;
 	background-repeat: no-repeat;
-	background-image: url('../lol-ressources/poro_sad.png');
+	background-image: url('../../assets/images/poro_sad.png');
 	background-position: 50% 50%;
 	margin-left: auto;
 }

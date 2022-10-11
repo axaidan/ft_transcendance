@@ -5,13 +5,12 @@ import { useEffect, useState } from "react"
 import { AxiosResponse } from "axios";
 
 // Intern:
-import { Friendsbar, Navbar } from '../componants'
+import { Friendsbar, Navbar } from '../components'
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { IUser, DflUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
-import { Navbar2 } from '../componants/Navbar2';
 import bg_website from '../assets/videos/bg_website.webm'
 
 export function Home() {
@@ -29,7 +28,7 @@ export function Home() {
 
 	return (
 		<div>
-			<Navbar2 me={user} />
+			<Navbar me={user} />
 
 			{/* 	WALTER:
 				Ici tu doit t'arranger pour que

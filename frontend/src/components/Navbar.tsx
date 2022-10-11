@@ -1,19 +1,15 @@
-import React, { useCallback } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { FaUserCircle, FaHome, FaComments, FaStore } from 'react-icons/fa';
+import { NavLink, useLocation } from "react-router-dom";
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { IUser } from "../types";
-import { useCookies } from "react-cookie";
-import axios from 'axios'
 import { AxiosJwt } from "../hooks/AxiosJwt";
-import '../styles/components/Navbar2.css'
+import '../styles/components/Navbar.css'
 
 type NavProps = {
 	me: IUser;
 }
 
-export function Navbar2({ me }: NavProps) {
+export function Navbar({ me }: NavProps) {
 
 	const request = AxiosJwt();
 	const [toggleMenu, setToggleMenu] = useState(false);
@@ -62,13 +58,12 @@ export function Navbar2({ me }: NavProps) {
 							</div>
 						</NavLink>
 					</li>
-					<li className={pathname === 'home' ? "items_active" : "items"}>
+					<li className={pathname === "/home/accueil" ? "items_active" : "items"}>
 						<NavLink to='/home/acceuil'>
-							{/* {pathname} */}
-							{splitLocation[1]}
+							home
 						</NavLink>
 					</li>
-					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
+					<li className={splitLocation[1] === "/me" ? "items_active" : "items"}>
 						<NavLink to='/home/me'>
 							profile
 						</NavLink>
