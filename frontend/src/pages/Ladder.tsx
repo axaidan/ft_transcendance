@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AxiosJwt } from '../hooks/AxiosJwt'
 
 export function Ladder() {
- 
+
 	const navigate = useNavigate();
 	const [users, setUsers] = useState([]);
 	const axios = AxiosJwt();
