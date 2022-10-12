@@ -10,6 +10,7 @@ import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Module({
 	imports: [
@@ -26,6 +27,9 @@ import { AvatarModule } from './avatar/avatar.module';
 		DiscussionMessageModule,
 		GameModule,
 		AvatarModule,
+	],
+	providers: [
+		MailerService,
 	]
 })
-export class AppModule {}
+export class AppModule { }

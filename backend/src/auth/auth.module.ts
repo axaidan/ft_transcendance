@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy, FtStrategy} from './strategie';
+import { JwtStrategy, FtStrategy } from './strategie';
 import { UserService } from '../users/users.service';
 import { JwtModule } from '@nestjs/jwt';
-import { MailModule } from 'src/mail/mail.module';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
 	imports: [JwtModule.register({}), MailModule],
@@ -12,4 +12,4 @@ import { MailModule } from 'src/mail/mail.module';
 	providers: [AuthService, JwtStrategy, FtStrategy, UserService]
 })
 
-export class AuthModule {}
+export class AuthModule { }

@@ -1,17 +1,17 @@
 import { Module } from "@nestjs/common";
-import { AchievementService } from "src/achiv/achiv.service";
-import { JwtGuard } from "src/auth/guard";
-import { FtStrategy } from "src/auth/strategie";
 import { RelationController } from "./relation.controller";
 import { RelationService } from "./relation.service";
+import { FtStrategy } from '../auth/strategie/ft.strategie';
+import { AchievementService } from '../achiv/achiv.service';
+import { JwtGuard } from '../auth/guard/jwt.guard';
 
 @Module({
 	imports: [],
 	controllers: [RelationController],
 	providers: [RelationService,
-		AchievementService, 
-	FtStrategy,
-	JwtGuard]
+		AchievementService,
+		FtStrategy,
+		JwtGuard]
 })
 
-export class RelationModule {}
+export class RelationModule { }

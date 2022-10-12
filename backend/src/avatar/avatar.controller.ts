@@ -1,19 +1,19 @@
 import { Body, Controller, Delete, Get, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { GetUser } from "src/auth/decorator";
-import { JwtGuard } from "src/auth/guard";
+import { GetUser } from "../auth/decorator";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AvatarService } from "./avatar.service";
+import { JwtGuard } from '../auth/guard/jwt.guard';
 
 
 @Controller('avatar')
 export class AvatarController {
-	constructor (private avatarService: AvatarService) {};
+	constructor(private avatarService: AvatarService) { };
 
 	@Post('upload')
 	@UseGuards(JwtGuard)
 	@UseInterceptors(FileInterceptor('file'))
-	uploadImage(@GetUser('id') meId: number,@UploadedFile() file: Express.Multer.File) {
+	uploadImage(@GetUser('id') meId: number, @UploadedFile() file: Express.Multer.File) {
 		return this.avatarService.uploadImageToCloudinary(file, meId);
 	}
 
@@ -25,7 +25,7 @@ export class AvatarController {
 	}
 
 
-	@Get('list')	
+	@Get('list')
 	@UseGuards(JwtGuard)
 	list_avatar(@GetUser('id') meId: number) {
 		return this.avatarService.list_avatar(meId);

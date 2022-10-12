@@ -1,9 +1,9 @@
 import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res, Post, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { FtGuard } from './guard';
 import { Request, Response } from 'express';
 import { GetUser } from './decorator';
 import { SigninTestDto } from './dto';
+import { FtGuard } from './guard';
 
 @Controller('auth')
 export class AuthController {
@@ -43,7 +43,7 @@ export class AuthController {
 
 	@Get('signin-test')
 	async signinTest(
-		@Query('login') login : string,
+		@Query('login') login: string,
 		@Res({ passthrough: true }) response: Response
 	) {
 		let token: string;
