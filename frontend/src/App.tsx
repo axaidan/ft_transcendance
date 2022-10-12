@@ -1,8 +1,5 @@
-// Extern:
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from 'react-router-dom';
 
-// Intern:
 import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest } from "./pages";
 import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./components";
 
