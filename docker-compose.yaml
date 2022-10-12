@@ -12,17 +12,17 @@ services:
     volumes:
       - postgres:/var/lib/posgresql/data
 
-  # test-db:
-  #   container_name: test_db
-  #   image: postgres:latest
-  #   ports:
-  #     - "5435:5432"
-  #   environment:
-  #     POSTGRES_USER: maxime
-  #     POSTGRES_PASSWORD: maxime
-  #     POSTGRES_DB: db_maxime
-  #   volumes:
-  #     - test_db_vol:/var/lib/posgresql/data
+  test-db:
+    container_name: test_db
+    image: postgres:latest
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_USER: maxime
+      POSTGRES_PASSWORD: maxime
+      POSTGRES_DB: db_maxime
+    volumes:
+      - test_db_vol:/var/lib/posgresql/data
 
   back:
     container_name: back
@@ -51,7 +51,7 @@ services:
 
 volumes:
   postgres:
-    # test_db_vol: 
+  test_db_vol: 
 
     #        command: "tail -f"
     #        command: sh -c "apk add bash vim ; npm i -g @nestjs/cli; npm --prefix /back/nestjs-api-tutorial install; npm add -D prisma ; npm add @prisma/client ; npm run --prefix /back/nestjs-api-tutorial start:dev;" #npx prisma generate; npx prisma migrate dev; npm run start:dev"
