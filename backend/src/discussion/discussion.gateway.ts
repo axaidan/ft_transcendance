@@ -11,7 +11,6 @@ import { DiscussionDto } from './dto';
 export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(
-    private prisma: PrismaService,
     private discService: DiscussionService,
     private discMsgService: DiscussionMessageService,
   ) {}
@@ -37,13 +36,7 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
   handleDiscMsg(client: Socket, dto: DiscussionMessageDto): void {
     const room = `disc${dto.discId}`;
     this.wss.to(room).emit('discMsgToclient', dto);
-    this.prisma.discussionMessage.create({
-      data: {
-        text: dto.text,
-        userId: dto.userId,
-        discussionId: dto.discId,
-      },
-    });
+    this.discMsgService.create(dto);
   }
 
   @SubscribeMessage('loginToServer')
@@ -57,8 +50,8 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     client.broadcast.emit('logoutToClient', userId);
   }
 
-  @SubscribeMessage('joinDiscToServer')
-  handleJoinDisc(client: Socket, dto: DiscussionDto) {
+  // @SubscribeMessage('joinDiscToServer')
+  // handleJoinDisc(client: Socket, dto: DiscussionDto) {
     
-  }
+  // }
 }
