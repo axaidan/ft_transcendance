@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+import { IUser } from '../types';
+
 import '../styles/components/Friendsbar.css'
-import PropTypes from "prop-types"
+import '../styles/components/friendsbar_components/SocialOption.css'
+
+
 
 
 // ICI ON AURA DU SOCKET A FAIRE! 
@@ -11,13 +16,43 @@ type FriendbarProps = {
 	userId: number;
 }
 
+
+function SocialOption() {
+	return (
+		<div className='social-option'>
+			<div>
+				<p id="social-title">SOCIAL</p>
+			</div>
+			<div>
+				<button id='social-add' className="social-btn"></button>
+				<button id='social-sort' className="social-btn"></button>
+				<button id='social-search' className="social-btn"></button>
+			</div>
+		</div>
+	)
+}
+
+type OnlineFriendProps = {
+	online_friends: IUser[];
+}
+
+function OnlineFriends({online_friends}:OnlineFriendProps) {
+	return (
+		<div>
+
+		</div>
+	)
+}
+
 export function Friendsbar({ userId }: FriendbarProps) {
 
+	const [ onlineFriend, setOnlineFriend ] = useState([]);
 
 	return (
-		<nav className='Friendsbar'>
-			<p color="black" > {userId} </p>
-		</nav>
+		<div className='Friendsbar'>
+			<SocialOption />
+			<OnlineFriends online_friends={onlineFriend} />
+		</div>
 	);
 };
 

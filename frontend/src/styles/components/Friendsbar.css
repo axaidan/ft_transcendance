@@ -5,26 +5,11 @@ body {
 
 .Friendsbar {
 	color: #fff;
-	display: flex;
-	flex-direction: column;
 	width: 220px;
-	height: 100vh;
-	top: 110px;
-	/* position: fixed; */
-	right: 0;
 	border-left: 3px solid #16222a;
 	background-color: #020912;
-	justify-content: center;
 	background-repeat: no-repeat;
 	background-image: url('../../assets/images/poro_sad.png');
 	background-position: 50% 50%;
 	margin-left: auto;
-}
-
-.user_info ul {
-	position: absolute;
-	top: 0px;
-	height: 60px;
-	width: 100%;
-	border-bottom: 3px solid #16222a;
 }

@@ -27,7 +27,7 @@ export function Home() {
 	}, []);
 
 	return (
-		<div>
+		<div className="set-body">
 			<Navbar me={user} />
 
 			{/* 	WALTER:

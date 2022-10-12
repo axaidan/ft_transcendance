@@ -1,0 +1,42 @@
+.social-option {
+    display: flex;
+    justify-content: space-between;
+    /* align-items: center; */
+    margin-left: 14px;
+    margin-right: 8px;
+    height: 40px;
+}
+
+.social-option div {
+    display: flex;
+    align-items: center;
+}
+
+.social-btn {
+    height: 20px;
+    width: 20px;
+    margin: 5px;
+    border: none;
+}
+
+#social-title {
+    padding-top: 6px;
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: smaller;
+}
+
+#social-add {
+    background: url(../../../assets/images/socialOption/add_person_mask.png);
+    background-size: 20px;
+}
+
+#social-sort {
+    background: url(../../../assets/images/socialOption/sort_mask.png);
+    background-size: 20px;
+}
+
+#social-search {
+    background: url(../../../assets/images/socialOption/search_mask.png);
+    background-size: 20px;
+}

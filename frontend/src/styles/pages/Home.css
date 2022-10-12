@@ -1,8 +1,14 @@
 .container-body {
 	color: aliceblue;
 	display: flex;
+	width: 100%;
+	height: 100%;
 }
 
 .bg_video {
 	background-color: black;
+}
+
+.set-body {
+	height: 100vh;
 }
