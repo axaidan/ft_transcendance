@@ -1,6 +1,7 @@
-import { Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { Logger, UseGuards } from '@nestjs/common';
+import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtGuard } from './auth/guard';
 
 @WebSocketGateway({ cors: '*:*'})
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -14,12 +15,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.logger.log('Initialized')
   }
 
+  @UseGuards(JwtGuard)
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`a client connected`);
+    this.logger.log(`A CLIENT CONNECTED`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`a client disconnected`);
+    this.logger.log(`A CLIENT DISCONECTED`);
   }
 
   // @SubscribeMessage('message')
@@ -29,15 +31,18 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   @SubscribeMessage('loginToServer')
   handleLogin(client: Socket, userId: number) {
-    this.logger.log(`user ${userId} CONNECTED`);
-    this.clients[userId] = client.id;
+    if (this.clients[userId]) {
+      this.logger.error(`USER ${userId} DOUBLE CONNECTION`);
+      throw new WsException(`double connection`);
+    }
+    this.clients[userId] = client;
+    this.logger.log(`USER ${userId} CONNECTED`);
     client.broadcast.emit('loginToClient', userId);
   }
 
   @SubscribeMessage('logoutToServer')
   handleLogout(client: Socket, userId: number) {
-    this.logger.log(`user ${userId} DISCONNECTED`);
+    this.logger.log(`USER ${userId} DISCONNECTED`);
     client.broadcast.emit('logoutToClient', userId);
   }
 }
-
