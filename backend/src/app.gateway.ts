@@ -3,46 +3,69 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from './auth/guard';
 
-@WebSocketGateway({ cors: '*:*'})
+@WebSocketGateway({ cors: '*:*' })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() wss: Server;
 
   private logger: Logger = new Logger('AppGateway');
-  private clients = new Map();
+  private clientsMap = new Map<number, Socket>();
 
+  ////////////////////////////////////
+  //  INIT, CONNECTION, DISCONNECT  //
+  ////////////////////////////////////
   afterInit(server: Server) {
     this.logger.log('Initialized')
   }
 
   @UseGuards(JwtGuard)
   handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`A CLIENT CONNECTED`);
+    this.logger.log(`CLIENT ${client.id} CONNECTED`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`A CLIENT DISCONECTED`);
+    this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
+    for (const [id, value] of this.clientsMap.entries()) {
+      if (client.id === value.id) {
+        this.logger.log(`USER ${id} LOGGED OUT`);
+        this.wss.emit('logoutToClient', id);
+        this.clientsMap.delete(id);
+        break ;
+      }
+    }
+    this.dispayClientsMap();
   }
 
-  // @SubscribeMessage('message')
-  // handleMessage(client: Socket, payload: any): string {
-  //   return 'Hello world!';
-  // }
+  //////////////
+  //  METHODS //
+  //////////////
+  dispayClientsMap() {
+    for (const [key, value] of this.clientsMap.entries()) {
+      console.log(`clientsMap[${key}]\t=\t${value.id}`);
+    }
+  }
+  
 
+  //////////////
+  //  EVENTS  //
+  //////////////
   @SubscribeMessage('loginToServer')
   handleLogin(client: Socket, userId: number) {
-    if (this.clients[userId]) {
-      this.logger.error(`USER ${userId} DOUBLE CONNECTION`);
+    if (this.clientsMap[userId]) {
+      this.logger.error(`USER ${userId} DOUBLE LOG IN`);
       throw new WsException(`double connection`);
     }
-    this.clients[userId] = client;
-    this.logger.log(`USER ${userId} CONNECTED`);
+    this.clientsMap.set(userId, client);
+    this.logger.log(`USER ${userId} LOGGED IN`);
     client.broadcast.emit('loginToClient', userId);
+    this.dispayClientsMap();
   }
 
   @SubscribeMessage('logoutToServer')
   handleLogout(client: Socket, userId: number) {
-    this.logger.log(`USER ${userId} DISCONNECTED`);
+    this.logger.log(`USER ${userId} LOGGED OUT`);
     client.broadcast.emit('logoutToClient', userId);
+    this.clientsMap.delete(userId);
   }
+  
 }
