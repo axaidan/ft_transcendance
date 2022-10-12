@@ -15,7 +15,7 @@ export class DiscussionMessageService {
               userId: dto.userId,
               discussionId: dto.discId,
             },
-          });
+        });
     }
     
 }

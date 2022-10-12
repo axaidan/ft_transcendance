@@ -50,6 +50,12 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     client.broadcast.emit('logoutToClient', userId);
   }
 
+  @SubscribeMessage('joinDiscRoom')
+  handleJoinDiscRoom(client: Socket, discId: number) {
+    const room: string = 'disc' + discId;
+    client.join(room);
+  }
+
   // @SubscribeMessage('joinDiscToServer')
   // handleJoinDisc(client: Socket, dto: DiscussionDto) {
     

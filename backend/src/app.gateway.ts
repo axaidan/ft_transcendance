@@ -45,7 +45,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       console.log(`\tclientsMap[${key}]\t=\t${value}`);
     }
   }
-  
 
   //////////////
   //  EVENTS  //
@@ -69,6 +68,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     this.clientsMap.delete(userId);
   }
 
+  /*  PASS A userId, 
+      RETURNS TRUE IF THIS USER HAS A WEBSOCKET OPEN
+  */
   @SubscribeMessage('isOnlineToServer')
   handleIsOnline(client: Socket, userId: number) : WsResponse<boolean> {
     if (this.clientsMap[userId]) {
