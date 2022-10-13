@@ -8,37 +8,33 @@ import { AxiosResponse } from "axios";
 import { Friendsbar, Navbar } from '../components'
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { IUser, DflUser } from "../types";
-import io, { Socket } from 'socket.io-client';
-import { useCookies } from "react-cookie";
+// import io, { Socket } from 'socket.io-client';
+// import { useCookies } from "react-cookie";
 
 // Assets:
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website.webm'
 
 
-const GetCookie = () => {
-	const [ cookies ] = useCookies();
-	return cookies.access_token;
-}
+// const GetCookie = () => {
+// 	const [ cookies ] = useCookies();
+// 	return cookies.access_token;
+// }
 
-const GetSocket = ( userId: number ) => {
-	const newSocket = io(`http://localhost:3000`, 
-	{ extraHeaders: 
-		{ Authorization: `Bearer ${GetCookie}` }
-	});
-	newSocket.emit('loginToServer', userId);
+// const GetSocket = ( userId: number ) => {
+// 	const newSocket = io(`http://localhost:3000`, 
+// 	{ extraHeaders: 
+// 		{ Authorization: `Bearer ${GetCookie}` }
+// 	});
+// 	newSocket.emit('loginToServer', userId);
 
-	// newSocket.on("disconnect", () => {
-	// 	newSocket.emit('logoutToServer', userId);
-	// });
-
-	return (newSocket);
-}
+// 	return (newSocket);
+// }
 
 export function Home() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState<IUser>(DflUser);
-	const [socket, setSocket] = useState<Socket>();
+	// const [socket, setSocket] = useState<Socket>();
 
 	const axios = AxiosJwt();
 	
@@ -46,7 +42,7 @@ export function Home() {
 		axios.get("/user/me")
 		.then((res: AxiosResponse<IUser>) => {
 			setUser(res.data);
-			setSocket(GetSocket(res.data.id));
+			// setSocket(GetSocket(res.data.id));
 		 })
 		.catch(() => { navigate('/'); });
 	}, []);
