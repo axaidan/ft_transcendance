@@ -8,7 +8,6 @@ import { DiscussionService } from 'src/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
-import { DiscussionDto } from 'src/discussion/dto/index';
 
 const N = 20;
 
@@ -61,7 +60,7 @@ describe('App e2e', () => {
 	// dummyUser HAS 5 Discussion, 3 WHERE user1Id, 2 WHERE user2Id
 	// user[0 - 9)] ALL HAVE DISCUSSIONS
 	// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
-		let i = 1;
+		let i = 0;
 		let arr: Discussion[] = [];
 		let disc: Discussion;
 		for ( ; i < 2 ; i++) {
@@ -960,201 +959,201 @@ describe('App e2e', () => {
 
 		
 
-	describe('Discussion', () => {
+	// describe('Discussion', () => {
 
-		describe('Create POST /discussion/create', () => {
-			it('VALID - should 201', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(201)
-				.expectBodyContains(userId)
-				.expectBodyContains(dummyUser.id)
-				// .inspect();
-			});
+	// 	// describe('Create POST /discussion/create', () => {
+	// 	// 	it('VALID - should 201', () => {
+	// 	// 		const userId = userArr[0].id;
+	// 	// 		const dto: DiscussionDto = {
+	// 	// 			user2Id: userId,
+	// 	// 		};
+	// 	// 		return pactum
+	// 	// 		.spec()
+	// 	// 		.post('/discussion/create')
+	// 	// 		.withHeaders({
+	// 	// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 	// 		})
+	// 	// 		.withBody(dto)
+	// 	// 		.expectStatus(201)
+	// 	// 		.expectBodyContains(userId)
+	// 	// 		.expectBodyContains(dummyUser.id)
+	// 	// 		// .inspect();
+	// 	// 	});
 
-			it('NON VALID DTO- should 201', () => {
-				const userId = userArr[0].id;
-				const dto = {
-					// user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(400)
-				// .expectBodyContains(userId)
-				// .expectBodyContains(dummyUser.id)
-				.inspect();
-			});
+	// 	// 	it('NON VALID DTO- should 201', () => {
+	// 	// 		const userId = userArr[0].id;
+	// 	// 		const dto = {
+	// 	// 			// user2Id: userId,
+	// 	// 		};
+	// 	// 		return pactum
+	// 	// 		.spec()
+	// 	// 		.post('/discussion/create')
+	// 	// 		.withHeaders({
+	// 	// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 	// 		})
+	// 	// 		.withBody(dto)
+	// 	// 		.expectStatus(400)
+	// 	// 		// .expectBodyContains(userId)
+	// 	// 		// .expectBodyContains(dummyUser.id)
+	// 	// 		.inspect();
+	// 	// 	});
 
-			it('NO DTO- should 201', () => {
-				const userId = userArr[0].id;
-				const dto = {
-					// user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				// .withBody(dto)
-				.expectStatus(400)
-				// .expectBodyContains(userId)
-				// .expectBodyContains(dummyUser.id)
-				.inspect();
-			});
+	// 	// 	it('NO DTO- should 201', () => {
+	// 	// 		const userId = userArr[0].id;
+	// 	// 		const dto = {
+	// 	// 			// user2Id: userId,
+	// 	// 		};
+	// 	// 		return pactum
+	// 	// 		.spec()
+	// 	// 		.post('/discussion/create')
+	// 	// 		.withHeaders({
+	// 	// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 	// 		})
+	// 	// 		// .withBody(dto)
+	// 	// 		.expectStatus(400)
+	// 	// 		// .expectBodyContains(userId)
+	// 	// 		// .expectBodyContains(dummyUser.id)
+	// 	// 		.inspect();
+	// 	// 	});
 
-			it('NO JWT - should 401', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				// .withHeaders({
-				// 	Authorization: `Bearer ${dummyJwt.access_token}`,
-				// })
-				.withBody(dto)
-				.expectStatus(401)
-				// .inspect();
-			});
+	// 	// 	it('NO JWT - should 401', () => {
+	// 	// 		const userId = userArr[0].id;
+	// 	// 		const dto: DiscussionDto = {
+	// 	// 			user2Id: userId,
+	// 	// 		};
+	// 	// 		return pactum
+	// 	// 		.spec()
+	// 	// 		.post('/discussion/create')
+	// 	// 		// .withHeaders({
+	// 	// 		// 	Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 	// 		// })
+	// 	// 		.withBody(dto)
+	// 	// 		.expectStatus(401)
+	// 	// 		// .inspect();
+	// 	// 	});
 			
-			it('ALREADY EXISTS - should 400', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(400)
-				// .inspect();
-			});
-		});	// DESCRIBE(DISCUSSION/CREATE)
+	// 	// 	it('ALREADY EXISTS - should 400', () => {
+	// 	// 		const userId = userArr[0].id;
+	// 	// 		const dto: DiscussionDto = {
+	// 	// 			user2Id: userId,
+	// 	// 		};
+	// 	// 		return pactum
+	// 	// 		.spec()
+	// 	// 		.post('/discussion/create')
+	// 	// 		.withHeaders({
+	// 	// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 	// 		})
+	// 	// 		.withBody(dto)
+	// 	// 		.expectStatus(400)
+	// 	// 		// .inspect();
+	// 	// 	});
+	// 	// });	// DESCRIBE(DISCUSSION/CREATE)
 
 
-		describe('Retrieve GET /discussion/', () => {
+	// 	describe('Retrieve GET /discussion/', () => {
 		
-			it('VALID - HAS DISCUSSIONS - should 200', () => {
-				return pactum
-				.spec()
-				.get('/discussion')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.expectStatus(200)
-				.expectBodyContains(dummyUser.id)
-				// .expectBodyContains(dummyUser.username) !!! NOT EDITED
-				.expectBodyContains(userArr[0].id)
-				.expectBodyContains(userArr[0].username)
-				.expectBodyContains(userArr[1].id)
-				.expectBodyContains(userArr[1].username)
-				.expectBodyContains(userArr[2].id)
-				.expectBodyContains(userArr[2].username)
-				.expectBodyContains(userArr[3].id)
-				.expectBodyContains(userArr[3].username)
-				.expectBodyContains(userArr[4].id)
-				.expectBodyContains(userArr[4].username)
-				.expectJsonLength(5)
-				// .inspect();
-			});
+	// 		it('VALID - HAS DISCUSSIONS - should 200', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get('/discussion')
+	// 			.withHeaders({
+	// 				Authorization: `Bearer ${dummyJwt.access_token}`,
+	// 			})
+	// 			.expectStatus(200)
+	// 			.expectBodyContains(dummyUser.id)
+	// 			// .expectBodyContains(dummyUser.username) !!! NOT EDITED
+	// 			.expectBodyContains(userArr[0].id)
+	// 			.expectBodyContains(userArr[0].username)
+	// 			.expectBodyContains(userArr[1].id)
+	// 			.expectBodyContains(userArr[1].username)
+	// 			.expectBodyContains(userArr[2].id)
+	// 			.expectBodyContains(userArr[2].username)
+	// 			.expectBodyContains(userArr[3].id)
+	// 			.expectBodyContains(userArr[3].username)
+	// 			.expectBodyContains(userArr[4].id)
+	// 			.expectBodyContains(userArr[4].username)
+	// 			.expectJsonLength(5)
+	// 			// .inspect();
+	// 		});
 
-			it('VALID - HAS NO DISCUSSION - should 200', () => {
-				return pactum
-				.spec()
-				.get('/discussion')
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[N / 2].access_token}`,
-				})
-				.expectStatus(200)
-				.expectBodyContains([])
-				.expectJsonLength(0)
-				// .inspect();
-			});
+	// 		it('VALID - HAS NO DISCUSSION - should 200', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get('/discussion')
+	// 			.withHeaders({
+	// 				Authorization: `Bearer ${jwtArr[N / 2].access_token}`,
+	// 			})
+	// 			.expectStatus(200)
+	// 			.expectBodyContains([])
+	// 			.expectJsonLength(0)
+	// 			// .inspect();
+	// 		});
 			
-			it('NO JWT - should 401', () => {
-				return pactum
-				.spec()
-				.get('/discussion')
-				// .withHeaders({
-				// 	Authorization: `Bearer ${jwtArr[N / 2].access_token}`,
-				// })
-				.expectStatus(401);
-				// .inspect();
-			});
+	// 		it('NO JWT - should 401', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get('/discussion')
+	// 			// .withHeaders({
+	// 			// 	Authorization: `Bearer ${jwtArr[N / 2].access_token}`,
+	// 			// })
+	// 			.expectStatus(401);
+	// 			// .inspect();
+	// 		});
 
-			it('WRONG JWT - should 401', () => {
-				return pactum
-				.spec()
-				.get('/discussion')
-				.withHeaders({
-					Authorization: `Bearer blablabla`,
-				})
-				.expectStatus(401);
-				// .inspect();
-			});
+	// 		it('WRONG JWT - should 401', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get('/discussion')
+	// 			.withHeaders({
+	// 				Authorization: `Bearer blablabla`,
+	// 			})
+	// 			.expectStatus(401);
+	// 			// .inspect();
+	// 		});
 
-		});	// DESCRIBE (DISCUSSION/RETRIEVE)
+	// 	});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		describe('Retrieve Msgs GET /discussion/:id', () => {
-			it('VALID - NO MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[0].access_token}`,
-				})
-				.expectStatus(200)
-				.expectBodyContains([])
-				.expectJsonLength(0)
-				// .inspect()
-			});
+	// 	describe('Retrieve Msgs GET /discussion/:id', () => {
+	// 		it('VALID - NO MSGS', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get(`/discussion/${dummyUser.id}`)
+	// 			.withHeaders({
+	// 				Authorization: `Bearer ${jwtArr[0].access_token}`,
+	// 			})
+	// 			.expectStatus(200)
+	// 			.expectBodyContains([])
+	// 			.expectJsonLength(0)
+	// 			// .inspect()
+	// 		});
 
-			it('VALID - HAS MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[1].access_token}`,
-				})
-				.expectStatus(200)
-				.expectJsonLength(10)
-				// .inspect()
-			});
+	// 		it('VALID - HAS MSGS', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get(`/discussion/${dummyUser.id}`)
+	// 			.withHeaders({
+	// 				Authorization: `Bearer ${jwtArr[1].access_token}`,
+	// 			})
+	// 			.expectStatus(200)
+	// 			.expectJsonLength(10)
+	// 			// .inspect()
+	// 		});
 
-			it('VALID - NO CONV - should 200 EMPTY ARR', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[10].access_token}`,
-				})
-				.expectStatus(200)
-				.expectJsonLength(0)
-				// .inspect()
-			});
-		}); // DESCRIBE (DISCUSSION/:ID)
+	// 		it('VALID - NO CONV - should 200 EMPTY ARR', () => {
+	// 			return pactum
+	// 			.spec()
+	// 			.get(`/discussion/${dummyUser.id}`)
+	// 			.withHeaders({
+	// 				Authorization: `Bearer ${jwtArr[10].access_token}`,
+	// 			})
+	// 			.expectStatus(200)
+	// 			.expectJsonLength(0)
+	// 			// .inspect()
+	// 		});
+	// 	}); // DESCRIBE (DISCUSSION/:ID)
 
 
 
-	});	// DESCRIBE(DISCUSSION)
+	// });	// DESCRIBE(DISCUSSION)
 
 }); // DESCRIBE(APP-E2E)

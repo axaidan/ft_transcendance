@@ -26,11 +26,12 @@ const GetSocket = ( userId: number ) => {
 		{ Authorization: `Bearer ${GetCookie}` }
 	});
 	newSocket.emit('loginToServer', userId);
-	// const chatSocket = io(`http://localhost:3000/discussionNs`, 
-	// { extraHeaders: 
-	// 	{ Authorization: `Bearer ${GetCookie}` }
-	// });
-	// chatSocket.emit('loginToServer', userId);
+
+	const chatSocket = io(`http://localhost:3000/chatNs`, 
+	{ extraHeaders: 
+		{ Authorization: `Bearer ${GetCookie}` }
+	});
+	chatSocket.emit('loginToServer', userId);
 
 	// newSocket.on("disconnect", () => {
 	// 	newSocket.emit('logoutToServer', userId);

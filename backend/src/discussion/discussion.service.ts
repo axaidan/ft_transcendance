@@ -2,23 +2,20 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { Discussion, DiscussionMessage } from '@prisma/client';
 import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DiscussionDto } from './dto';
+import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
 
 
 @Injectable()
 export class DiscussionService {
     constructor(
         private prisma: PrismaService,
-        private discMsg: DiscussionMessageService
+        private discMsgService: DiscussionMessageService
     ) {}
 
-    // POST /discussion/create
-    async create(currentUserId: number, dto: DiscussionDto) : Promise<Discussion> {
-        if (await this.exists(currentUserId, dto.user2Id) === true)
-            throw new HttpException('Discussion already exists', 400); 
+    async create(dto: CreateDiscussionDto) : Promise<Discussion> {
         const discussion = await this.prisma.discussion.create({
             data: {
-                user1Id: currentUserId,
+                user1Id: dto.user1Id,
                 user2Id: dto.user2Id,
             }
         });
@@ -39,51 +36,62 @@ export class DiscussionService {
         return discussions;
     }
 
-    async getMessagesbyDiscId(discussionId: number) : Promise<DiscussionMessage[]> {
-        const messages: DiscussionMessage[] = await this.prisma.discussionMessage.findMany({
+    async getDiscussionById(discId: number) :
+    Promise<Discussion>
+    {
+        const discussion: Discussion = await this.prisma.discussion.findUnique({
             where: {
-                discussionId: discussionId,
+                id: discId,
             },
-            include: {
-                user: { select: { id: true, username: true } }
-            }
         });
-        return messages;
+        return discussion;
     }
 
-    // async getMessagesbyLogin(discussionId: string) : Promise<DiscussionMessage[]> {
-    //     const messages: DiscussionMessage[] = await this.prisma.discussionMessage.findMany({
-    //         where: {
-    //             discussionId: discussionId,
-    //         },
-    //     });
-    //     return messages;
-    // }
-    
-    async findIdByUserId(currentUserId: number, user2Id: number) : Promise<number> {
+    async getDiscussionByUsersId(user1Id: number, user2Id: number) :
+    Promise<Discussion>
+    {
         const discussion = await this.prisma.discussion.findFirst({
             where: {
-                OR: [
-                    { user1Id: currentUserId, user2Id: user2Id },
-                    { user1Id: user2Id, user2Id: currentUserId },
-                ]
-            }
+                OR: [ { user1Id: user1Id, user2Id: user2Id }
+                    , { user1Id: user2Id, user2Id: user1Id } ]
+            },
         });
-        if (discussion === null)
-            return null;
-        const discussionId = discussion.id;
-        return discussionId;
+        return discussion;
     }
 
-    async exists(user1Id: number, user2Id: number) : Promise<boolean> {
-        const search: Discussion[] = await this.prisma.discussion.findMany({
-            where: { OR: [
-                    { user1Id: user1Id, user2Id: user2Id },
-                    { user1Id: user2Id, user2Id: user1Id }
-                ]}
-        });
-        if (search.length === 0)
-            return (false);
-        return (true);
+    async getMessagesByDiscId(discussionId: number) :
+    Promise<GetDiscussionMessagesDto>
+    { 
+        const messages: DiscussionMessage[] = await this.discMsgService.getMessagesByDiscId(discussionId);
+        const dto : GetDiscussionMessagesDto = {
+            discId: discussionId,
+            messages: messages,
+        };
+        return dto;
+    }
+
+    async getMessagesByUserId(user1Id: number, user2Id: number) : 
+    Promise<GetDiscussionMessagesDto>
+    {
+        let discussion: Discussion;
+        let messages: DiscussionMessage[];
+
+        discussion = await this.getDiscussionByUsersId(user1Id, user2Id);
+        if (!discussion) {
+            const dto: CreateDiscussionDto = {
+                user1Id: user1Id,
+                user2Id: user2Id,
+            }
+            discussion = await this.create(dto);
+            messages = [];
+        }
+        else {
+            messages = await this.discMsgService.getMessagesByDiscId(discussion.id);
+        }
+        const dto: GetDiscussionMessagesDto = {
+            discId: discussion.id,
+            messages: messages,
+        }
+        return dto;
     }
 }

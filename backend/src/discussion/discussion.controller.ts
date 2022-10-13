@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Discussion } from '@prisma/client';
+import { blockParams } from 'handlebars';
 // import { blockParams } from 'handlebars';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
-import { DiscussionDto } from './dto';
+import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
 
 @UseGuards(JwtGuard)
 @Controller('discussion')
@@ -13,44 +15,26 @@ export class DiscussionController {
         private discService: DiscussionService
     ) {}
 
-    @Post('create')
-    create(@GetUser('id') currentUserId: number, @Body() dto: DiscussionDto, ) {
-        return this.discService.create(currentUserId, dto);
+    @Get('user/:id')
+    async getMessagesByUserId (
+        @GetUser('id') currentUserId: number,
+        @Param('id', ParseIntPipe) user2Id: number
+        ) : Promise<GetDiscussionMessagesDto>
+    {
+            return await this.discService.getMessagesByUserId(currentUserId, user2Id);
     }
 
-    // WHERE :id IS A USER_ID
-    // (SHOULD BE ABLE TO DO JUST WITH A DISCUSSION_ID  )
-    // (WILL SEE WHEN INTEGRATED                        )
-    // @Get(':userid')
-    // async getMessagesByUserId(
-    //     @GetUser('id') currentUserId: number,
-    //     @Param('userid', ParseIntPipe) user2Id: number
-    //     ) {
-    //     const discId: number = await this.discService.findIdByUserId(currentUserId, user2Id);
-    //     // console.log('=== getMessages() discId === ' + discId);
-    //     if (!discId) {
-    //         return [];
-    //     }
-    //     return this.discService.getMessagesbyDiscId(discId);
-    // }
-
-    @Get(':userid')
-    async getMessagesByUserId(
-        @GetUser('id') currentUserId: number,
-        @Param('userid', ParseIntPipe) user2Id: number
-        ) {
-        const discId: number = await this.discService.findIdByUserId(
-            currentUserId,
-            user2Id
-            );
-        if (!discId) {
-            return [];
-        }
-        return this.discService.getMessagesbyDiscId(discId);
+    @Get(':id')
+    async getMessagesByDiscId (@Param('id', ParseIntPipe) discId: number) :
+    Promise<GetDiscussionMessagesDto>
+    {
+        return await this.discService.getMessagesByDiscId(discId);
     }
 
     @Get()
-    getDiscussions(@GetUser('id') currentUserId: number) {
-        return this.discService.getDiscussions(currentUserId);
+    async getDiscussions(@GetUser('id') currentUserId: number) :
+    Promise<Discussion[]>
+    {
+        return await this.discService.getDiscussions(currentUserId);
     }
 }
