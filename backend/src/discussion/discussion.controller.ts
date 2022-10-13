@@ -35,6 +35,7 @@ export class DiscussionController {
         return await this.discService.getMessagesByDiscId(discId);
     }
 
+    //  GET /discussion
     @Get()
     async getDiscussions(@GetUser('id') currentUserId: number) :
     Promise<Discussion[]>

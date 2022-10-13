@@ -1,11 +1,10 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { Discussion, DiscussionMessage, User } from '@prisma/client';
 import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
-import { Socket } from 'socket.io';
 import { DiscussionGateway } from './discussion.gateway';
-import { DiscussionDto } from './dto/discussion.dto';
+import { Socket } from 'socket.io';
 
 export type DiscussionWithUsers = {
     id: number
@@ -18,11 +17,13 @@ export type DiscussionWithUsers = {
 @Injectable()
 export class DiscussionService {
 
-    private websockets = new Map<number, string>();
+    //private websockets = new Map<number, string>();
+    private websockets = new Map<number, Socket>();
 
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
+        @Inject(forwardRef(() => DiscussionGateway))
         private discGateway: DiscussionGateway,
     ) {}
 
@@ -107,11 +108,11 @@ export class DiscussionService {
                 user2Id: user2Id,
             }
             discussion = await this.create(createDto);
-            this.discGateway.joinDiscRoom(this.wsMap[user1Id], discussion.id);
-            this.discGateway.newDisc(this.wsMap[user1Id], discussion)
+            this.discGateway.joinDiscRoom(this.wsMap[user1Id], discussion.id, /*DBG*/user1Id);
+            this.discGateway.newDisc(this.wsMap[user1Id], discussion, /*DBG*/user1Id)
             if (this.wsMap[user2Id]) {
-                this.discGateway.joinDiscRoom(this.wsMap[user2Id], discussion.id);
-                this.discGateway.newDisc(this.wsMap[user2Id], discussion)
+                this.discGateway.joinDiscRoom(this.wsMap[user2Id], discussion.id, /*DBG*/user2Id);
+                this.discGateway.newDisc(this.wsMap[user2Id], discussion, /*DBG*/user2Id)
             }
             messages = [];
         }
