@@ -4,7 +4,8 @@ import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
 import { DiscussionMessageDto } from 'src/discussion-message/dto/discussion-message.dto';
-import { DiscussionService } from './discussion.service';
+import { DiscussionService, DiscussionWithUsers } from './discussion.service';
+import { Discussion } from '@prisma/client';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chatNs' })
 export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -49,12 +50,17 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     }
   }
 
+  newDisc (client: Socket, discussion: DiscussionWithUsers) {
+    client.emit('newDiscToClient', discussion);
+  }
+
   //////////////
   //  EVENTS  //
   //////////////
   @SubscribeMessage('loginToServer')
   async handleLogin(client: Socket, userId: number) {
     this.logger.log(`USER ${userId} LOGGED IN`);
+    this.discService.wsMap.set(userId, client);
     await this.joinAllDiscRooms(client, userId);
   }
 

@@ -7,6 +7,7 @@ import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
 
+
 @UseGuards(JwtGuard)
 @Controller('discussion')
 export class DiscussionController {
@@ -15,6 +16,7 @@ export class DiscussionController {
         private discService: DiscussionService
     ) {}
 
+    //  GET /discussion/user/:id
     @Get('user/:id')
     async getMessagesByUserId (
         @GetUser('id') currentUserId: number,
@@ -25,6 +27,7 @@ export class DiscussionController {
         return await this.discService.getMessagesByUserId(currentUserId, user2Id);
     }
 
+    //  GET /discussion/:id
     @Get(':id')
     async getMessagesByDiscId(@Param('id', ParseIntPipe) discId: number) :
     Promise<GetDiscussionMessagesDto>
