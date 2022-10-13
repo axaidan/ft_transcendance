@@ -4,6 +4,71 @@ const prisma = new PrismaClient()
 
 async function main() {
 	
+	const publicAvatarAxel = await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg'},
+		update: {},
+		create: {
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg',
+			is_public: true,
+			public_id: 'vbxxdzbgzoixomwrdxrr',
+		}
+	}) 
+	
+	const publicAvatarMlormois = await prisma.avatar.upsert({
+		where: {url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
+			public_id: 'cfkfccmyazzhmuqgazr4',
+		}
+	}) 
+	
+	const AvatarVictor= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg'},
+		update: {},
+		create: {
+			is_public: false,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg',
+			public_id: 'qgpd7mhqavtsjcok8euj',
+		}
+	}) 
+		
+	const publicAvatarSmile= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg',
+			public_id: 'btflycu1uiba5bmxte17',
+		}
+	}) 
+	
+		
+	const publicAvatarFurry= await prisma.avatar.upsert({
+		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+		update: {},
+		create: {
+			is_public: true,
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
+			public_id: 'cfkfccmyazzhmuqgazr4',
+		}
+	}) 
+	
+
+/*
+	const publicAvatar2 = await prisma.avatar.upsert({
+		where: {url: ''},
+		update: {},
+		create: {
+			is_pubic: true,
+			url: ''
+		}
+	}) 
+
+	*/
+
+
 	const sergent = await prisma.user.upsert({
 		where: {login: 'mlormois'}, 
 		update: {},
@@ -36,7 +101,8 @@ async function main() {
 		update:{},
 		create:{
 			login: 'viporten',
-			username: 'Raled',
+			username: 'el beaugausse',
+			avatarId: AvatarVictor.id,
 		},
 	})
 
@@ -107,7 +173,7 @@ async function main() {
 	})
 
 	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'un curly'},
+		where: {title: 'tiens un curly'},
 		update: {}, 
 		create: {
 			title: 'tiens un curly',
@@ -202,7 +268,6 @@ async function main() {
 			path: 'fa-solid fa-trophy',
 		},
 	})
-
 
 
 	const game1 = await prisma.game.upsert({

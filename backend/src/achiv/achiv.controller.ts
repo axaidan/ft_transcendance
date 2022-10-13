@@ -2,9 +2,9 @@ import { Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
 import { AchievementService } from './achiv.service';
 import { AchivDto, LinkDto } from './dto';
 import { JwtGuard } from '../auth/guard';
+import { GetUser } from "src/auth/decorator";
 
 
-@UseGuards(JwtGuard)
 @Controller('achiv')
 export class AchivController {
 	constructor(private achivService: AchievementService) {};
@@ -14,7 +14,7 @@ export class AchivController {
 		return this.achivService.createAchiv(achivDto);
 	}
 
-	@Get('list')
+	@Get('list_all')
 	getAchiv(){
 		return this.achivService.getAchiv();
 	}
@@ -24,8 +24,24 @@ export class AchivController {
 		return this.achivService.updateAchiv(dto.userId, dto.achivId);
 	}
 
-	@Post('findAchivFor')
+	@Get('list_unlock')
+	@UseGuards(JwtGuard)
+	listUnlockAchiv(@GetUser('id') userId: number) {
+		return this.achivService.listUnlockAchiv(userId);
+	}
+
+
+
+	@Get('list_lock')
+	@UseGuards(JwtGuard)
+	listLockAchiv(@GetUser('id') userId:number) {
+		return this.achivService.listLockAchiv(userId);
+	}
+
+	@Get('findAchivForUser')
 	findUserForAchivIda(@Body() dto:LinkDto) {
 		return this.achivService.findUserForAchivId(dto.userId, dto.achivId);
 	}
+
+
 }

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { AxiosResponse } from "axios";
 
 // Intern:
-import { Friendsbar, Navbar } from '../componants'
+import { Friendsbar, Navbar } from '../components'
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { IUser, DflUser } from "../types";
 import io, { Socket } from 'socket.io-client';
@@ -13,6 +13,7 @@ import { useCookies } from "react-cookie";
 
 // Assets:
 import '../styles/pages/Home.css'
+import bg_website from '../assets/videos/bg_website.webm'
 
 
 const GetCookie = () => {
@@ -51,11 +52,12 @@ export function Home() {
 	}, []);
 
 	return (
-		<div>
+		<div className="set-body">
 			<Navbar me={user} />
 			<div className='container-body'>
-				<Outlet context={ user } />
-				<Friendsbar userId={user.id} socket={socket!}/>
+				<video src={bg_website} autoPlay loop muted className='bg_video' />
+				<Outlet context={user} />
+				<Friendsbar userId={user.id} />
 			</div>
 		</div>
 	)

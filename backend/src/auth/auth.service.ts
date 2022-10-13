@@ -22,6 +22,7 @@ export class AuthService {
 					login: login,
 					username: login,
 					email: login + '@student.42.fr',
+					avatarId: 1,
 				}
 			});
 

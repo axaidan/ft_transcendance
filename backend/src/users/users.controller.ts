@@ -9,7 +9,7 @@ import { EditUserDto } from './dto/edit-user.dto';
 @UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
-	constructor( private userService: UserService) {};
+	constructor(private userService: UserService) { };
 
 	@Get('all')
 	getAllUsers() {
@@ -22,7 +22,7 @@ export class UserController {
 	}
 
 	@Get(':id')
-	getUserById( @Param('id', ParseIntPipe) userId: number ) {
+	getUserById(@Param('id', ParseIntPipe) userId: number) {
 		return this.userService.getUser(userId);
 	}
 

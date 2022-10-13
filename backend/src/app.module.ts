@@ -9,6 +9,7 @@ import { RelationModule } from './relations/relation.module';
 import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
+import { AvatarModule } from './avatar/avatar.module';
 import { AppGateway } from './app.gateway';
 
 @Module({
@@ -25,6 +26,7 @@ import { AppGateway } from './app.gateway';
 		DiscussionModule,
 		DiscussionMessageModule,
 		GameModule,
+		AvatarModule,
 	],
 	providers: [AppGateway]
 })
