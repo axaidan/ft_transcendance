@@ -8,7 +8,6 @@ import { DiscussionService } from 'src/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
-import { DiscussionDto } from 'src/discussion/dto/index';
 
 const N = 20;
 
@@ -62,7 +61,7 @@ describe('App e2e', () => {
 	// dummyUser HAS 5 Discussion, 3 WHERE user1Id, 2 WHERE user2Id
 	// user[0 - 9)] ALL HAVE DISCUSSIONS
 	// user[10 - 19] HAVE NO DISCUSSION] has 2 discussion
-		let i = 1;
+		let i = 0;
 		let arr: Discussion[] = [];
 		let disc: Discussion;
 		for ( ; i < 2 ; i++) {
@@ -982,93 +981,93 @@ describe('App e2e', () => {
 
 	describe('Discussion', () => {
 
-		describe('Create POST /discussion/create', () => {
-			it('VALID - should 201', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(201)
-				.expectBodyContains(userId)
-				.expectBodyContains(dummyUser.id)
-				// .inspect();
-			});
+		// describe('Create POST /discussion/create', () => {
+		// 	it('VALID - should 201', () => {
+		// 		const userId = userArr[0].id;
+		// 		const dto: DiscussionDto = {
+		// 			user2Id: userId,
+		// 		};
+		// 		return pactum
+		// 		.spec()
+		// 		.post('/discussion/create')
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+		// 		})
+		// 		.withBody(dto)
+		// 		.expectStatus(201)
+		// 		.expectBodyContains(userId)
+		// 		.expectBodyContains(dummyUser.id)
+		// 		// .inspect();
+		// 	});
 
-			it('NON VALID DTO- should 201', () => {
-				const userId = userArr[0].id;
-				const dto = {
-					// user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(400)
-				// .expectBodyContains(userId)
-				// .expectBodyContains(dummyUser.id)
-				.inspect();
-			});
+		// 	it('NON VALID DTO- should 201', () => {
+		// 		const userId = userArr[0].id;
+		// 		const dto = {
+		// 			// user2Id: userId,
+		// 		};
+		// 		return pactum
+		// 		.spec()
+		// 		.post('/discussion/create')
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+		// 		})
+		// 		.withBody(dto)
+		// 		.expectStatus(400)
+		// 		// .expectBodyContains(userId)
+		// 		// .expectBodyContains(dummyUser.id)
+		// 		.inspect();
+		// 	});
 
-			it('NO DTO- should 201', () => {
-				const userId = userArr[0].id;
-				const dto = {
-					// user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				// .withBody(dto)
-				.expectStatus(400)
-				// .expectBodyContains(userId)
-				// .expectBodyContains(dummyUser.id)
-				.inspect();
-			});
+		// 	it('NO DTO- should 201', () => {
+		// 		const userId = userArr[0].id;
+		// 		const dto = {
+		// 			// user2Id: userId,
+		// 		};
+		// 		return pactum
+		// 		.spec()
+		// 		.post('/discussion/create')
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+		// 		})
+		// 		// .withBody(dto)
+		// 		.expectStatus(400)
+		// 		// .expectBodyContains(userId)
+		// 		// .expectBodyContains(dummyUser.id)
+		// 		.inspect();
+		// 	});
 
-			it('NO JWT - should 401', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				// .withHeaders({
-				// 	Authorization: `Bearer ${dummyJwt.access_token}`,
-				// })
-				.withBody(dto)
-				.expectStatus(401)
-				// .inspect();
-			});
+		// 	it('NO JWT - should 401', () => {
+		// 		const userId = userArr[0].id;
+		// 		const dto: DiscussionDto = {
+		// 			user2Id: userId,
+		// 		};
+		// 		return pactum
+		// 		.spec()
+		// 		.post('/discussion/create')
+		// 		// .withHeaders({
+		// 		// 	Authorization: `Bearer ${dummyJwt.access_token}`,
+		// 		// })
+		// 		.withBody(dto)
+		// 		.expectStatus(401)
+		// 		// .inspect();
+		// 	});
 			
-			it('ALREADY EXISTS - should 400', () => {
-				const userId = userArr[0].id;
-				const dto: DiscussionDto = {
-					user2Id: userId,
-				};
-				return pactum
-				.spec()
-				.post('/discussion/create')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(400)
-				// .inspect();
-			});
-		});	// DESCRIBE(DISCUSSION/CREATE)
+		// 	it('ALREADY EXISTS - should 400', () => {
+		// 		const userId = userArr[0].id;
+		// 		const dto: DiscussionDto = {
+		// 			user2Id: userId,
+		// 		};
+		// 		return pactum
+		// 		.spec()
+		// 		.post('/discussion/create')
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
+		// 		})
+		// 		.withBody(dto)
+		// 		.expectStatus(400)
+		// 		// .inspect();
+		// 	});
+		// });	// DESCRIBE(DISCUSSION/CREATE)
 
 
 		describe('Retrieve GET /discussion/', () => {
@@ -1134,41 +1133,37 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		describe('Retrieve Msgs GET /discussion/:id', () => {
+		describe('Retrieve Msgs GET /discussion/user/:id', () => {
 			it('VALID - NO MSGS', () => {
 				return pactum
 				.spec()
-				.get(`/discussion/${dummyUser.id}`)
+				.get(`/discussion/user/${dummyUser.id}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.expectStatus(200)
-				.expectBodyContains([])
-				.expectJsonLength(0)
 				// .inspect()
 			});
 
 			it('VALID - HAS MSGS', () => {
 				return pactum
 				.spec()
-				.get(`/discussion/${dummyUser.id}`)
+				.get(`/discussion/user/${dummyUser.id}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[1].access_token}`,
 				})
 				.expectStatus(200)
-				.expectJsonLength(10)
 				// .inspect()
 			});
 
 			it('VALID - NO CONV - should 200 EMPTY ARR', () => {
 				return pactum
 				.spec()
-				.get(`/discussion/${dummyUser.id}`)
+				.get(`/discussion/user/${dummyUser.id}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[10].access_token}`,
 				})
 				.expectStatus(200)
-				.expectJsonLength(0)
 				// .inspect()
 			});
 		}); // DESCRIBE (DISCUSSION/:ID)

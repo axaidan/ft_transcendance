@@ -6,7 +6,10 @@ import { DiscussionService } from './discussion.service';
 import { DiscussionGateway } from './discussion.gateway';
 
 @Module({
-    imports: [DiscussionMessageModule],
+    imports: [
+        DiscussionMessageModule,
+        DiscussionGateway,
+    ],
     controllers: [DiscussionController],
     providers: [
         DiscussionService,

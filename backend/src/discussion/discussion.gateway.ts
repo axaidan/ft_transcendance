@@ -1,28 +1,79 @@
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JwtGuard } from 'src/auth/guard';
+import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
+import { DiscussionMessageDto } from 'src/discussion-message/dto/discussion-message.dto';
+import { DiscussionService, DiscussionWithUsers } from './discussion.service';
+import { Discussion } from '@prisma/client';
 
-@WebSocketGateway({ cors: '*:*', namespace: 'discussionNs' })
-export class DiscussionGateway /*implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect*/ {
+@WebSocketGateway({ cors: '*:*', namespace: 'chatNs' })
+export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-  @WebSocketServer() wss: Server;
+  constructor(
+    private discService: DiscussionService,
+    private discMsgService: DiscussionMessageService,
+  ) {}
 
-  private logger: Logger = new Logger('DiscussionGateway');
+  @WebSocketServer()  wss: Server;
+  private             logger: Logger = new Logger('DiscussionGateway');
 
-  // afterInit(server: Server) {
-  //   this.logger.log('Initialized')
-  // }
-
-  // handleConnection(client: Socket, ...args: any[]) {
-  //   this.logger.log(`Client ${client.id} CONNECTED`)
-  // }
-
-  // handleDisconnect(client: Socket) {
-  //   this.logger.log(`Client ${client.id} DISCONNECTED`)
-  // }
-
-  @SubscribeMessage('message')
-  handleMessage(client: Socket, payload: any): string {
-    return 'Hello world!';
+  ////////////////////////////////
+  //  INIT, CONNECT, DISCONNECT //
+  ////////////////////////////////
+  afterInit(server: Server) {
+    this.logger.log('Initialized')
   }
+
+  @UseGuards(JwtGuard)
+  handleConnection(client: Socket, ...args: any[]) {
+    this.logger.log(`CLIENT ${client.id} CONNECTED`);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
+  }
+
+  //////////////
+  //  METHODS //
+  //////////////
+  joinDiscRoom(client: Socket, discId: number) {
+    const room: string = 'disc' + discId;
+    client.join(room);
+  }
+
+  async joinAllDiscRooms(client: Socket, userId: number) {
+    const discussions = await this.discService.getDiscussions(userId);
+    for (const discussion of discussions) {
+      this.joinDiscRoom(client, discussion.id);
+    }
+  }
+
+  newDisc (client: Socket, discussion: DiscussionWithUsers) {
+    client.emit('newDiscToClient', discussion);
+  }
+
+  //////////////
+  //  EVENTS  //
+  //////////////
+  @SubscribeMessage('loginToServer')
+  async handleLogin(client: Socket, userId: number) {
+    this.logger.log(`USER ${userId} LOGGED IN`);
+    this.discService.wsMap.set(userId, client);
+    await this.joinAllDiscRooms(client, userId);
+  }
+
+  @SubscribeMessage('logoutToServer')
+  handleLogout(client: Socket, userId: number): void {
+    this.logger.log(`USER ${userId} LOGGED OUT`);
+    client.broadcast.emit('logoutToClient', userId);
+  }
+
+  @SubscribeMessage('discMsgToServer')
+  handleDiscMsg(client: Socket, dto: DiscussionMessageDto): void {
+    const room = `disc${dto.discId}`;
+    this.wss.to(room).emit('discMsgToclient', dto);
+    this.discMsgService.create(dto);
+  }
+  
 }
