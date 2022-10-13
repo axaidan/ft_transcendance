@@ -24,7 +24,7 @@ export class DiscussionMessageService {
     async getMessagesByDiscId(discId: number) {
         const messages: DiscussionMessage[] = await this.prisma.discussionMessage.findMany({
             where: {
-                discussionId: discId
+                discussionId: discId,
             },
             include: {
                 user: { select: { id: true, username: true } }
@@ -32,5 +32,4 @@ export class DiscussionMessageService {
         });
         return messages;
     }
-    
 }

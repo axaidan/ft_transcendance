@@ -19,13 +19,14 @@ export class DiscussionController {
     async getMessagesByUserId (
         @GetUser('id') currentUserId: number,
         @Param('id', ParseIntPipe) user2Id: number
-        ) : Promise<GetDiscussionMessagesDto>
+    ) :
+    Promise<GetDiscussionMessagesDto>
     {
-            return await this.discService.getMessagesByUserId(currentUserId, user2Id);
+        return await this.discService.getMessagesByUserId(currentUserId, user2Id);
     }
 
     @Get(':id')
-    async getMessagesByDiscId (@Param('id', ParseIntPipe) discId: number) :
+    async getMessagesByDiscId(@Param('id', ParseIntPipe) discId: number) :
     Promise<GetDiscussionMessagesDto>
     {
         return await this.discService.getMessagesByDiscId(discId);

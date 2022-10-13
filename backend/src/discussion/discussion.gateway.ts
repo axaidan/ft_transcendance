@@ -36,6 +36,7 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
   //////////////
   //  METHODS //
   //////////////
+
   joinDiscRoom(client: Socket, discId: number) {
     const room: string = 'disc' + discId;
     client.join(room);

@@ -22,7 +22,6 @@ export class DiscussionService {
         return discussion;
     }
 
-    // GET /discussion
     async getDiscussions(currentUserId: number) : Promise<Discussion[]> {
         const discussions: Discussion[] = await this.prisma.discussion.findMany({
             where: {
@@ -36,16 +35,16 @@ export class DiscussionService {
         return discussions;
     }
 
-    async getDiscussionById(discId: number) :
-    Promise<Discussion>
-    {
-        const discussion: Discussion = await this.prisma.discussion.findUnique({
-            where: {
-                id: discId,
-            },
-        });
-        return discussion;
-    }
+    // async getDiscussionById(discId: number) :
+    // Promise<Discussion>
+    // {
+    //     const discussion: Discussion = await this.prisma.discussion.findUnique({
+    //         where: {
+    //             id: discId,
+    //         },
+    //     });
+    //     return discussion;
+    // }
 
     async getDiscussionByUsersId(user1Id: number, user2Id: number) :
     Promise<Discussion>
@@ -83,6 +82,8 @@ export class DiscussionService {
                 user2Id: user2Id,
             }
             discussion = await this.create(dto);
+            // JOIN NEW ROOM
+            // SEND NEW DISCUSSION EVENT
             messages = [];
         }
         else {
