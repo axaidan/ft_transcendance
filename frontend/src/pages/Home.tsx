@@ -29,13 +29,6 @@ export function Home() {
 	return (
 		<div className="set-body">
 			<Navbar me={user} />
-
-			{/* 	WALTER:
-				Ici tu doit t'arranger pour que
-				Friendsbar ne soit pas en fix
-				mais partage le body avec Outlet 
-			*/}
-
 			<div className='container-body'>
 				<video src={bg_website} autoPlay loop muted className='bg_video' />
 				<Outlet context={user} />
@@ -44,17 +37,3 @@ export function Home() {
 		</div>
 	)
 }
-
-/*		<Outlet />
-	Grace a Outlet Navbar et Friendsbar 
-	on leurs places uniquement dans ce fichier!
-	TOUT le reste des componant ( sauf exeption css )
-	ce situe dans cette Outlet! 
-*/
-
-/*		useContext()
-	Dans l'Outlet je te donne en context l'user current
-	donc nous n'avons plus a faire la requete pour savoir
-	a qui est la session. juste recuper l'user grace a:
-	useContext().
-*/
