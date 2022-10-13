@@ -16,6 +16,7 @@
 	/* position: fixed; */
 	width: 100%;
 	align-items: center;
+
 }
 
 .nav_links {
@@ -29,6 +30,7 @@
 	background: linear-gradient(to left, #020912 0, #091720 50%, #020912);
 	background-repeat: repeat-x;
 	align-items: center;
+	list-style: none;
 }
 
 .items_left {

@@ -1,17 +1,95 @@
-
-.container-info-profile {
+.user_body {
 	display: flex;
+	width: 100%;
+	height: 100%;
+	/* background-color: brown; */
 }
 
-.container-nav-option {
+.left_side {
 	display: flex;
-	width: calc(100vw - 220px);
-	justify-content: space-between;
+	flex-direction: column;
+	/* background-color: green; */
+	height: 100%;
+	width: 40%;
+}
+
+.banner {
+	display: flex;
+	flex-direction: column;
+	/* background-color: red; */
+	height: 60%;
 	align-items: center;
+	font-family: Friz Quadrata Std Bold;
 }
 
-.btn-friend, .btn-block {
+.user_nickname {
+	display: flex;
+	margin-top: 25%;
+	font-size: xx-large;
+
+}
+
+.xp_bar {
 	height: 30px;
-	width: 30px;
-	margin-right: 15px;
+	display: flex;
+	/* background-color: yellow; */
+	background-image: url('../../assets/images/profile_component/level-bar-bottom.png');
+	background-size: 200px;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	background-position-y: center;
+	width: 100%;
+}
+
+.xp_fill {
+	position: relative;
+	display: flex;
+	width: 100%;
+	/* height: 100%; */
+	background-image: url('../../assets/images/profile_component/level-bar-fill-hover.png');
+	background-position-y: 50%;
+	background-position-x: 40%;
+	background-size: 150px 25px;
+	background-repeat: no-repeat;
+}
+
+.xp_nbr {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	background-image: url('../../assets/images/profile_component/level-bar-top.png');
+	background-position-x: calc(50% - 100px);
+	background-position-y: 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+	align-items: center;
+	font-size: small;
+}
+
+.xp_value {
+	color: white;
+	display: flex;
+	position: relative;
+	margin-left: calc(50% - 105px);
+	margin-top: 5px;
+}
+
+.clan {
+	display: flex;
+	color: #938f75;
+}
+
+.loot {
+	display: flex;
+	height: 10%;
+	margin-top: 50%;
+	background-color: aqua;
+}
+
+.stats {
+	display: flex;
+	margin-left: auto;
+	background-color: blue;
+	width: 100%;
+	justify-content: center;
 }

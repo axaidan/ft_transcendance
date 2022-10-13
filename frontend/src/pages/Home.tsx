@@ -11,7 +11,7 @@ import { IUser, DflUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
-import bg_website from '../assets/videos/bg_website.webm'
+import bg_website from '../assets/videos/bg_website2.webm'
 
 export function Home() {
 	const navigate = useNavigate();
