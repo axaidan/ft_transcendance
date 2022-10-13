@@ -18,7 +18,7 @@ export type DiscussionWithUsers = {
 @Injectable()
 export class DiscussionService {
 
-    private websockets = new Map<number, Socket>();
+    private websockets = new Map<number, string>();
 
     constructor(
         private prisma: PrismaService,

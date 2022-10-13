@@ -52,7 +52,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   @SubscribeMessage('loginToServer')
   handleLogin(client: Socket, userId: number) {
     if (this.clientsMap[userId]) {
-      this.logger.error(`USER ${userId} DOUBLE LOG IN`);
+      this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
       throw new WsException(`double connection`);
     }
     this.clientsMap.set(userId, client.id);
