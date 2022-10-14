@@ -8,13 +8,14 @@ import { DiscussionGateway } from './discussion.gateway';
 @Module({
     imports: [
         DiscussionMessageModule,
-        DiscussionGateway,
     ],
-    controllers: [DiscussionController],
+    controllers: [
+        DiscussionController,
+    ],
     providers: [
         DiscussionService,
         DiscussionMessageService,
-        DiscussionGateway
+        DiscussionGateway,
     ],
 })
 export class DiscussionModule {}
