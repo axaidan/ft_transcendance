@@ -2,6 +2,7 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from './auth/guard';
+import { OnlineStatusDto } from './users/dto';
 
 @WebSocketGateway({ cors: '*:*' })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -54,6 +55,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     if (this.clientsMap.has(userId)) {
       // this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
       throw new WsException(`double connection`);
+      client.disconnect(true);
     }
     this.clientsMap.set(userId, client.id);
     // this.logger.log(`USER ${userId} LOGGED IN`);
@@ -72,12 +74,18 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       RETURNS TRUE IF THIS USER HAS A WEBSOCKET OPEN
   */
   @SubscribeMessage('isOnlineToServer')
-  handleIsOnline(client: Socket, userId: number) : WsResponse<boolean> {
-    if (this.clientsMap[userId]) {
-      return { event: 'isOnlineToClient', data: true };
+  handleIsOnline(client: Socket, userId: number) : WsResponse<OnlineStatusDto> {
+    if (this.clientsMap.has(userId)) {
+      return { event: 'isOnlineToClient', data: {
+        userId: userId,
+        onlineStatus: true,
+      }};
     }
     else {
-      return { event: 'isOnlineToClient', data: false };
+      return { event: 'isOnlineToClient', data: {
+        userId: userId,
+        onlineStatus: false,
+      }};
     }
   }
   
