@@ -8,9 +8,8 @@ import { IUser } from "../types";
 // Assets:
 import '../styles/pages/Profile.css'
 
-export function Profile()
-{
-	let user:IUser = useOutletContext();
+export function Profile() {
+	let user: IUser = useOutletContext();
 
 	return (
 		<>

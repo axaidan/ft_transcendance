@@ -1,0 +1,27 @@
+.othNavProfile-container {
+	display: flex;
+	justify-content: space-between;
+	height: 30px;
+	width: calc(100vw - 240px);
+}
+
+.othNavProfile-title-ctn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 60px;
+	width: 400px;
+	background: url(../../../assets/images/othNavProfile/profile_active_bg.png) no-repeat;
+	background-size: cover;
+}
+
+#othNavProfile-title {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0;
+	margin: 0;
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: medium;
+}

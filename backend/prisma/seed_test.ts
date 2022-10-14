@@ -3,11 +3,11 @@ const prisma = new PrismaClient()
 
 
 async function main() {
-	
+
 
 	const achiv0 = await prisma.achievement.upsert({
-		where: {title: 'HelloWorld'},
-		update: {}, 
+		where: { title: 'HelloWorld' },
+		update: {},
 		create: {
 			title: 'HelloWorld',
 			descriptions: 'you login for the first time',
@@ -16,8 +16,8 @@ async function main() {
 	})
 
 	const achiv1 = await prisma.achievement.upsert({
-		where: {title: 'begin of a legend'},
-		update: {}, 
+		where: { title: 'begin of a legend' },
+		update: {},
 		create: {
 			title: 'begin of a legend',
 			descriptions: 'you win your first game',
@@ -26,8 +26,8 @@ async function main() {
 	})
 
 	const achiv2 = await prisma.achievement.upsert({
-		where: {title: 'play 3 game'},
-		update: {}, 
+		where: { title: 'play 3 game' },
+		update: {},
 		create: {
 			title: 'play 3 game',
 			descriptions: 'do you realy like the game?',
@@ -36,8 +36,8 @@ async function main() {
 	})
 
 	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'un curly'},
-		update: {}, 
+		where: { title: 'un curly' },
+		update: {},
 		create: {
 			title: 'tiens un curly',
 			descriptions: 'tu as ajouter ton premier ami',
@@ -47,8 +47,8 @@ async function main() {
 
 
 	const achiv4 = await prisma.achievement.upsert({
-		where: {title: 'U there, shutup!'},
-		update: {}, 
+		where: { title: 'U there, shutup!' },
+		update: {},
 		create: {
 			title: 'U there, shutup!',
 			descriptions: 'you block a user',
@@ -58,8 +58,8 @@ async function main() {
 
 
 	const achiv5 = await prisma.achievement.upsert({
-		where: {title: 'social club is open'},
-		update: {}, 
+		where: { title: 'social club is open' },
+		update: {},
 		create: {
 			title: 'social club is open',
 			descriptions: 'tu as rejoins une groupe',
@@ -69,8 +69,8 @@ async function main() {
 
 
 	const achiv6 = await prisma.achievement.upsert({
-		where: {title: 'huston do you ear me'},
-		update: {}, 
+		where: { title: 'huston do you ear me' },
+		update: {},
 		create: {
 			title: 'huston do you ear me',
 			descriptions: 'tu as envoyer ton premier message',
@@ -80,8 +80,8 @@ async function main() {
 
 
 	const achiv7 = await prisma.achievement.upsert({
-		where: {title: 'you have chose your name'},
-		update: {}, 
+		where: { title: 'you have chose your name' },
+		update: {},
 		create: {
 			title: 'you have chose your name',
 			descriptions: 'add a speudo',
@@ -91,8 +91,8 @@ async function main() {
 
 
 	const achiv8 = await prisma.achievement.upsert({
-		where: {title: 'custom master'},
-		update: {}, 
+		where: { title: 'custom master' },
+		update: {},
 		create: {
 			title: 'custom master',
 			descriptions: 'download a avatar',
@@ -102,8 +102,8 @@ async function main() {
 
 
 	const achiv9 = await prisma.achievement.upsert({
-		where: {title: 'here is my kingdom'},
-		update: {}, 
+		where: { title: 'here is my kingdom' },
+		update: {},
 		create: {
 			title: 'here is my kingdom',
 			descriptions: 'creer un chanel',
@@ -113,8 +113,8 @@ async function main() {
 
 
 	const achiv10 = await prisma.achievement.upsert({
-		where: {title: 'ragnarok'},
-		update: {}, 
+		where: { title: 'ragnarok' },
+		update: {},
 		create: {
 			title: 'ragnarok',
 			descriptions: 'delete un chanel',
@@ -123,14 +123,15 @@ async function main() {
 	})
 
 	const achiv11 = await prisma.achievement.upsert({
-		where: {title: 'platine'},
-		update: {}, 
+		where: { title: 'platine' },
+		update: {},
 		create: {
 			title: 'platine',
 			descriptions: 'all success unlock',
 			path: 'fa-solid fa-trophy',
 		},
 	})
+}
 
 
 
@@ -143,4 +144,3 @@ main()
 		await prisma.$disconnect()
 		process.exit()
 	})
-}

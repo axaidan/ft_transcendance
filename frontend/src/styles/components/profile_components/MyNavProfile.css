@@ -1,0 +1,19 @@
+.div_user {
+	width: 100%;
+	height: 100%;
+}
+
+.NavUser {
+	align-items: center;
+	width: 100%;
+	height: 50px;
+	justify-content: space-around;
+	justify-content: space-between;
+}
+
+.user_nav_items {
+	margin-left: 10px;
+	margin-right: 10px;
+	font-size: small;
+	font-weight: bold;
+}

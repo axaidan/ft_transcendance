@@ -33,6 +33,9 @@ model User {
 	discussion2 Discussion[] @relation("discussion2")
 	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
+	avatar Avatar? @relation(fields: [avatarId], references: [id])
+	avatarId Int?
+
     @@map("user")
 }
 
@@ -52,9 +55,16 @@ model Achievement{
 model Avatar {
 	id Int @id @default(autoincrement())
 	
-	title String @unique
 
-	path String
+	url String @unique
+	is_public Boolean
+	public_id String?
+
+
+	owner User []
+
+	@@map("avatar")
+	
 }
 
 model Discussion {

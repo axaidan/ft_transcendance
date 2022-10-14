@@ -264,7 +264,38 @@ export class RelationService{
 		return false;
 	}
 
+	async research_friend(meId: number, path: string) {
+		var findMe = await this.prisma.user.findFirst({where: {id: meId}})
 
+		if (!findMe) {
+			throw new ForbiddenException('u not exist'); }
+		
+		if (path === ""){
+			return this.list_friend(meId);
+		}
+		else {
 
+			const friends2 = await this.prisma.user.findMany({
+				where: {
+					whoWatchesMe: {
+						some: {
+							userId : {equals : meId},
+							relation: {equals: 1},
+							isBlock: {equals:0},
+						}
+					},
+					login: {
+						startsWith: path,	
+					}
+				},
+				orderBy: {
+					login: 'asc',
+				}
+
+			})
+			console.log(friends2);
+			return friends2;
+		}
+	}
 
 }
