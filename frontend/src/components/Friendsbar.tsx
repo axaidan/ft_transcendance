@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 // Intern:
 import { IUser } from '../types';
 import { AxiosJwt } from '../hooks';
+import SocketContextComponent from '../context/Components';
 
 // Assets:
 import '../styles/components/Friendsbar.css'
@@ -141,10 +142,12 @@ export function Friendsbar({ userId }: FriendbarProps) {
 
 	return (
 		<div className='Friendsbar'>
-			<SocialOption />
-			<OnlineFriends online_friends={onlineFriend} />
-			{/* <OurChannel online_friends={onlineFriend} />
-			<FooterFriendBar online_friends={onlineFriend} /> */}
+			<SocketContextComponent>
+				<SocialOption />
+				<OnlineFriends online_friends={onlineFriend} />
+				{/* <OurChannel online_friends={onlineFriend} />
+				<FooterFriendBar online_friends={onlineFriend} /> */}
+			</SocketContextComponent>
 		</div>
 	);
 };
