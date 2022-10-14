@@ -2,8 +2,6 @@
 .env.test
 .env.test.swp
 *.swp
-./backend/node_modules
-./frontend/node_modules
 
 # OS
 .DS_Store
