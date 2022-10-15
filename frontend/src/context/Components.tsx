@@ -1,15 +1,19 @@
+import { AxiosResponse } from "axios";
 import React, { PropsWithChildren, useEffect, useReducer, useState } from "react";
+import { AxiosJwt } from "../hooks";
 import { useSocket } from "../hooks/useSocket";
+import { DflUser, IUser } from "../types";
 import { defaultSocketContextState, ESocketActionType, SocketContextProvider, SocketReducer } from "./Socket";
 
-export interface ISocketContextComponentProps extends PropsWithChildren {}
+export interface ISocketContextComponentProps extends PropsWithChildren {
+    userId: number;
+}
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
     const { children } = props;
- 
     const [ SocketState, SocketDispatch ] = useReducer( SocketReducer, defaultSocketContextState );
     const [ loading, setLoading ] = useState(true);
-
+    
     const socket = useSocket('localhost:3000', {
         reconnectionAttempts: 5,
         reconnectionDelay: 5000,
@@ -17,27 +21,30 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     })
 
     useEffect(() => {
-        // Connect to the Web Socket // 
-        socket.connect();
-        // Save the socket in context //
-        SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
-        // Start the envent listeners // 
-        StartListeners();
-        // Send the handshake //
-        StartHandshake();
+        // Connect to the Web Socket //
+        if (props.userId != 0)
+        {
+            socket.connect();
+            // Save the socket in context //
+            SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
+            // Start the envent listeners // 
+            StartListeners();
+            // Send the handshake //
+            StartHandshake( props.userId );
+        }
 
-    }, [])
+    }, [props.userId])
 
     const StartListeners = () => {
 
         /** User Connected Event */
-        socket.on('user_connected', (users: string[]) => {
+        socket.on('user_connected', (uid: number) => {
             console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: users});
+            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
         })
 
         /** User Disconnect Event */
-        socket.on('user_disconnected', (uid: string) => {
+        socket.on('user_disconnected', (uid: number) => {
             console.info('User connected, new user list received.');
             SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
         })
@@ -61,18 +68,24 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         socket.io.on('reconnect_failed', () => {
             console.info('Reconnection failure');
         });
+
+
     };
 
-    const StartHandshake = () => {
+    const StartHandshake = ( userId: number ) => {
         console.info('Sending handshake to server ...');
 
-        socket.emit('handshake', (uid: string, users: string[]) => {
+        socket.emit('handshake', (uid: string, users: number[]) => {
             console.log('User handshake callback message received');
             SocketDispatch({type: ESocketActionType.UP_UID, payload: uid});
             SocketDispatch({type: ESocketActionType.UP_USERS, payload: users});
         });
-
+        
+        socket.emit('user_connected', userId);
+        console.info('userId: ' + userId )
+        
         setLoading( false );
+
     };
 
     if (loading) return <p>Loading socket IO ... </p>;

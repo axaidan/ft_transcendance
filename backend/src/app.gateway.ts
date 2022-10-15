@@ -18,17 +18,17 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     // this.logger.log('Initialized')
   }
 
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   handleConnection(client: Socket, ...args: any[]) {
-    // this.logger.log(`CLIENT ${client.id} CONNECTED`);
+    this.logger.log(`CLIENT ${client.id} CONNECTED`);
   }
 
   handleDisconnect(client: Socket) {
-    // this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
+    this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
     for (const [id, value] of this.clientsMap) {
       if (client.id === value) {
         // this.logger.log(`USER ${id} LOGGED OUT`);
-        this.wss.emit('logoutToClient', id);
+        this.wss.emit('user_disconnected', id);
         this.clientsMap.delete(id);
         break ;
       }
@@ -40,31 +40,31 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   //  METHODS //
   //////////////
   dispayClientsMap() {
-    // this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
+    this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
     for (const [key, value] of this.clientsMap) {
-      // this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
+      this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
     }
   }
 
   //////////////
   //  EVENTS  //
   //////////////
-  @SubscribeMessage('loginToServer')
+  @SubscribeMessage('user_connected')
   handleLogin(client: Socket, userId: number) {
     if (this.clientsMap.has(userId)) {
       // this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
       throw new WsException(`double connection`);
     }
     this.clientsMap.set(userId, client.id);
-    // this.logger.log(`USER ${userId} LOGGED IN`);
-    client.broadcast.emit('loginToClient', userId);
-    // this.dispayClientsMap();
+    this.logger.log(`USER ${userId} LOGGED IN`);
+    client.broadcast.emit('user_connected', userId);
+    this.dispayClientsMap();
   }
 
-  @SubscribeMessage('logoutToServer')
+  @SubscribeMessage('user_disconnected')
   handleLogout(client: Socket, userId: number) {
-    // this.logger.log(`USER ${userId} LOGGED OUT`);
-    client.broadcast.emit('logoutToClient', userId);
+    this.logger.log(`USER ${userId} LOGGED OUT`);
+    client.broadcast.emit('user_disconnected', userId);
     this.clientsMap.delete(userId);
   }
 

@@ -1,11 +1,10 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
 
-
 export interface ISocketContextState {
     socket : Socket | undefined;
     uid: string; 
-    users: string[];
+    users: number[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
@@ -23,7 +22,7 @@ export enum ESocketActionType {
 
 export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS;
 
-export type TSocketContextPayload = string | string[] | Socket;
+export type TSocketContextPayload = string | number[] | number | Socket;
 
 export interface ISocketContextActions {
     type: TSocketContextActions;
@@ -39,9 +38,9 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
         case ESocketActionType.UP_UID:
             return { ...state, uid: action.payload as string};
         case ESocketActionType.UP_USERS:
-            return { ...state, users: action.payload as string[]};
+            return { ...state, users: action.payload as number[]};
         case ESocketActionType.RM_USER:
-            return { ...state, users: state.users.filter((uid) => uid !== ( action.payload as string ))};
+            return { ...state, users: state.users.filter((uid) => uid !== ( action.payload as number ))};
         default:
             return { ...state };
     }

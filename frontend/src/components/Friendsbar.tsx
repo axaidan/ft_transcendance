@@ -1,5 +1,5 @@
 // Extern:
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AxiosResponse } from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import SocketContextComponent from '../context/Components';
 import '../styles/components/Friendsbar.css'
 import '../styles/components/friendsbar_components/SocialOption.css'
 import '../styles/components/friendsbar_components/Contact.css'
+import SocketContext from '../context/Socket';
 
 // ****************************************************************** //
 // ***************          SOCIAL OPTION           ***************** //
@@ -114,10 +115,20 @@ function Contact({ user }:ContactProps) {
 
 type OnlineFriendProps = { online_friends: IUser[]; }
 function OnlineFriends({online_friends}:OnlineFriendProps) {
+
+	const { users } = useContext(SocketContext).SocketState;
+
+	// useEffect(() => {
+	// 	console.log(users);
+	// }, []);
+
 	return (
 		<ul id='contact-list'>
-			{ online_friends.map(( user: IUser ) => (
-				<Link className='no_decoration' to={""}>
+			{ users.map(( user: number, index ) => (
+				<p key={index}>{user}</p>
+			))}
+			{ online_friends.map(( user: IUser, index ) => (
+				<Link key={index} className='no_decoration' to={""}>
 					<Contact user={user} />
 				</Link>
 			))}
@@ -142,7 +153,7 @@ export function Friendsbar({ userId }: FriendbarProps) {
 
 	return (
 		<div className='Friendsbar'>
-			<SocketContextComponent>
+			<SocketContextComponent userId={userId}>
 				<SocialOption />
 				<OnlineFriends online_friends={onlineFriend} />
 				{/* <OurChannel online_friends={onlineFriend} />
