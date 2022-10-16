@@ -74,7 +74,7 @@ async function main() {
 		update: {},
 		create: {
 			login: 'mlormois',
-			username: 'lmasturbator',
+			username: 'Sergent',
 		},
 	}) 
 

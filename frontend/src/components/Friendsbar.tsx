@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 // Intern:
 import { IUser } from '../types';
 import { AxiosJwt } from '../hooks';
+import SocketContextComponent from '../context/Components';
 
 // Assets:
 import '../styles/components/Friendsbar.css'
@@ -88,8 +89,13 @@ type ContactProps = { user: IUser };
 function Contact({ user }: ContactProps) {
 
 	// CECI SERA DONNE GRACE AU SOCKET STATUS
+<<<<<<< HEAD
 	const status = Status.ONLINE;
 	const notif: number = 0;
+=======
+	const status = Status.INQUEUE;
+	const notif: number = 1;
+>>>>>>> d43e022a866b945ac3d26d53d3cf24f7e07df1e5
 
 	return (
 		<li className='contact-container'>
@@ -141,10 +147,12 @@ export function Friendsbar({ userId }: FriendbarProps) {
 
 	return (
 		<div className='Friendsbar'>
-			<SocialOption />
-			<OnlineFriends online_friends={onlineFriend} />
-			{/* <OurChannel online_friends={onlineFriend} />
-			<FooterFriendBar online_friends={onlineFriend} /> */}
+			<SocketContextComponent>
+				<SocialOption />
+				<OnlineFriends online_friends={onlineFriend} />
+				{/* <OurChannel online_friends={onlineFriend} />
+				<FooterFriendBar online_friends={onlineFriend} /> */}
+			</SocketContextComponent>
 		</div>
 	);
 };
