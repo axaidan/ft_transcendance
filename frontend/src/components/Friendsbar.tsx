@@ -39,7 +39,7 @@ enum Status {
 	OFFLINE
 }
 
-const colorStatus = ( mode:number, cible:string, notifed: boolean) => {
+const colorStatus = (mode: number, cible: string, notifed: boolean) => {
 	switch (cible) {
 		case "status":
 			switch (mode) {
@@ -64,8 +64,8 @@ const colorStatus = ( mode:number, cible:string, notifed: boolean) => {
 					return ('contact-color-username');
 			}
 		case "border":
-			return (mode === Status.OFFLINE ? 
-					'contact-color-offline' : 'contact-color-online');
+			return (mode === Status.OFFLINE ?
+				'contact-color-offline' : 'contact-color-online');
 	}
 	return ("")
 }
@@ -74,36 +74,36 @@ const colorStatus = ( mode:number, cible:string, notifed: boolean) => {
 // ***************        CONTACT FRIENDBAR         ***************** //
 // ****************************************************************** //
 type ContactStatusProps = { mode: number };
-function ContactStatus({ mode }:ContactStatusProps) {
-	const statusTab:string[] = [ 'online', 'absent', 'inQueue', 'inGame', 'offline'];
+function ContactStatus({ mode }: ContactStatusProps) {
+	const statusTab: string[] = ['online', 'absent', 'inQueue', 'inGame', 'offline'];
 	return (
 		<div id={colorStatus(mode, "status", false)} className="contact-status">
 			<div id="status-bulle">◉</div>
-			{ statusTab[mode] }
+			{statusTab[mode]}
 		</div>
 	)
 }
 
 type ContactProps = { user: IUser };
-function Contact({ user }:ContactProps) {
+function Contact({ user }: ContactProps) {
 
 	// CECI SERA DONNE GRACE AU SOCKET STATUS
-	const status = Status.OFFLINE;
+	const status = Status.ONLINE;
 	const notif: number = 0;
 
 	return (
 		<li className='contact-container'>
 			<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' className="contact_icon" />
 			<div className='contact-info'>
-				<div id={colorStatus(status, 'username', notif ? true : false )} className="contact-name">
+				<div id={colorStatus(status, 'username', notif ? true : false)} className="contact-name">
 					{user.username}
 				</div>
-				<ContactStatus mode={status}/>
+				<ContactStatus mode={status} />
 			</div>
-			{ notif ?
-			<div className='contact-notification'>
-				{ notif }
-			</div> : <></>
+			{notif ?
+				<div className='contact-notification'>
+					{notif}
+				</div> : <></>
 			}
 
 
@@ -112,10 +112,10 @@ function Contact({ user }:ContactProps) {
 }
 
 type OnlineFriendProps = { online_friends: IUser[]; }
-function OnlineFriends({online_friends}:OnlineFriendProps) {
+function OnlineFriends({ online_friends }: OnlineFriendProps) {
 	return (
 		<ul id='contact-list'>
-			{ online_friends.map(( user: IUser ) => (
+			{online_friends.map((user: IUser) => (
 				<Link className='no_decoration' to={""}>
 					<Contact user={user} />
 				</Link>
@@ -132,11 +132,11 @@ type FriendbarProps = { userId: number; }
 export function Friendsbar({ userId }: FriendbarProps) {
 
 	const axios = AxiosJwt();
-	const [ onlineFriend, setOnlineFriend ] = useState<IUser[]>([]);
+	const [onlineFriend, setOnlineFriend] = useState<IUser[]>([]);
 
 	useEffect(() => {
 		axios.get('/relation/list_friend')
-		.then( (res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data)} );
+			.then((res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data) });
 	});
 
 	return (
