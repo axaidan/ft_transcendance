@@ -55,4 +55,10 @@ export class RelationController {
 		return this.relationService.is_block(meId, userId);
 	}
 
+	@Get('research_friend/:path')
+	async research_friend(@GetUser('id')meId:number, @Param('path') path:string) {
+		return this.relationService.research_friend(meId, path);
+	}
+
+
 }

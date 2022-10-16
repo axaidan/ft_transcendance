@@ -80,4 +80,26 @@ export class AvatarService {
 	}
   }
 
+ async 	edit_avatar(userId: number, avatarId: number) {
+	var findMe = await this.prisma.user.findFirst({where: {id: userId}})
+
+	var findAvatar = await this.prisma.avatar.findFirst({
+		where: {
+			id: avatarId,
+			is_public: true,
+	},})
+	
+	if (!findMe)
+		throw new ForbiddenException('u not exit')
+	if (!findAvatar)
+		throw new ForbiddenException('wrong avatar id')
+
+	var updateUser = await this.prisma.user.update({
+		where : {id: userId},
+		data :{avatarId: avatarId},
+	})
+
+	return ;
+ }
+
 }

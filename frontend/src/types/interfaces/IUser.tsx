@@ -5,7 +5,8 @@ export type IUser = {
     email: string,
     createdAt: string,
     updatedAt: string
-    twoFactorAuth: boolean
+    twoFactorAuth: boolean,
+    avatar: string,
 }
 
 export const DflUser:IUser = {
@@ -15,5 +16,6 @@ export const DflUser:IUser = {
     email: "string",
     createdAt: "string",
     updatedAt: "string",
-    twoFactorAuth: false
+    twoFactorAuth: false,
+    avatar: ""
 }

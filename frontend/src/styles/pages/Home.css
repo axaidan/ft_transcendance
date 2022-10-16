@@ -1,4 +1,5 @@
 .container-body {
+	/* position: relative; */
 	color: aliceblue;
 	display: flex;
 	width: 100%;
@@ -10,5 +11,9 @@
 }
 
 .set-body {
+	/* height: 100vh; */
+	min-height: 800px;
+	max-height: 1200px;
 	height: 100vh;
+	width: 100vw;
 }

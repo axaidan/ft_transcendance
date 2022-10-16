@@ -8,34 +8,58 @@ import { AxiosResponse } from "axios";
 import { Friendsbar, Navbar } from '../components'
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import { IUser, DflUser } from "../types";
+import io, { Socket } from 'socket.io-client';
+import { useCookies } from "react-cookie";
 
 // Assets:
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website2.webm'
 
+
+const GetCookie = () => {
+	const [ cookies ] = useCookies();
+	return cookies.access_token;
+}
+
+const GetSocket = ( userId: number ) => {
+	const newSocket = io(`http://localhost:3000`, 
+	{ extraHeaders: 
+		{ Authorization: `Bearer ${GetCookie}` }
+	});
+	newSocket.emit('loginToServer', userId);
+
+	const chatSocket = io(`http://localhost:3000/chatNs`, 
+	{ extraHeaders: 
+		{ Authorization: `Bearer ${GetCookie}` }
+	});
+	chatSocket.emit('loginToServer', userId);
+
+	// newSocket.on("disconnect", () => {
+	// 	newSocket.emit('logoutToServer', userId);
+	// });
+
+	return (newSocket);
+}
+
 export function Home() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState<IUser>(DflUser);
-	const axios = AxiosJwt();
+	const [socket, setSocket] = useState<Socket>();
 
+	const axios = AxiosJwt();
+	
 	useEffect(() => {
 		axios.get("/user/me")
-			.then((res: AxiosResponse<IUser>) => {
-				setUser(res.data);
-			})
-			.catch(() => { navigate('/'); });
+		.then((res: AxiosResponse<IUser>) => {
+			setUser(res.data);
+			setSocket(GetSocket(res.data.id));
+		 })
+		.catch(() => { navigate('/'); });
 	}, []);
 
 	return (
 		<div className="set-body">
 			<Navbar me={user} />
-
-			{/* 	WALTER:
-				Ici tu doit t'arranger pour que
-				Friendsbar ne soit pas en fix
-				mais partage le body avec Outlet 
-			*/}
-
 			<div className='container-body'>
 				<video src={bg_website} autoPlay loop muted className='bg_video' />
 				<Outlet context={user} />
@@ -44,17 +68,3 @@ export function Home() {
 		</div>
 	)
 }
-
-/*		<Outlet />
-	Grace a Outlet Navbar et Friendsbar 
-	on leurs places uniquement dans ce fichier!
-	TOUT le reste des componant ( sauf exeption css )
-	ce situe dans cette Outlet! 
-*/
-
-/*		useContext()
-	Dans l'Outlet je te donne en context l'user current
-	donc nous n'avons plus a faire la requete pour savoir
-	a qui est la session. juste recuper l'user grace a:
-	useContext().
-*/
