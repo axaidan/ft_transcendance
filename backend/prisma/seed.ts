@@ -102,7 +102,7 @@ async function main() {
 		create:{
 			login: 'viporten',
 			username: 'el beaugausse',
-			avatarId: AvatarVictor.id,
+			avatarUrl: AvatarVictor.url,
 		},
 	})
 
