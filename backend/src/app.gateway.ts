@@ -2,9 +2,15 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from './auth/guard';
+import { UserService } from './users/users.service';
 
 @WebSocketGateway({ cors: '*:*' })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+
+	constructor(
+		private uservice: UserService,
+	) {}
+
 
   @WebSocketServer() wss: Server;
 
@@ -21,6 +27,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   // @UseGuards(JwtGuard)
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`CLIENT ${client.id} CONNECTED`);
+	
   }
 
   handleDisconnect(client: Socket) {
@@ -51,21 +58,27 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   //////////////
   @SubscribeMessage('user_connected')
   handleLogin(client: Socket, userId: number) {
-    if (this.clientsMap.has(userId)) {
-      // this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
-      throw new WsException(`double connection`);
-    }
-    this.clientsMap.set(userId, client.id);
-    this.logger.log(`USER ${userId} LOGGED IN`);
-    client.broadcast.emit('user_connected', userId);
-    this.dispayClientsMap();
+	this.uservice.getUser(userId)
+	.then( (res) => {
+		if (this.clientsMap.has(userId)) {
+			// this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
+			throw new WsException(`double connection`);
+		  }
+		  this.clientsMap.set(userId, client.id);
+		  this.logger.log(`USER ${userId} LOGGED IN`);
+		  client.broadcast.emit('user_connected', res);
+		  this.dispayClientsMap();
+	});
   }
 
   @SubscribeMessage('user_disconnected')
   handleLogout(client: Socket, userId: number) {
-    this.logger.log(`USER ${userId} LOGGED OUT`);
-    client.broadcast.emit('user_disconnected', userId);
-    this.clientsMap.delete(userId);
+	this.uservice.getUser(userId)
+	.then((res) => {
+		this.logger.log(`USER ${userId} LOGGED OUT`);
+		client.broadcast.emit('user_disconnected', res);
+		this.clientsMap.delete(userId);
+	});
   }
 
   /*  PASS A userId, 

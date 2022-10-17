@@ -2,11 +2,9 @@
     position: relative;
     display: flex;
     justify-content:left;
-    width: 200px;
     font-size: 1.1em;
     margin: 10px;
     border: 0px;
-
 	font-family: 'Friz Quadrata Std';
 }
 
@@ -30,11 +28,32 @@
 .contact-status div {
     margin-right: 9px;
 }
+/* width */
+::-webkit-scrollbar {
+	width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #020912;
+}
+  
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: rgb(196, 150, 26);
+	border-radius: 10px;
+}
+  /* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: rgb(221, 198, 135);
+}
 
 #contact-list {
     list-style-type: none;
     margin: 0px;
     padding-left: 2px;
+	overflow: scroll;
+	overflow-x: hidden;
 }
 
 #contact-list a{
@@ -45,6 +64,7 @@
 .contact_icon {
     padding-top: 5px;
 	width: 40px;
+	height: 40px;
 	border-radius: 50% 50%;
 }
 

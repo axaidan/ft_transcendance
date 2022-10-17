@@ -4,12 +4,15 @@ body {
 }
 
 .Friendsbar {
+	position: relative;
+	display: grid;
+	grid-template-rows: 35px auto 37px;
 	color: #fff;
 	width: 220px;
 	border-left: 3px solid #16222a;
 	background-color: #020912;
 	background-repeat: no-repeat;
-	background-image: url('../../assets/images/poro_sad.png');
+	/* background-image: url('../../assets/images/poro_sad.png'); */
 	background-position: 50% 50%;
 	margin-left: auto;
 } 

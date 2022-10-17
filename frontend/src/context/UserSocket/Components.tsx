@@ -1,8 +1,8 @@
 import { AxiosResponse } from "axios";
 import React, { PropsWithChildren, useEffect, useReducer, useState } from "react";
-import { AxiosJwt } from "../hooks";
-import { useSocket } from "../hooks/useSocket";
-import { DflUser, IUser } from "../types";
+import { AxiosJwt } from "../../hooks";
+import { useSocket } from "../../hooks/useSocket";
+import { DflUser, IUser } from "../../types";
 import { defaultSocketContextState, ESocketActionType, SocketContextProvider, SocketReducer } from "./Socket";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
@@ -38,15 +38,15 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const StartListeners = () => {
 
         /** User Connected Event */
-        socket.on('user_connected', (uid: number) => {
+        socket.on('user_connected', (user: IUser) => {
             console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
+            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: user});
         })
 
         /** User Disconnect Event */
-        socket.on('user_disconnected', (uid: number) => {
+        socket.on('user_disconnected', (user: IUser) => {
             console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
+            SocketDispatch({ type: ESocketActionType.RM_USER, payload: user});
         })
 
         /** Reconnect event **/
@@ -60,9 +60,9 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         });
 
         /** Reconnection error */
-        socket.io.on('reconnect', (error) => {
-            console.info('Reconnection error: ' + error);
-        });
+        // socket.io.on('reconnect', (error) => {
+        //     console.info('Reconnection error: ' + error);
+        // });
 
         /**  */
         socket.io.on('reconnect_failed', () => {
