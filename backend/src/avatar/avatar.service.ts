@@ -16,7 +16,7 @@ export class AvatarService {
       throw new BadRequestException('Invalid file type.');
     });
 
-	if (owner.avatarId) {
+	if (owner.avatarUrl) {
 		await this.remove_avatar(userId);
 	}
 
@@ -31,7 +31,7 @@ export class AvatarService {
 
 	var updateUser = await this.prisma.user.update({where :{id: userId},
 	data : {
-		avatarId: newAvatar.id,
+		avatarUrl: newAvatar.url,
 	}})
 	return ret;
   }
@@ -61,7 +61,7 @@ export class AvatarService {
 
 
 	var list = await this.prisma.avatar.findMany({where: {
-		OR : [{is_public : true}, {id : me.avatarId}]
+		OR : [{is_public : true}, {url: me.avatarUrl}]
 		
 
 	}})
@@ -73,7 +73,7 @@ export class AvatarService {
   async remove_avatar(userId: number) {
 	var me = await this.prisma.user.findFirst({where: { id: userId}})
 
-	var avatar = await this.prisma.avatar.findFirst({where: {id: me.avatarId}});
+	var avatar = await this.prisma.avatar.findFirst({where: {url: me.avatarUrl}});
 	
 	if (!avatar) {
 		v2.uploader.destroy(avatar.public_id);
@@ -96,7 +96,7 @@ export class AvatarService {
 
 	var updateUser = await this.prisma.user.update({
 		where : {id: userId},
-		data :{avatarId: avatarId},
+		data :{avatarUrl: findAvatar.url},
 	})
 
 	return ;
