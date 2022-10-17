@@ -6,14 +6,74 @@
 }
 
 .navbar {
+	display: grid;
+	background-color: red;
+	width: 100%;
+	grid-template-rows: 80px;
+}
+
+.nav_links {
+	margin: 0;
+	padding: 0;
+	border: 1px solid wheat;
+	display: grid;
+	grid-template-columns: 4fr 2fr 3fr 220px;
+	background: linear-gradient(45deg, #020912, #091720);
 	display: flex;
+	overflow: hidden;
+	list-style: none;
+	align-items: center;
+	color: white;
+}
+
+.items_left {
+	display: grid;
+	grid-template-columns: 50% 25% 25%;
+	grid-template-rows: 1fr;
+	background-color: red;
+	border: 1px white solid;
+	height: 100%;
+}
+
+.items_right {
+	display: grid;
+	grid-template-rows: 1;
+	grid-template-columns: repeat(3, 1fr);
+	height: 100%;
+
+}
+
+.play {
+	display: grid;
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+	grid-column: 1 / 4;
+}
+
+.items {
+	display: grid;
+	background-color: blue;
+	border: 1px orange solid;
+	color: aliceblue;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.nav_user {
+	display: grid;
+	color: aliceblue;
+	background-color: green;
+}
+
+/*
+.navbar {
 	height: 80px;
 	background: linear-gradient(45deg, #020912, #091720);
 	border-bottom: 2px solid #16222a;
 	border-top: 1px solid #785a28;
 	overflow: hidden;
 	top: 0;
-	/* position: fixed; */
 	width: 100%;
 	align-items: center;
 
@@ -206,4 +266,4 @@
 .user_icon {
 	width: 50px;
 	border-radius: 50% 50%;
-}
+} */

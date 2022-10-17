@@ -63,7 +63,7 @@ export function Home() {
 		<div className="set-body">
 			<Navbar me={user} />
 			<div className='container-body'>
-				<video src={bg_website} autoPlay loop className='bg_video' />
+				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
 				<Outlet context={user} />
 				<Friendsbar userId={user.id} />
 			</div>
