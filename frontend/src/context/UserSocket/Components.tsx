@@ -38,15 +38,15 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const StartListeners = () => {
 
         /** User Connected Event */
-        socket.on('user_connected', (user: IUser) => {
+        socket.on('loginToClient', (uid: number) => {
             console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: user});
+            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
         })
 
         /** User Disconnect Event */
-        socket.on('user_disconnected', (user: IUser) => {
+        socket.on('logoutToClient', (uid: number) => {
             console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.RM_USER, payload: user});
+            SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
         })
 
         /** Reconnect event **/
@@ -81,7 +81,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             SocketDispatch({type: ESocketActionType.UP_USERS, payload: users});
         });
         
-        socket.emit('user_connected', userId);
+        socket.emit('loginToServer', userId);
         console.info('userId: ' + userId )
         
         setLoading( false );
