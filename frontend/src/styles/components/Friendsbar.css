@@ -12,4 +12,5 @@ body {
 	background-image: url('../../assets/images/poro_sad.png');
 	background-position: 50% 50%;
 	margin-left: auto;
-} 
+	padding: 0;
+}

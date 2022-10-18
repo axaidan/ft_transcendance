@@ -48,44 +48,40 @@ export function Navbar({ me }: NavProps) {
 	return (
 		<div className="navbar">
 			<ul className="nav_links">
-				<div className="items_left">
-					<li className="play">
-						<NavLink to='/game'>
-							<div className="play_div">
-								<button className="play_btn">
-									Play
-								</button>
-							</div>
-						</NavLink>
-					</li>
-					<li className={pathname === "/home/accueil" ? "items_active" : "items"}>
-						<NavLink to='/home/acceuil'>
-							home
-						</NavLink>
-					</li>
-					<li className={splitLocation[1] === "/me" ? "items_active" : "items"}>
-						<NavLink to='/home/me'>
-							profile
-						</NavLink>
-					</li>
-				</div>
-				<div className="items_right">
-					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
-						<NavLink to='/home/ladder'>
-							Ladder
-						</NavLink>
-					</li>
-					<li className={splitLocation[1] === "" ? "items_active" : "items"}>
-						<NavLink to='/home/channel'>
-							Channels
-						</NavLink>
-					</li>
-					<li className={splitLocation[1] === "" ? "items_active" : "items"} >
-						<NavLink to='/home/store'>
-							Store
-						</NavLink>
-					</li>
-				</div>
+				<li className="play">
+					<NavLink to='/game'>
+						<div className="play_div">
+							<button className="play_btn">
+								Play
+							</button>
+						</div>
+					</NavLink>
+				</li>
+				<li className={pathname === "/home/accueil" ? "items_active" : "items"} id='home'>
+					<NavLink to='/home/acceuil'>
+						home
+					</NavLink>
+				</li>
+				<li className={splitLocation[1] === "/me" ? "items_active" : "items"} id='profile'>
+					<NavLink to='/home/me'>
+						profile
+					</NavLink>
+				</li>
+				<li className={splitLocation[1] === "" ? "items_active" : "items"} id='ladder'>
+					<NavLink to='/home/ladder'>
+						Ladder
+					</NavLink>
+				</li>
+				<li className={splitLocation[1] === "" ? "items_active" : "items"} id='channel'>
+					<NavLink to='/home/channel'>
+						Channels
+					</NavLink>
+				</li>
+				<li className={splitLocation[1] === "" ? "items_active" : "items"} id='store'>
+					<NavLink to='/home/store'>
+						Store
+					</NavLink>
+				</li>
 				<div className="nav_user">
 					<div className="avatar">
 						<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' className="user_icon">
