@@ -87,11 +87,10 @@ function ContactStatus({ mode }: ContactStatusProps) {
 	)
 }
 
-type ContactProps = { user: IUser };
-function Contact({ user }: ContactProps) {
+type ContactProps = { user: IUser, status: number };
+function Contact({ user, status }: ContactProps) {
 
 	// CECI SERA DONNE GRACE AU SOCKET STATUS
-	const status = Status.ONLINE;
 	const notif: number = 0;
 
 	return (
@@ -108,8 +107,6 @@ function Contact({ user }: ContactProps) {
 					{notif}
 				</div> : <></>
 			}
-
-
 		</li>
 	)
 }
@@ -123,15 +120,53 @@ function OnlineFriends() {
 	useEffect(() => {
 		axios.get('/relation/list_friend')
 			.then((res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data) });
-	});
+	}, []);
+
+	useEffect(() => {
+		console.log('users: ' + users);
+	}, [users])
+
+
+	const isOnline = ( uid: number, index: number, user: IUser ) => {
+
+		if ( users.includes(uid)) {
+
+			return (
+				<Link key={index} className='no_decoration' to={""}>
+					<Contact user={user} status={0}/>
+				</Link> 
+			)
+		}
+		else  (
+			<></>
+		)
+	}
+
+	const isOffline = ( uid: number, index: number, user: IUser ) => {
+
+		if ( users.includes(uid) == false ) {
+
+			return (
+				<Link key={index} className='no_decoration' to={""}>
+					<Contact user={user} status={4}/>
+				</Link> 
+			)
+		}
+		else  (
+			<></>
+		)
+	}
+
 
 	return (
 		<ul id='contact-list'>
 			{onlineFriend.map((user: IUser, index) => (
-				<Link key={index} className='no_decoration' to={""}>
-					<Contact user={user} />
-				</Link>
+				isOnline( user.id, index, user )
 			))}
+			{onlineFriend.map((user: IUser, index) => (
+				isOffline( user.id, index, user )
+			))}
+
 			{/* {online_friends.map((user: IUser, index) => (
 				<Link key={index} className='no_decoration' to={""}>
 					<Contact user={user} />
@@ -158,7 +193,7 @@ function ChatNav() {
 
 	return (
 		<div className='messages-nav'>
-			<Contact user={DflUser} />
+			<Contact user={DflUser} status={0} />
 			<div className='messages-options'>
 				<button id='btn-messages-reduction'></button>
 				<button id='btn-messages-panel'></button>
@@ -180,10 +215,7 @@ function DiscussionNav() {
 	return (
 		<div className='discussion-container'>
 			{onlineFriend.map((user: IUser, index) => (
-				<Contact user={user} />
-			))}
-			{onlineFriend.map((user: IUser, index) => (
-				<Contact user={user} />
+				<Contact user={user} status={0} />
 			))}
 		</div>
 	)

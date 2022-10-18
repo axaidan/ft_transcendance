@@ -101,7 +101,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
     for (const userId of this.userService.wsMap.keys()) {
       userIdArr.push(userId);
     }
-    return (userIdArr);
+    this.logger.log('userIdArr: ' + userIdArr);
+    client.emit('getOnlineUsersToClient', userIdArr);
   }
   
 }

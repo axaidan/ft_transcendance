@@ -49,6 +49,11 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
         })
 
+        socket.on('getOnlineUsersToClient', ( onlineUsers: number[]) => {
+            console.log('Users: ' + onlineUsers);
+            SocketDispatch({ type: ESocketActionType.GET_USERS, payload: onlineUsers});
+        })
+
         /** Reconnect event **/
         socket.io.on('reconnect', (attempt) => {
             console.info('Reconnected on attempt: ' + attempt);
@@ -59,12 +64,6 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             console.info('Reconnection attempt: ' + attempt);
         });
 
-        /** Reconnection error */
-        // socket.io.on('reconnect', (error) => {
-        //     console.info('Reconnection error: ' + error);
-        // });
-
-        /**  */
         socket.io.on('reconnect_failed', () => {
             console.info('Reconnection failure');
         });
@@ -75,12 +74,13 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const StartHandshake = ( userId: number ) => {
         console.info('Sending handshake to server ...');
 
-        socket.emit('handshake', (uid: string, users: number[]) => {
-            console.log('User handshake callback message received');
-            SocketDispatch({type: ESocketActionType.UP_UID, payload: uid});
-            SocketDispatch({type: ESocketActionType.UP_USERS, payload: users});
-        });
-        
+        // socket.emit('handshake', (uid: string, users: number[]) => {
+        //     console.log('User handshake callback message received');
+        //     SocketDispatch({type: ESocketActionType.UP_UID, payload: uid});
+        //     SocketDispatch({type: ESocketActionType.UP_USERS, payload: users});
+        // });
+
+        socket.emit('getOnlineUsersToServer');
         socket.emit('loginToServer', userId);
         console.info('userId: ' + userId )
         

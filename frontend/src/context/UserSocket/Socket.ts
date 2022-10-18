@@ -19,9 +19,10 @@ export enum ESocketActionType {
     UP_UID = 'update_uid',
     UP_USERS = 'update_users',
     RM_USER = 'remove_user',
+    GET_USERS = 'get_users',
 }
 
-export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS;
+export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS | ESocketActionType.GET_USERS; 
 
 export type TSocketContextPayload = string | number[] | number | Socket | IUser;
 
@@ -42,6 +43,8 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
             return { ...state, users: [ ...state.users, action.payload as number] };
         case ESocketActionType.RM_USER:
             return { ...state, users: state.users.filter((uid) => uid !== ( action.payload as number ))};
+        case ESocketActionType.GET_USERS:
+            return { ...state, users: action.payload as number[] };
         default:
             return { ...state };
     }
