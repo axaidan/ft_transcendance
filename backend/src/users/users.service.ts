@@ -1,11 +1,23 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { AppGateway } from 'src/app.gateway';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto/edit-user.dto';
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {};
+
+    private websockets = new Map<number, string>();
+
+	constructor(
+		private prisma: PrismaService,
+    	@Inject(forwardRef(() => AppGateway))
+		private appGateway: AppGateway,
+		) {};
+
+	get wsMap() {
+        return this.websockets;
+    }
 
 	async createUser(login : string) {
 	return await this.prisma.user.create({

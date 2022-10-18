@@ -1112,6 +1112,7 @@ describe('App e2e', () => {
 				// .inspect()
 			});
 
+			// NO WEBSOCKET ON TEST, TEST NOT POSSIBLE FOR NOW
 			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
 			// 	return pactum
 			// 	.spec()
