@@ -508,6 +508,7 @@ describe('App e2e', () => {
 			.expectStatus(200)
 			/*.inspect()*/;
 		});  
+
 		it('NO JWT - should return 401', () => {
 			return pactum
 			.spec()
@@ -525,26 +526,24 @@ describe('App e2e', () => {
 		});
 		
 		});
+
 		describe('EditUser()', () => {
 
 		const baseDto: EditUserDto = {
-			email: 'dummy@gmail.com',
 			username: 'LoveDummyDu93',
 			twoFactorAuth: true,
 		}
 
-		it('VALID EMAIL, USERNAME, 2FA - should 200', () => {
+		it('VALID USERNAME, 2FA - should 200', () => {
 			const dto = baseDto;
 			return pactum
 			.spec()
 			.patch('/user')
 			.withHeaders({
-			Authorization: `Bearer ${dummyJwt.access_token}`,
+				Authorization: `Bearer ${dummyJwt.access_token}`,
 			})
 			.withBody(dto)
 			.expectStatus(200)
-			// .inspect()
-			.expectBodyContains(dto.email)
 			.expectBodyContains(dto.username)
 			.expectBodyContains(dto.twoFactorAuth);
 		});
@@ -562,36 +561,8 @@ describe('App e2e', () => {
 			// .inspect()
 		});
 
-		it('NON VALID EMAIL, VALID REST - should 400', () => {
-			const {...dto} = baseDto;
-			dto.email = 'nonValidEmail';
-			return pactum
-			.spec()
-			.patch('/user')
-			.withHeaders({
-			Authorization: `Bearer ${dummyJwt.access_token}`,
-			})
-			.withBody(dto)
-			.expectStatus(400)
-			// .inspect();
-		});
-
-		it('VALID EMAIL ONLY - should 200', () => {
-			const {username, twoFactorAuth, ...dto} = baseDto;
-			return pactum
-			.spec()
-			.patch('/user')
-			.withHeaders({
-			Authorization: `Bearer ${dummyJwt.access_token}`,
-			})
-			.withBody(dto)
-			.expectStatus(200)
-			// .inspect()
-			.expectBodyContains(dto.email);
-		});
-
 		it('VALID USERNAME - should 200', () => {
-			const {email, twoFactorAuth, ...dto} = baseDto;
+			const {twoFactorAuth, ...dto} = baseDto;
 			dto.username = "HateDummyDu94";
 			return pactum
 			.spec()
@@ -606,7 +577,7 @@ describe('App e2e', () => {
 		});
 
 		it('VALID 2FA - should 200', () => {
-			const {username, email, ...dto} = baseDto;
+			const {username, ...dto} = baseDto;
 			dto.twoFactorAuth = false;
 			return pactum
 			.spec()
@@ -620,23 +591,8 @@ describe('App e2e', () => {
 			.expectBodyContains(dto.twoFactorAuth);
 		});
 
-		it('WRONG EMAIL - should 400', () => {
-			const {username, twoFactorAuth, ...dto} = baseDto;
-			dto.email = 'nonValidEmail';
-			return pactum
-			.spec()
-			.patch('/user')
-			.withHeaders({
-			Authorization: `Bearer ${dummyJwt.access_token}`,
-			})
-			.withBody(dto)
-			.expectStatus(400);
-			// .inspect()
-			// .expectBodyContains(dto.email);
-		});
-
 		it('EMPTY USERNAME - should 400', () => {
-			const {twoFactorAuth, email, ...dto} = baseDto;
+			const {twoFactorAuth, ...dto} = baseDto;
 			dto.username = '';
 			return pactum
 			.spec()
@@ -651,7 +607,7 @@ describe('App e2e', () => {
 		});
 
 		it('EMPTY DTO - should 200', () => {
-			const {twoFactorAuth, email, username, ...dto} = baseDto;
+			const {twoFactorAuth, username, ...dto} = baseDto;
 			return pactum
 			.spec()
 			.patch('/user')
@@ -1156,16 +1112,16 @@ describe('App e2e', () => {
 				// .inspect()
 			});
 
-			it('VALID - NO CONV - should 200 EMPTY ARR', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/user/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[10].access_token}`,
-				})
-				.expectStatus(200)
-				// .inspect()
-			});
+			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
+			// 	return pactum
+			// 	.spec()
+			// 	.get(`/discussion/user/${dummyUser.id}`)
+			// 	.withHeaders({
+			// 		Authorization: `Bearer ${jwtArr[10].access_token}`,
+			// 	})
+			// 	.expectStatus(200)
+			// 	// .inspect()
+			// });
 		}); // DESCRIBE (DISCUSSION/:ID)
 
 

@@ -4,10 +4,10 @@ export class EditUserDto {
     
     // !!! TO TAKE OUT, EMAIL NOT EDITABLE
     // EMAIL EDITING TESTS TO BE REMOVED TOO
-    @IsEmail()
-    @IsOptional()
-    @MaxLength(320) // OFFICIAL EMAIL ADDRESS MAX LENGTH
-    email?: string;
+    // @IsEmail()
+    // @IsOptional()
+    // @MaxLength(320) // OFFICIAL EMAIL ADDRESS MAX LENGTH
+    // email?: string;
 
     @IsString()
     @IsOptional()
