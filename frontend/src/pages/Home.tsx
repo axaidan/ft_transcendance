@@ -15,32 +15,6 @@ import { useCookies } from "react-cookie";
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website.webm'
 
-
-// const GetCookie = () => {
-// 	const [ cookies ] = useCookies();
-// 	return cookies.access_token;
-// }
-
-// const GetSocket = ( userId: number ) => {
-// 	const newSocket = io(`http://localhost:3000`, 
-// 	{ extraHeaders: 
-// 		{ Authorization: `Bearer ${GetCookie}` }
-// 	});
-// 	newSocket.emit('loginToServer', userId);
-
-// 	const chatSocket = io(`http://localhost:3000/chatNs`, 
-// 	{ extraHeaders: 
-// 		{ Authorization: `Bearer ${GetCookie}` }
-// 	});
-// 	chatSocket.emit('loginToServer', userId);
-
-// 	// newSocket.on("disconnect", () => {
-// 	// 	newSocket.emit('logoutToServer', userId);
-// 	// });
-
-// 	return (newSocket);
-// }
-
 export function Home() {
 	const navigate = useNavigate();
 	const [user, setUser] = useState<IUser>(DflUser);

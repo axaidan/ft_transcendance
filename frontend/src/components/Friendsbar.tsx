@@ -114,23 +114,29 @@ function Contact({ user }: ContactProps) {
 	)
 }
 
-type OnlineFriendProps = { online_friends: IUser[]; }
-function OnlineFriends({ online_friends }: OnlineFriendProps) {
+function OnlineFriends() {
 
+	const axios = AxiosJwt();
+	const [onlineFriend, setOnlineFriend] = useState<IUser[]>([]);
 	const { users } = useContext(SocketContext).SocketState;
+
+	useEffect(() => {
+		axios.get('/relation/list_friend')
+			.then((res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data) });
+	});
 
 	return (
 		<ul id='contact-list'>
-			{online_friends.map((user: IUser, index) => (
+			{onlineFriend.map((user: IUser, index) => (
 				<Link key={index} className='no_decoration' to={""}>
 					<Contact user={user} />
 				</Link>
 			))}
-			{online_friends.map((user: IUser, index) => (
+			{/* {online_friends.map((user: IUser, index) => (
 				<Link key={index} className='no_decoration' to={""}>
 					<Contact user={user} />
 				</Link>
-			))}
+			))} */}
 		</ul>
 	)
 }
@@ -203,20 +209,11 @@ function Chat() {
 type FriendbarProps = { userId: number; }
 export function Friendsbar({ userId }: FriendbarProps) {
 
-	const axios = AxiosJwt();
-	const [onlineFriend, setOnlineFriend] = useState<IUser[]>([]);
-
-	useEffect(() => {
-		axios.get('/user/all')
-			.then((res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data) });
-	});
-
 	return (
 		<div className='Friendsbar'>
 			<SocketContextComponent userId={userId}>
 				<SocialOption />
-				<OnlineFriends online_friends={onlineFriend} />
-				{/* <OurChannel online_friends={onlineFriend} /> */}
+				<OnlineFriends />
 				<FooterFriendBar />
 				<Chat />
 			</SocketContextComponent>
