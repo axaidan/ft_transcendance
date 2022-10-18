@@ -14,13 +14,27 @@ export function Profile() {
 	const axios = AxiosJwt();
 	let user: IUser = useOutletContext();
 	const [avatar, setAvatar] = useState('');
+	const [toggleEdit, setToggleEdit] = useState(false);
+
+
+	const toggleUserEdit = () => {
+		setToggleEdit(!toggleEdit);
+	}
 
 	return (
 		<div className="user_body">
 			<div className="left_side">
 				<div className="banner">
 					<div className="user_nickname">
-						{user.username}
+						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} />
+						<div className={toggleEdit ? "disabled" : "user-nick"}>
+							{user.username}
+						</div>
+						<button onClick={toggleUserEdit} className={toggleEdit ? "validate-edit" : "disabled"}>
+							Validate
+						</button>
+						<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
+						</button>
 					</div>
 					<div className="clan">
 						My clan

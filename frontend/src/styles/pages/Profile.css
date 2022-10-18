@@ -93,3 +93,53 @@
 	width: 100%;
 	justify-content: center;
 }
+
+.no-edit {
+	margin-left: 20px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/edit_hover.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 200%;
+}
+
+.no-edit:active {
+	margin-left: 20px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/edit_click.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 200%;
+}
+
+.no-edit:hover {
+	box-shadow: 0 0 20px 2px white;
+	border-radius: 50% 50%;
+}
+
+.edit-up {
+	margin-left: 10px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/red_x_mark.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 100%;
+	background-repeat: no-repeat;
+}
+
+.edit-up:active {
+	scale: 0.8;
+}
+
+.disabled {
+	display: none;
+}
