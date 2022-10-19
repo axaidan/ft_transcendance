@@ -45,9 +45,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	//  METHODS //
 	//////////////
 	dispayClientsMap() {
-		this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
+		// this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
 		for (const [key, value] of this.clientsMap) {
-			this.logger.log(`\tuserService.wsMap[${key}]\t=\t${value}`);
+			this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
 		}
 	}
 

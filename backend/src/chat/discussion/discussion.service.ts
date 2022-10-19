@@ -1,9 +1,9 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { Discussion, DiscussionMessage, User } from '@prisma/client';
-import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
+import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
-import { DiscussionGateway } from './discussion.gateway';
+import { ChatGateway } from '../chat.gateway';
 import { DiscussionDto } from './dto/discussion.dto';
 
 export type DiscussionWithUsers = {
@@ -20,8 +20,8 @@ export class DiscussionService {
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        @Inject(forwardRef(() => DiscussionGateway))
-        private discGateway: DiscussionGateway,
+        @Inject(forwardRef(() => ChatGateway))
+        private chatGateway: ChatGateway,
     ) {}
 
     async create(dto: CreateDiscussionDto) : Promise<DiscussionWithUsers> {
@@ -104,8 +104,8 @@ export class DiscussionService {
             discussion = await this.create(createDto);
             console.log('getMessagesByUserId() - DISCUSSION CREATED');
             // JOIN user1Id AND user2Id TO NEW ROOM
-            this.discGateway.joinDiscRoom(user1Id, discussion.id);
-            this.discGateway.joinDiscRoom(user2Id, discussion.id);
+            this.chatGateway.joinDiscRoom(user1Id, discussion.id);
+            this.chatGateway.joinDiscRoom(user2Id, discussion.id);
             // EMIT newDiscToClient TO ROOM
             const dto: DiscussionDto = {
                 id: discussion.id,
@@ -114,7 +114,7 @@ export class DiscussionService {
                 username1: discussion.user1.username,
                 username2: discussion.user2.username,
             }
-            this.discGateway.newDisc(discussion.id, dto);
+            this.chatGateway.newDisc(discussion.id, dto);
             messages = [];
         }
         else {

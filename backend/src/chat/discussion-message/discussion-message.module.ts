@@ -5,5 +5,8 @@ import { DiscussionMessageService } from './discussion-message.service';
   providers: [
     DiscussionMessageService
   ],
+  exports: [
+    DiscussionMessageService,
+  ]
 })
 export class DiscussionMessageModule {}

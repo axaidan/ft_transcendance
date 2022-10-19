@@ -6,8 +6,8 @@ import { UserModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { AchivModule } from './achiv/achiv.module';
 import { RelationModule } from './relations/relation.module';
-import { DiscussionModule } from './discussion/discussion.module';
-import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
+import { DiscussionModule } from './chat/discussion/discussion.module';
+import { DiscussionMessageModule } from './chat/discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
 import { AppGateway } from './app.gateway';
@@ -24,9 +24,6 @@ import { ChatModule } from './chat/chat.module';
 		MailModule,
 		AchivModule,
 		RelationModule,
-		DiscussionModule,
-		DiscussionMessageModule,
-		// ChatModule,
 		GameModule,
 		AvatarModule,
 		ChatModule,

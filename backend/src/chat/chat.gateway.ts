@@ -1,16 +1,14 @@
 import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
-import { Discussion } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
-import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
-import { DiscussionMessageDto } from 'src/discussion-message/dto/discussion-message.dto';
-import internal from 'stream';
-import { DiscussionService, DiscussionWithUsers } from './discussion.service';
-import { DiscussionDto } from './dto/discussion.dto';
+import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
+import { DiscussionMessageDto } from 'src/chat/discussion-message/dto/discussion-message.dto';
+import { DiscussionService } from './discussion/discussion.service';
+import { DiscussionDto } from './discussion/dto/discussion.dto';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chatNs' })
-export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
     constructor(
         @Inject(forwardRef(() => DiscussionService))
@@ -19,7 +17,7 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     ) { }
 
     @WebSocketServer() wss: Server;
-    private logger: Logger = new Logger('DiscussionGateway');
+    private logger: Logger = new Logger('ChatGateway');
     private clientsMap = new Map<number, Socket>();
 
     ////////////////////////////////
@@ -77,7 +75,7 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
 
     displayClientsMap() {
         for (const [key, value] of this.clientsMap) {
-            this.logger.log(`\twsMap[${key}]\t=\t${value.id}`);
+            this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
         }
     }
 
