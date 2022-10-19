@@ -18,7 +18,6 @@ import { MailModule } from 'src/mail/mail.module';
 		JwtStrategy,
 		FtStrategy,
 		UserService,
-		// AppGateway,			// JUST TO BE ABLE TO INCLUDE UserService
 	]
 })
 

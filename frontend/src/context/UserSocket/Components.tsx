@@ -19,12 +19,18 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         reconnectionDelay: 5000,
         autoConnect: false,
     })
+    // const socket2 = useSocket('localhost:3000/chatNs', {
+    //     reconnectionAttempts: 5,
+    //     reconnectionDelay: 5000,
+    //     autoConnect: false,
+    // })
 
     useEffect(() => {
         // Connect to the Web Socket //
         if (props.userId != 0)
         {
             socket.connect();
+            // socket2.connect();
             // Save the socket in context //
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
             // Start the envent listeners // 
@@ -48,6 +54,17 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             console.info('User connected, new user list received.');
             SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
         })
+
+        // socket2.on('loginToClient', (uid: number) => {
+        //     console.info('User connected, new user list received.');
+        //     SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
+        // })
+
+        // /** User Disconnect Event */
+        // socket2.on('logoutToClient', (uid: number) => {
+        //     console.info('User connected, new user list received.');
+        //     SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
+        // })
 
         socket.on('getOnlineUsersToClient', ( onlineUsers: number[]) => {
             console.log('Users: ' + onlineUsers);
@@ -83,6 +100,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
 
 		socket.emit('loginToServer', userId);
+		// socket2.emit('loginToServer', userId);
         console.info('userId: ' + userId )
         
         setLoading( false );

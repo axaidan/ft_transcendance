@@ -20,25 +20,25 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	//  INIT, CONNECTION, DISCONNECT  //
 	////////////////////////////////////
 	afterInit(server: Server) {
-		// this.logger.log('Initialized');
+		this.logger.log('Initialized');
 	}
 
 	// @UseGuards(JwtGuard)
 	handleConnection(client: Socket, ...args: any[]) {
-		// this.logger.log(`CLIENT ${client.id} CONNECTED`);
+		this.logger.log(`CLIENT ${client.id} CONNECTED`);
 	}
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
 		for (const [id, value] of this.clientsMap) {
 			if (client.id === value) {
-				// this.logger.log(`USER ${id} LOGGED OUT`);
+				this.logger.log(`USER ${id} LOGGED OUT`);
 				this.wss.emit('logoutToClient', id);
 				this.clientsMap.delete(id);
 				break;
 			}
 		}
-		// this.dispayClientsMap();
+		this.dispayClientsMap();
 	}
 
 	//////////////
@@ -102,7 +102,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		for (const userId of this.clientsMap.keys()) {
 			userIdArr.push(userId);
 		}
-		this.logger.log('userIdArr: ' + userIdArr);
 		client.emit('getOnlineUsersToClient', userIdArr);
 	}
 
