@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
 import { MailService } from '../mail/mail.service';
-import { NotFoundError } from 'rxjs';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -11,21 +11,18 @@ export class AuthService {
 		private prisma: PrismaService,
 		private conf: ConfigService,
 		private jwt: JwtService,
+		private userService: UserService,
 		private mailService: MailService) { }
 
 
 	async signin(login: string) {
-		let user = await this.prisma.user.findFirst({ where: { login: login } });
+		let user = await this.prisma.user.findUnique({
+			where: {
+				login: login,
+			},
+		});
 		if (!user)
-			user = await this.prisma.user.create({
-				data: {
-					login: login,
-					username: login,
-					email: login + '@student.42.fr',
-					avatarId: 1,
-				}
-			});
-
+			user = await this.userService.createUser(login);
 		const token = await this.signToken(user.id, user.login);
 		if (user.twoFactorAuth === true) {
 			this.mailService.sendLoginToken(user, token.access_token);

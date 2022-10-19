@@ -28,6 +28,8 @@ import { AppGateway } from './app.gateway';
 		GameModule,
 		AvatarModule,
 	],
-	providers: [AppGateway]
+	providers: [
+		AppGateway,
+	]
 })
 export class AppModule {}
