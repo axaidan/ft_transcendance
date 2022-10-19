@@ -21,12 +21,18 @@ export function Profile() {
 		setToggleEdit(!toggleEdit);
 	}
 
+	const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+		useEffect(() => {
+			axios.patch('', { username: 'caca' }).then(function (res) { console.log(res) });
+		})
+	}
+
 	return (
 		<div className="user_body">
 			<div className="left_side">
 				<div className="banner">
 					<div className="user_nickname">
-						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} />
+						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} />
 						<div className={toggleEdit ? "disabled" : "user-nick"}>
 							{user.username}
 						</div>
