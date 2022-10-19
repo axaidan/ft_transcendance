@@ -77,11 +77,12 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         // socket.emit('handshake', (uid: string, users: number[]) => {
         //     console.log('User handshake callback message received');
         //     SocketDispatch({type: ESocketActionType.UP_UID, payload: uid});
-        //     SocketDispatch({type: ESocketActionType.UP_USERS, payload: users});
         // });
 
         socket.emit('getOnlineUsersToServer');
-        socket.emit('loginToServer', userId);
+
+
+		socket.emit('loginToServer', userId);
         console.info('userId: ' + userId )
         
         setLoading( false );

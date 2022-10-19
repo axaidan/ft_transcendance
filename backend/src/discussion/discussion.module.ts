@@ -3,7 +3,7 @@ import { DiscussionMessageModule } from 'src/discussion-message/discussion-messa
 import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
 import { DiscussionController } from './discussion.controller';
 import { DiscussionService } from './discussion.service';
-import { DiscussionGateway } from './discussion.gateway';
+// import { DiscussionGateway } from './discussion.gateway';
 
 @Module({
     imports: [
@@ -15,7 +15,7 @@ import { DiscussionGateway } from './discussion.gateway';
     providers: [
         DiscussionService,
         DiscussionMessageService,
-        DiscussionGateway,
+        // DiscussionGateway,
     ],
 })
 export class DiscussionModule {}

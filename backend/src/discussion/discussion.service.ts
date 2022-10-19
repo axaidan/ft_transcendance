@@ -3,7 +3,7 @@ import { Discussion, DiscussionMessage, User } from '@prisma/client';
 import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
-import { DiscussionGateway } from './discussion.gateway';
+// import { DiscussionGateway } from './discussion.gateway';
 import { Socket } from 'socket.io';
 
 export type DiscussionWithUsers = {
@@ -23,8 +23,8 @@ export class DiscussionService {
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        @Inject(forwardRef(() => DiscussionGateway))
-        private discGateway: DiscussionGateway,
+        // @Inject(forwardRef(() => DiscussionGateway))
+        // private discGateway: DiscussionGateway,
     ) {}
 
     get wsMap() {
@@ -111,17 +111,17 @@ export class DiscussionService {
             discussion = await this.create(createDto);
             // console.log('getMessagesByUserId() - DISCUSSION CREATED');
             // console.log('this.wsMap[user1Id].id = ' + this.wsMap[user1Id].id);
-            this.discGateway.joinDiscRoom(this.wsMap[user1Id], discussion.id, /*DBG*/user1Id);
-            // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 1');
-            this.discGateway.newDisc(this.wsMap[user1Id], discussion, /*DBG*/user1Id)
-            // console.log('getMessagesByUserId() - newDisc EMITTED FOR USER 1');
+            // this.discGateway.joinDiscRoom(this.wsMap[user1Id], discussion.id, /*DBG*/user1Id);
+            // // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 1');
+            // this.discGateway.newDisc(this.wsMap[user1Id], discussion, /*DBG*/user1Id)
+            // // console.log('getMessagesByUserId() - newDisc EMITTED FOR USER 1');
 
-            if (this.wsMap[user2Id]) {
-                // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
-                this.discGateway.joinDiscRoom(this.wsMap[user2Id], discussion.id, /*DBG*/user2Id);
-                // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
-                this.discGateway.newDisc(this.wsMap[user2Id], discussion, /*DBG*/user2Id)
-            }
+            // if (this.wsMap[user2Id]) {
+            //     // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
+            //     this.discGateway.joinDiscRoom(this.wsMap[user2Id], discussion.id, /*DBG*/user2Id);
+            //     // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
+            //     this.discGateway.newDisc(this.wsMap[user2Id], discussion, /*DBG*/user2Id)
+            // }
             messages = [];
         }
         else {

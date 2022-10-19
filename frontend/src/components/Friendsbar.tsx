@@ -115,7 +115,11 @@ function OnlineFriends() {
 
 	const axios = AxiosJwt();
 	const [onlineFriend, setOnlineFriend] = useState<IUser[]>([]);
+
+
 	const { users } = useContext(SocketContext).SocketState;
+
+
 
 	useEffect(() => {
 		axios.get('/relation/list_friend')

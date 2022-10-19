@@ -11,7 +11,6 @@ import { DiscussionMessageModule } from './discussion-message/discussion-message
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
 import { AppGateway } from './app.gateway';
-import { UserService } from './users/users.service';
 
 @Module({
 	imports: [
@@ -30,8 +29,7 @@ import { UserService } from './users/users.service';
 		AvatarModule,
 	],
 	providers: [
-		UserService,
 		AppGateway,
-	],
+	]
 })
 export class AppModule {}
