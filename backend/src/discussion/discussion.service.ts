@@ -4,6 +4,7 @@ import { DiscussionMessageService } from 'src/discussion-message/discussion-mess
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
 import { DiscussionGateway } from './discussion.gateway';
+import { DiscussionDto } from './dto/discussion.dto';
 
 export type DiscussionWithUsers = {
     id: number
@@ -105,8 +106,15 @@ export class DiscussionService {
             // JOIN user1Id AND user2Id TO NEW ROOM
             this.discGateway.joinDiscRoom(user1Id, discussion.id);
             this.discGateway.joinDiscRoom(user2Id, discussion.id);
-            this.discGateway.newDisc(discussion.id);
             // EMIT newDiscToClient TO ROOM
+            const dto: DiscussionDto = {
+                id: discussion.id,
+                user1Id: discussion.user1Id,
+                user2Id: discussion.user2Id,
+                username1: discussion.user1.username,
+                username2: discussion.user2.username,
+            }
+            this.discGateway.newDisc(discussion.id, dto);
             messages = [];
         }
         else {

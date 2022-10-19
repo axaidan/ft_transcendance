@@ -53,7 +53,8 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     //////////////
     joinDiscRoom(userId: number, discId: number) {
         if (this.clientsMap.has(userId)) {
-            const client: Socket = this.clientsMap[userId];
+            const client: Socket = this.clientsMap.get(userId);
+            this.logger.log(client);
             const roomName: string = 'disc' + discId;
             if ((roomName in client.rooms) === false) {
                 this.logger.log(`USER ${userId} JOINING '${roomName}' ROOM`);
@@ -69,9 +70,9 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
         }
     }
 
-    newDisc(discId: number) {
+    newDisc(discId: number, dto: DiscussionDto) {
         const roomName: string = 'disc' + discId;
-        this.wss.to(roomName).emit('newDiscToClient');
+        this.wss.to(roomName).emit('newDiscToClient', dto);
     }
 
     displayClientsMap() {
@@ -87,13 +88,13 @@ export class DiscussionGateway implements OnGatewayInit, OnGatewayConnection, On
     async handleLogin(client: Socket, userId: number) {
         if (this.clientsMap.has(userId)) {
             this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
-            client.disconnect(true);
+            // client.disconnect(true);
             throw new WsException(`double connection`);
         }
-        this.clientsMap.set(userId, client);
         this.logger.log(`USER ${userId} LOGGED IN`);
-        await this.joinAllDiscRooms(userId);
+        this.clientsMap.set(userId, client);
         this.displayClientsMap();
+        await this.joinAllDiscRooms(userId);
     }
 
     @SubscribeMessage('logoutToServer')
