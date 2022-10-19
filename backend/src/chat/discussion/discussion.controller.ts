@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { Discussion } from '@prisma/client';
-import { blockParams } from 'handlebars';
-// import { blockParams } from 'handlebars';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
-import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
+import { GetDiscussionMessagesDto } from './dto';
 
 
 @UseGuards(JwtGuard)

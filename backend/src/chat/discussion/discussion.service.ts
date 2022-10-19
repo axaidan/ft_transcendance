@@ -1,10 +1,10 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { Discussion, DiscussionMessage, User } from '@prisma/client';
-import { DiscussionMessageService } from 'src/discussion-message/discussion-message.service';
+import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, GetDiscussionDto, GetDiscussionMessagesDto } from './dto';
-// import { DiscussionGateway } from './discussion.gateway';
-import { Socket } from 'socket.io';
+import { ChatGateway } from '../chat.gateway';
+import { DiscussionDto } from './dto/discussion.dto';
 
 export type DiscussionWithUsers = {
     id: number
@@ -17,19 +17,12 @@ export type DiscussionWithUsers = {
 @Injectable()
 export class DiscussionService {
 
-    //private websockets = new Map<number, string>();
-    private websockets = new Map<number, Socket>();
-
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        // @Inject(forwardRef(() => DiscussionGateway))
-        // private discGateway: DiscussionGateway,
+        @Inject(forwardRef(() => ChatGateway))
+        private chatGateway: ChatGateway,
     ) {}
-
-    get wsMap() {
-        return this.websockets;
-    }
 
     async create(dto: CreateDiscussionDto) : Promise<DiscussionWithUsers> {
         const discussion = await this.prisma.discussion.create({
@@ -109,19 +102,19 @@ export class DiscussionService {
                 user2Id: user2Id,
             }
             discussion = await this.create(createDto);
-            // console.log('getMessagesByUserId() - DISCUSSION CREATED');
-            // console.log('this.wsMap[user1Id].id = ' + this.wsMap[user1Id].id);
-            // this.discGateway.joinDiscRoom(this.wsMap[user1Id], discussion.id, /*DBG*/user1Id);
-            // // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 1');
-            // this.discGateway.newDisc(this.wsMap[user1Id], discussion, /*DBG*/user1Id)
-            // // console.log('getMessagesByUserId() - newDisc EMITTED FOR USER 1');
-
-            // if (this.wsMap[user2Id]) {
-            //     // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
-            //     this.discGateway.joinDiscRoom(this.wsMap[user2Id], discussion.id, /*DBG*/user2Id);
-            //     // console.log('getMessagesByUserId() - joinDiscRoom() OK FOR USER 2');
-            //     this.discGateway.newDisc(this.wsMap[user2Id], discussion, /*DBG*/user2Id)
-            // }
+            console.log('getMessagesByUserId() - DISCUSSION CREATED');
+            // JOIN user1Id AND user2Id TO NEW ROOM
+            this.chatGateway.joinDiscRoom(user1Id, discussion.id);
+            this.chatGateway.joinDiscRoom(user2Id, discussion.id);
+            // EMIT newDiscToClient TO ROOM
+            const dto: DiscussionDto = {
+                id: discussion.id,
+                user1Id: discussion.user1Id,
+                user2Id: discussion.user2Id,
+                username1: discussion.user1.username,
+                username2: discussion.user2.username,
+            }
+            this.chatGateway.newDisc(discussion.id, dto);
             messages = [];
         }
         else {

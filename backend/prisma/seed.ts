@@ -449,6 +449,102 @@ async function main() {
 		});
 	}
 
+	// RELATIONS SEED
+	for (let i = 0 ; i < 10 ; i++) {
+		// FRIENDS OF mlormois
+		await prisma.relation.create({
+			data: {
+				userId: 1,
+				userIWatchId: 9 + i,
+				relation: 1,
+			}
+		});
+		// FRIENDS OF mlormois
+		await prisma.relation.create({
+			data: {
+				userId: 2,
+				userIWatchId: 9 + i,
+				relation: 1,
+			}
+		});
+	}
+	await prisma.relation.create({
+		data: {
+			userId: 2,
+			userIWatchId: 1,
+			relation: 1,
+		}
+	});
+	await prisma.relation.create({
+		data: {
+			userId: 1,
+			userIWatchId: 2,
+			relation: 1,
+		}
+	});
+	// DISCUSSION SEED
+	// mlormois - user0
+	const disc1 = await prisma.discussion.create({
+		data: {
+			user1Id: 1,
+			user2Id: 9,
+		}
+	});
+	// axaidan - user0
+	const disc2 = await prisma.discussion.create({
+		data: {
+			user1Id: 2,
+			user2Id: 9,
+		}
+	});
+	// viporten - user0
+	await prisma.discussion.create({
+		data: {
+			user1Id: 4,
+			user2Id: 9,
+		}
+	});
+	// DISCUSSIONMESSAGES SEED
+	// user0 => mlormois MESSAGES
+	for (let i = 0 ; i < 5 ; i++) {
+		await prisma.discussionMessage.create({
+			data: {
+				userId: 9,
+				discussionId: disc1.id,
+				text: "user0 msg" + i,
+			}
+		});
+	}
+	// mlormois => user0 MESSAGES
+	for (let i = 0 ; i < 5 ; i++) {
+		await prisma.discussionMessage.create({
+			data: {
+				userId: sergent.id,
+				discussionId: disc1.id,
+				text: "sergent msg" + i,
+			}
+		});
+	}
+	// user0 => axaidan MESSAGES
+	for (let i = 0 ; i < 5 ; i++) {
+		await prisma.discussionMessage.create({
+			data: {
+				userId: 9,
+				discussionId: disc2.id,
+				text: "user0 msg" + i,
+			}
+		});
+	}
+	// mlormois => user0 MESSAGES
+	for (let i = 0 ; i < 5 ; i++) {
+		await prisma.discussionMessage.create({
+			data: {
+				userId: Axel.id,
+				discussionId: disc2.id,
+				text: "axaidan msg" + i,
+			}
+		});
+	}
 }
 
 main()

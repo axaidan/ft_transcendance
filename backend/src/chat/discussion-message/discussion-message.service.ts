@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { DiscussionMessage } from '@prisma/client';
-import { GetDiscussionDto } from 'src/discussion/dto/get-discussion.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DiscussionMessageDto } from './dto';
 
