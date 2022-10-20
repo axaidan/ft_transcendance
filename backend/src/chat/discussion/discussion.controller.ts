@@ -10,7 +10,7 @@ import { CreateDiscussionDto } from './dto';
 @Controller('discussion')
 export class DiscussionController {
 
-    private logger: Logger = new Logger();
+	private logger: Logger = new Logger('DiscController');
 
     constructor(
         private discService: DiscussionService
@@ -28,7 +28,7 @@ export class DiscussionController {
     @Post()
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Body(ParseIntPipe) body : { user2Id: number }, 
+        @Body(/*ParseIntPipe*/) body : { user2Id: number }, 
     ) :
     Promise<Discussion>
     {
@@ -36,6 +36,7 @@ export class DiscussionController {
             user1Id: currentUserId,
             user2Id: body.user2Id,
         };
+		this.logger.log(`USER ${currentUserId} CREATING DISC W/ USER ${body.user2Id}`)
         const discussion = await this.discService.create(dto);
         this.logger.log(`USER ${currentUserId} CREATED NEW Discussion W/ USER ${body.user2Id}`);
         return discussion;

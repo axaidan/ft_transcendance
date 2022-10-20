@@ -4,13 +4,14 @@ import { IUser } from "../../types";
 
 export interface ISocketContextState {
     socket : Socket | undefined;
-    uid: string; 
+    uid: number; 
     users: number[];
+	
 }
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
-    uid: '',
+    uid: 0,
     users: []
 }
 
@@ -24,7 +25,7 @@ export enum ESocketActionType {
 
 export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS | ESocketActionType.GET_USERS; 
 
-export type TSocketContextPayload = string | number[] | number | Socket | IUser;
+export type TSocketContextPayload = number[] | number | Socket | IUser;
 
 export interface ISocketContextActions {
     type: TSocketContextActions;
@@ -38,7 +39,7 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
         case ESocketActionType.UP_SOKET:
             return { ...state, socket: action.payload as Socket};
         case ESocketActionType.UP_UID:
-            return { ...state, uid: action.payload as string};
+            return { ...state, uid: action.payload as number};
         case ESocketActionType.UP_USERS:
             return { ...state, users: [ ...state.users, action.payload as number] };
         case ESocketActionType.RM_USER:

@@ -21,6 +21,15 @@
 	width: 700px;
 }
 
+.message-right {
+	text-align: right;
+	background-color: brown;
+}
+
+.message-left {
+	text-align: left;
+	background-color: blueviolet;
+}
 
 .messages-container {
 	display: grid;
@@ -47,7 +56,7 @@
 	overflow-x: hidden;
 }
 
-.messages-input {
+#messages-input {
 	background-color: #020912be;
 	border: 1px solid #785a28;
 	padding-left: 15px;

@@ -1,11 +1,13 @@
 import { Contact } from "..";
 import { DflUser } from "../../types";
 
-export function ChatNav() {
+type ChatNavProps = { user: string }
+export function ChatNav({ user }: ChatNavProps) {
 
 	return (
 		<div className='messages-nav'>
-			<Contact user={DflUser} status={0} />
+			{/* <Contact user={DflUser} status={0} /> */}
+			<p>{user}</p>
 			<div className='messages-options'>
 				<button id='btn-messages-reduction' onClick={HandleClicReduction}></button>
 				<button id='btn-messages-panel'></button>
