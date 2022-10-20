@@ -70,6 +70,7 @@ model Avatar {
 model Discussion {
 	id			Int @id @default(autoincrement())
 	createdAt	DateTime @default(now())
+    updatedAt	DateTime @updatedAt
 	user1Id		Int
 	user2Id		Int 
 	user1		User @relation(name: "discussion1", fields: [user1Id], references: [id], onDelete: Cascade)

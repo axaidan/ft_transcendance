@@ -2,7 +2,6 @@ import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
-import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { DiscussionMessageDto } from 'src/chat/discussion-message/dto/discussion-message.dto';
 import { DiscussionService } from './discussion/discussion.service';
 import { DiscussionDto } from './discussion/dto/discussion.dto';
@@ -13,7 +12,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(
         @Inject(forwardRef(() => DiscussionService))
         private discService: DiscussionService,
-        private discMsgService: DiscussionMessageService,
     ) { }
 
     @WebSocketServer() wss: Server;
@@ -62,14 +60,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     async joinAllDiscRooms(userId: number) {
-        const discussions = await this.discService.getDiscussions(userId);
+        const discussions = await this.discService.getDiscussionsIds(userId);
         for (const discussion of discussions) {
             this.joinDiscRoom(userId, discussion.id);
         }
     }
 
-    newDisc(discId: number, dto: DiscussionDto) {
-        const roomName: string = 'disc' + discId;
+    newDisc(dto: DiscussionDto) {
+        const roomName: string = 'disc' + dto.id;
         this.wss.to(roomName).emit('newDiscToClient', dto);
     }
 
@@ -96,18 +94,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('logoutToServer')
-    handleLogout(client: Socket, userId: number): void {
+    handleLogout(client: Socket, userId: number) :
+    void
+    {
         this.logger.log(`USER ${userId} LOGGED OUT`);
         client.broadcast.emit('logoutToClient', userId);
     }
 
     @SubscribeMessage('discMsgToServer')
-    handleDiscMsg(client: Socket, dto: DiscussionMessageDto): void {
+    async handleDiscMsg(client: Socket, dto: DiscussionMessageDto):
+    Promise<void>
+    {
+        this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
+        const message = await this.discService.createDiscMsg(dto);
         const roomName = `disc${dto.discId}`;
-        // this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
-        this.wss.to(roomName).emit('discMsgToclient', dto);
-        // this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
-        // don't wait for this async call
-		this.discMsgService.create(dto);
+        this.wss.to(roomName).emit('discMsgToclient', message);
+        this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
     }
 }
