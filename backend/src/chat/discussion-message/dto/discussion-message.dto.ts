@@ -1,4 +1,4 @@
-import { IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class DiscussionMessageDto {
    
@@ -11,5 +11,5 @@ export class DiscussionMessageDto {
     @IsString()
     @IsNotEmpty()
     text: string;
-    
+
 }
