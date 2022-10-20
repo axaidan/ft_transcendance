@@ -21,10 +21,16 @@ export function Profile() {
 		setToggleEdit(!toggleEdit);
 	}
 
-	const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+
+	const onChange = () => {
+		const newUsername = {
+			username: 'test',
+		};
+
 		useEffect(() => {
-			axios.patch('', { username: 'caca' }).then(function (res) { console.log(res) });
+			axios.patch('/user/', newUsername);
 		})
+		toggleUserEdit();
 	}
 
 	return (
@@ -32,11 +38,11 @@ export function Profile() {
 			<div className="left_side">
 				<div className="banner">
 					<div className="user_nickname">
-						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} />
+						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} />
 						<div className={toggleEdit ? "disabled" : "user-nick"}>
 							{user.username}
 						</div>
-						<button onClick={toggleUserEdit} className={toggleEdit ? "validate-edit" : "disabled"}>
+						<button onClick={onChange} className={toggleEdit ? "validate-edit" : "disabled"}>
 							Validate
 						</button>
 						<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
@@ -45,14 +51,16 @@ export function Profile() {
 					<div className="clan">
 						My clan
 					</div>
-					<div className="xp_bar">
-						<div className="xp_fill">
-							<div className="xp_nbr">
-								<div className="xp_value">
-									25
-								</div>
-							</div>
-						</div>
+					<div className="xp_bar"></div>
+					<div className="xp_fill"></div>
+					<div className="xp_nbr"></div>
+					<div className="xp_value">
+						25
+					</div>
+					<div className="profile-icon-div">
+						<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' id="profile_icon" />
+					</div>
+					<div className="end-of-banner">
 					</div>
 				</div>
 				<div className="loot">
