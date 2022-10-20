@@ -3,7 +3,7 @@ import { Discussion } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionService } from './discussion.service';
-import { CreateDiscussionDto, GetDiscussionMessagesDto } from './dto';
+import { CreateDiscussionDto } from './dto';
 
 
 @UseGuards(JwtGuard)
@@ -22,16 +22,16 @@ export class DiscussionController {
     }
 
     //  POST /discussion/:user2Id
-    @Post(':userId')
+    @Post()
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Param('id', ParseIntPipe) user2Id: number,
+        @Body(ParseIntPipe) body : { user2Id: number }, 
     ) :
     Promise<Discussion>
     {
         const dto: CreateDiscussionDto = {
             user1Id: currentUserId,
-            user2Id: user2Id,
+            user2Id: body.user2Id,
         };
         const discussion = await this.discService.create(dto);
         return discussion;

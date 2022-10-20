@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Discussion } from '@prisma/client';
+import { Discussion, DiscussionMessage } from '@prisma/client';
 import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, DiscussionDto } from './dto';
@@ -41,7 +41,7 @@ export class DiscussionService {
         }
         this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
         this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
-        this.chatGateway.newDisc(discussion.id, newDiscDto);
+        this.chatGateway.newDisc(newDiscDto);
         return discussion;
     }
 
@@ -63,9 +63,36 @@ export class DiscussionService {
         return discussions;
     }
 
-    createDiscMsg(dto: DiscussionMessageDto) :
-    void
+    async getDiscussionsIds(currentUserId: number) :
+    Promise<Discussion[]>
     {
-        this.discMsgService.create(dto);
+        const discussions: Discussion[] = await this.prisma.discussion.findMany({
+            where: {
+                OR: [ { user1Id: currentUserId }, { user2Id: currentUserId } ]
+            },
+        }); 
+        return discussions;
+    }
+
+    async createDiscMsg(dto: DiscussionMessageDto) :
+    Promise<DiscussionMessage>
+    {
+        return await this.discMsgService.create(dto);
+    }
+
+    async messagesCount(discId: number) :
+    Promise<number> 
+    {
+        const messagesCount = await this.prisma.discussion.findUnique({
+            where: {
+                id: discId,
+            },
+            include: {
+                _count: {
+                    select: { messages: true },
+                },
+            },
+        });
+        return messagesCount._count.messages;
     }
 }
