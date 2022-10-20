@@ -50,6 +50,7 @@ export class DiscussionService {
             include: {
                 user1: { select: { id: true, username: true, /*avatar: true,*/ } },
                 user2: { select: { id: true, username: true, /*avatar: true,*/ } },
+				messages: { select: { text: true, userId: true } },
             }
         }); 
         return discussions;
@@ -85,7 +86,7 @@ export class DiscussionService {
         return dto;
     }
 
-    //  GET /discussion/user/:id
+    //  GET /discussion/user/:userId
     //  RETURNS Discussion AND DiscussionMesssages OF 2 Users 
     //  CREATES THE Discussion IF DOESN'T EXIST
     async getMessagesByUserId(user1Id: number, user2Id: number) : 

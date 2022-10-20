@@ -19,20 +19,15 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         reconnectionDelay: 5000,
         autoConnect: false,
     })
-    const socket2 = useSocket('localhost:3000/chatNs', {
-        reconnectionAttempts: 5,
-        reconnectionDelay: 5000,
-        autoConnect: false,
-    })
 
     useEffect(() => {
         // Connect to the Web Socket //
         if (props.userId != 0)
         {
             socket.connect();
-            socket2.connect();
             // Save the socket in context //
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
+            SocketDispatch({type: ESocketActionType.UP_UID, payload: props.userId });
             // Start the envent listeners // 
             StartListeners();
             // Send the handshake //
@@ -91,18 +86,15 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const StartHandshake = ( userId: number ) => {
         console.info('Sending handshake to server ...');
 
-        socket.emit('handshake', (uid: string, users: number[]) => {
-            console.log('User handshake callback message received');
-            SocketDispatch({type: ESocketActionType.UP_UID, payload: uid});
-        });
-
+		// Recuperation des users en ligne
         socket.emit('getOnlineUsersToServer');
 
-
+		// Emission de notre connections au autres
 		socket.emit('loginToServer', userId);
-		socket2.emit('loginToServer', userId);
-        console.info('userId: ' + userId )
-        
+
+		// socket2.emit('loginToServer', userId);
+
+		// Fin de l'ecan d'affichage d'erreur
         setLoading( false );
 
     };

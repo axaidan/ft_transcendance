@@ -104,9 +104,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('discMsgToServer')
     handleDiscMsg(client: Socket, dto: DiscussionMessageDto): void {
         const roomName = `disc${dto.discId}`;
-        this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
+        // this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         this.wss.to(roomName).emit('discMsgToclient', dto);
-        this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
-        this.discMsgService.create(dto);
+        // this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
+        // don't wait for this async call
+		this.discMsgService.create(dto);
     }
 }
