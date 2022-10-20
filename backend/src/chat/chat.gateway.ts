@@ -13,7 +13,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(
         @Inject(forwardRef(() => DiscussionService))
         private discService: DiscussionService,
-        private discMsgService: DiscussionMessageService,
     ) { }
 
     @WebSocketServer() wss: Server;
@@ -107,6 +106,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         this.wss.to(roomName).emit('discMsgToclient', dto);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
-        this.discMsgService.create(dto);
+        this.discService.createDiscMsg(dto);
     }
 }
