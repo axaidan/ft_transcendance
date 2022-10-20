@@ -1,48 +1,13 @@
-import { useEffect, useReducer, useState } from "react";
+import { AxiosResponse } from "axios";
+import { useContext, useEffect, useReducer, useState } from "react";
 import { Socket } from "socket.io-client";
 import { ChatNav, DiscussionNav } from ".";
+import { ChatSocketContext } from "../../context/ChatSocket";
 import { AxiosJwt } from "../../hooks";
 
 import '../../styles/components/discussion_components/Chat.css'
-import { DflUser, IUser } from "../../types";
+import { dflDiscussion, DflUser, IDiscussion, IMessage, IUser } from "../../types";
 
-type IMessage = {
-	id: number;
-	createdAt: Date;
-	text: string;
-	userId: number;
-	discussionId: number;
-}
-
-type IDiscussion = {
-	discId: number;
-	user1: {
-		id: number;
-		username: string;
-	};
-	user1Id: number;
-	user2: {
-		id: number;
-		username: string;
-	};
-	user2Id: number;
-	messages: IMessage[];
-}
-
-const dflDiscussion = {
-	discId: 0,
-	user1: {
-		id: 0,
-		username: 'string',
-	},
-	user1Id: 0,
-	user2: {
-		id: 0,
-		username: 'string',
-	},
-	user2Id: 0,
-	messages: [],
-}
 
 type ChatBodyProps = { disc: IDiscussion };
 export function ChatBody({ disc }: ChatBodyProps) {
@@ -62,7 +27,7 @@ export function ChatBody({ disc }: ChatBodyProps) {
 
 	//  A L'OUVERTURE D'UNE FENETRE
 	// const messages: DiscussionMessage[] = axios.get('/discussion/discussion[i].id');
-	
+
 	// DANS LA STATE
 	// - 1 DiscussionMessage
 	//	QUI CHANGE DES QUE JE RECOIS 'discMsgToClient'
@@ -83,69 +48,84 @@ export function ChatBody({ disc }: ChatBodyProps) {
 	)
 }
 
-type ChatProps = { userDisc: number; }
-export function Chat({ userDisc }: ChatProps) {
+type ChatProps = { userDisc: number; userId: number }
+export function Chat({ userDisc, userId }: ChatProps) {
+	const { socket, uid } = useContext(ChatSocketContext).ChatSocketState;
 	const [discussion, setDiscussion] = useState<IDiscussion[]>([dflDiscussion,]);
 	const [activeDisc, setActiveDisc] = useState<number>(0);
+	const [othUser, setOthUser] = useState<string>('RANDOM');
 	const axios = AxiosJwt();
+	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
-		axios.get('/discussion')
-		.then((res) => {
-			setDiscussion(res.data);
-			console.log(res.data);
-		});
-		
-		HandleChange();
-	}, []);
-
-	useEffect(() => {
+		setLoading(true)
 		let did = getDiscId(userDisc);
 		if (did == undefined) {
 			axios.post('/discussion', { user2Id: userDisc })
-			.then((res) => {
-				setDiscussion( current => [...current, res.data]);
-				did = getDiscId(userDisc);
-			});
+				.then((res: AxiosResponse<IDiscussion>) => {
+					console.log(res.data);
+					setDiscussion(current => [...current, res.data]);
+					console.log('ASYNC ActiveDisc', activeDisc);
+					setOthUser(getOthUser(userId, res.data.user1, res.data.user2))
+					setLoading(false)
+				});
 			console.log('La discusion est cree et push dans le tableau de discussion');
 		}
-		setActiveDisc( did! );
+		else {
+			setActiveDisc(did!);
+			setOthUser(getOthUser(userId, discussion[did!].user1, discussion[did!].user2));
+			setLoading(false)
+		}
 		console.log('ActiveDisc', activeDisc);
+		console.log(discussion);
 	}, [userDisc])
+
+
+	useEffect(() => {
+		HandleChange(socket, uid, discussion[activeDisc].discId)
+		setActiveDisc(getDiscId(userDisc)!)
+	}, [discussion])
+
+	function getOthUser(me: number, user1: { id: number, username: string }, user2: { id: number, username: string }) {
+		return (me != user1.id ? user1.username : user2.username)
+	}
 
 	function getDiscId(userDisc: number): number | undefined {
 		for (let i = 0; discussion[i]; i++) {
-			if ( discussion[i].user1Id == userDisc || discussion[i].user2Id == userDisc )
+			if (discussion[i].user1Id == userDisc || discussion[i].user2Id == userDisc)
 				return i;
 		}
 		return undefined;
 	}
 
+
 	return (
 		<div id="chat-container">
 			<DiscussionNav />
 			<div className='messages-container'>
-				<ChatNav user1={discussion[activeDisc].user1.username}/>
-				<ChatBody disc={discussion[activeDisc]} />
+				{loading ? <div>Incoming</div> : <ChatNav user={othUser} />}
+				{loading || activeDisc == undefined ? <div>Creation de votre discussion</div> : <ChatBody disc={discussion[activeDisc]} />}
 				<input id="messages-input" placeholder='Tapez votre message ici...' />
 			</div>
 		</div>
 	)
 }
 
-function HandleChange() {
+function HandleChange(socket: any, uid: any, did: number) {
 	const input = document.getElementById('messages-input') as HTMLInputElement;
-
-	// socket2.on(discMsgToClient)
 
 	input.addEventListener("keypress", function (event) {
 		if (event.key === 'Enter') {
 			console.log('Enter pressed: ');
-			// socket2.emit('discMsgToServer', {
-			// 	userId: user.id,
-			// 	text: input.valut,
-			// 	discId: discussion.id,
-			// });
+			console.log(socket);
+			console.log('handleChange(): uid = ', uid);
+			console.log('handleChange(): did = ', did);
+			console.log('handleChange(): text = ', input.value);
+			socket!.emit('discMsgToServer', {
+				userId: uid,
+				text: input.value,
+				discId: did,
+			});
 			input.value = "";
 		}
 	})

@@ -1,68 +1,77 @@
+import axios from "axios";
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-
-type IMessage = {
-	text: string;
-	userId: number;
-	discId: number;
-}
+import { IDiscussion, IMessage } from "../../types";
 
 export interface IChatSocketContextState {
-	socket : Socket | undefined;
+	socket: Socket | undefined;
 	uid: number;
-	newMessages: IMessage[];
+	discussion: IDiscussion[];
 }
 
 export const dflChatSocketContextState: IChatSocketContextState = {
 	socket: undefined,
 	uid: 0,
-	newMessages: []
+	discussion: []
 }
 
 export enum EChatSocketActionType {
-    UP_SOKET = 'update_socket',
-    UP_UID = 'update_uid',
-    UP_DISC = 'update_discussion',
-    GET_DISC = 'get_discussion',
+	UP_SOKET = 'update_socket',
+	UP_UID = 'update_uid',
+	UP_DISC = 'update_discussion',
+	GET_DISC = 'get_discussion',
+	NEW_MSG = 'nouveau_message'
 }
 
-export type TChatSocketContextAction =	EChatSocketActionType.GET_DISC	|
-										EChatSocketActionType.UP_SOKET	|
-										EChatSocketActionType.UP_UID	|
-										EChatSocketActionType.UP_DISC;
+export type TChatSocketContextAction = EChatSocketActionType.GET_DISC |
+	EChatSocketActionType.UP_SOKET |
+	EChatSocketActionType.UP_UID |
+	EChatSocketActionType.UP_DISC |
+	EChatSocketActionType.NEW_MSG;
 
-export type TChatSocketContextPayload = number | Socket | number[];
+export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;
 	payload: TChatSocketContextPayload;
 }
 
-export const ChatSocketReducer = ( state: IChatSocketContextState, action: IChatSocketContextAction ) => { 
-    console.log( `ChatContext - Action: ${action.type} - Payload : `, action.payload );
+export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatSocketContextAction) => {
+	console.log(`ChatContext - Action: ${action.type} - Payload : `, action.payload);
 
-    switch(action.type) {
-        case EChatSocketActionType.UP_SOKET:
-            return { ...state, socket: action.payload as Socket};
-        case EChatSocketActionType.UP_UID:
-            return { ...state, uid: action.payload as number};
-        case EChatSocketActionType.UP_DISC:
-            return { ...state, newMessages: [ ...state.newMessages, action.payload as number] };
-        case EChatSocketActionType.GET_DISC:
-            return { ...state, newMessages: action.payload as number[] };
-        default:
-            return { ...state };
-    }
+	switch (action.type) {
+		case EChatSocketActionType.UP_SOKET:
+			return { ...state, socket: action.payload as Socket };
+		case EChatSocketActionType.UP_UID:
+			return { ...state, uid: action.payload as number };
+		case EChatSocketActionType.UP_DISC:
+			return { ...state, newMessages: [...state.discussion, action.payload as number] };
+		case EChatSocketActionType.GET_DISC:
+			return { ...state, newMessages: action.payload as number[] };
+		case EChatSocketActionType.NEW_MSG:
+			for (let i = 0; state.discussion[i]; i++)
+				if (state.discussion[i].discId == (action.payload as IMessage).discussionId) {
+					state.discussion[i].messages.push(action.payload as IMessage)
+					break ;
+				}
+					// return {
+					// 	...state,
+					// 	discussion: [...state.discussion, ...state.discussion[i].messages, [...state.discussion[i].messages, (action.payload as IMessageDto)]]
+					// };
+			return { ...state };
+		default:
+			return { ...state };
+	}
 }
 
 export interface IChatSocketContextProps {
-    ChatSocketState: IChatSocketContextState;
-    ChatSocketDispatch: React.Dispatch<IChatSocketContextAction>;
+	ChatSocketState: IChatSocketContextState;
+	ChatSocketDispatch: React.Dispatch<IChatSocketContextAction>;
 }
 
 export const ChatSocketContext = createContext<IChatSocketContextProps>({
-    ChatSocketState: dflChatSocketContextState,
-    ChatSocketDispatch: () => {}
+	ChatSocketState: dflChatSocketContextState,
+	ChatSocketDispatch: () => { }
 });
 
 export const ChatSocketContextConsumer = ChatSocketContext.Consumer;

@@ -31,9 +31,9 @@ export function Friendsbar({ userId }: FriendbarProps) {
 				<HeaderFriendBar />
 				<FriendsList setDisc={updateDisc} />
 				<FooterFriendBar />
-				{/* <ChatSocketContextComponent userId={userId}> */}
-					<Chat userDisc={activeDisc}/>
-				{/* </ChatSocketContextComponent> */}
+				<ChatSocketContextComponent userId={userId}>
+					<Chat userDisc={activeDisc} userId={userId}/>
+				</ChatSocketContextComponent>
 			</SocketContextComponent>
 		</div>
 	);

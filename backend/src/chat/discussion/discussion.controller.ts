@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { Discussion } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
@@ -9,6 +9,8 @@ import { CreateDiscussionDto } from './dto';
 @UseGuards(JwtGuard)
 @Controller('discussion')
 export class DiscussionController {
+
+	private logger: Logger = new Logger('DiscController');
 
     constructor(
         private discService: DiscussionService
@@ -25,7 +27,7 @@ export class DiscussionController {
     @Post()
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Body(ParseIntPipe) body : { user2Id: number }, 
+        @Body(/*ParseIntPipe*/) body : { user2Id: number }, 
     ) :
     Promise<Discussion>
     {
@@ -33,6 +35,7 @@ export class DiscussionController {
             user1Id: currentUserId,
             user2Id: body.user2Id,
         };
+		this.logger.log(`USER ${currentUserId} CREATING DISC W/ USER ${body.user2Id}`)
         const discussion = await this.discService.create(dto);
         return discussion;
     }
