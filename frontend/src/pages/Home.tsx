@@ -14,6 +14,7 @@ import { useCookies } from "react-cookie";
 // Assets:
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website2.webm'
+import { updateUser } from '../hooks/EditUser';
 
 
 const GetCookie = () => {
@@ -64,6 +65,9 @@ export function Home() {
 			<Navbar me={user} />
 			<div className='container-body'>
 				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
+				<form onSubmit={updateUser}>
+					<button type="submit">Submit</button>
+				</form>
 				<Outlet context={user} />
 				<Friendsbar userId={user.id} />
 			</div>

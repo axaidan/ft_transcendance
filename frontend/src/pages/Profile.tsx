@@ -1,5 +1,5 @@
 // Extern:
-import React, { useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 // Intern:
@@ -8,43 +8,91 @@ import { IUser } from "../types";
 // Assets:
 import '../styles/pages/Profile.css'
 import { AxiosJwt } from '../hooks/AxiosJwt';
+import axios from "axios";
+import { useCookies } from 'react-cookie';
+import { updateUser } from "../hooks";
+import { useForm } from '../hooks/UseForm';
+
+// function updateUser() {
+// 	useEffect(() => {
+// 		axios.patch<UpdateUserResponse>('http://localhost:3000/user/',
+// 			{ username: 'victor' },
+// 			{
+// 				headers: {
+// 					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
+// 					'Content-Type': 'application/json',
+// 					Accept: 'application/json',
+// 				},
+// 			},
+// 		).catch((error) => {
+// 			if (axios.isAxiosError(error)) {
+// 				console.log('error message: ', error.message);
+// 				return error.message;
+// 			} else {
+// 				console.log('unexpected error: ', error);
+// 				return 'An unexpected error occurred';
+// 			}
+// 		})
+// 	}, []);
+// }
+
+type State = {
+	newUsername: string;
+};
 
 export function Profile() {
 
-	const axios = AxiosJwt();
 	let user: IUser = useOutletContext();
 	const [avatar, setAvatar] = useState('');
 	const [toggleEdit, setToggleEdit] = useState(false);
+	const axios = AxiosJwt();
 
+	const [cookies] = useCookies();
+	const jwtToken = cookies.access_token;
+
+	const editUser = () => {
+		console.log(values);
+		console.log(initialState);
+		axios.patch('/user',
+			{ username: 'Anne-France' },
+			{
+				headers: {
+					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+			},
+		)
+		toggleUserEdit();
+	}
 
 	const toggleUserEdit = () => {
 		setToggleEdit(!toggleEdit);
 	}
 
+	const initialState = {
+		username: ''
+	};
 
-	const onChange = () => {
-		const newUsername = {
-			username: 'test',
-		};
-
-		useEffect(() => {
-			axios.patch('/user/', newUsername);
-		})
-		toggleUserEdit();
-	}
+	const { onChange, onSubmit, values } = useForm(
+		editUser,
+		initialState
+	)
 
 	return (
-		<div className="user_body">
+		<div className="user_body" >
 			<div className="left_side">
 				<div className="banner">
 					<div className="user_nickname">
-						<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} />
 						<div className={toggleEdit ? "disabled" : "user-nick"}>
 							{user.username}
 						</div>
-						<button onClick={onChange} className={toggleEdit ? "validate-edit" : "disabled"}>
-							Validate
-						</button>
+						<form onSubmit={onSubmit}>
+							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} />
+							<button onClick={editUser} className={toggleEdit ? "validate-edit" : "disabled"}>
+								Validate
+							</button>
+						</form>
 						<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
 						</button>
 					</div>
@@ -92,7 +140,6 @@ export function Profile() {
 					no clash yet
 				</div>
 			</div>
-
-		</div>
+		</div >
 	);
 }
