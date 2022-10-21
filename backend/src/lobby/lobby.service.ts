@@ -38,12 +38,13 @@ export class LobbyService {
             console.log('tu es deja log; need to throw execption');
             return ;
         }*/
-        console.log('user join queue');
+        console.log('user %d ,join queue ', meId);
         this.joinQueue(meId);
         if (this.queue.length < 2)
             return ;
         const u1 = this.queue.shift();
         const u2 = this.queue.shift();
+
         this.createLobby(u1, u2);
 
 
@@ -55,7 +56,7 @@ export class LobbyService {
     }
 
     async createLobby(userId1: number, userId2: number) {
-        console.log('create a lobby');
+        console.log('create a lobby with usermenber %d, and %d', userId1, userId2);
         const test = new Lobby();
     test.usersId.push(userId1);
     test.usersId.push(userId2);
@@ -73,8 +74,7 @@ export class LobbyService {
                 return l.LobbyId;
             }
         }
-        return ;
-        
+        return undefined;
     }
 
    async clearLobby(lobbyId: number) {

@@ -5,7 +5,7 @@
     watch()
 */
 
-import { Controller, Get, Logger, Post, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Logger, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { JwtGuard } from "src/auth/guard";
 import { LobbyService } from "./lobby.service";
@@ -21,9 +21,17 @@ export class lobbyController {
         return : lobbyId
     */
     @Get()
-    getLobby() {
-        console.log('helloword');
-        return ;
+	@UseGuards(JwtGuard)
+    getLobby(@GetUser('id') meId: number) {
+        console.log('getLobby:');
+        console.log(meId);
+        var test = this.lobbyService.findUserInLobbies(meId);
+        if (test)
+            console.log(test);
+        else
+            console.log('pas de user dans les lobby')
+
+        return test;
     }
 
     /* 
@@ -53,5 +61,10 @@ export class lobbyController {
     async inviteToLobby() {
     }
 
+
+    @Delete('cleanAll') // dev part
+    async cleanAll() {
+        return this.lobbyService.cleanLobbyMap();
+    }
 
 }
