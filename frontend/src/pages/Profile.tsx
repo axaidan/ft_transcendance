@@ -41,7 +41,6 @@ type State = {
 };
 
 export function Profile() {
-
 	let user: IUser = useOutletContext();
 	const [avatar, setAvatar] = useState('');
 	const [toggleEdit, setToggleEdit] = useState(false);
@@ -49,12 +48,13 @@ export function Profile() {
 
 	const [cookies] = useCookies();
 	const jwtToken = cookies.access_token;
+	const [username, setUsername] = useState([user.username]);
+
 
 	const editUser = () => {
-		console.log(values);
-		console.log(initialState);
+		// setUsername(Object.values(values));
 		axios.patch('/user',
-			{ username: 'Anne-France' },
+			values,
 			{
 				headers: {
 					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
@@ -64,6 +64,7 @@ export function Profile() {
 			},
 		)
 		toggleUserEdit();
+		location.reload();
 	}
 
 	const toggleUserEdit = () => {
@@ -88,7 +89,7 @@ export function Profile() {
 							{user.username}
 						</div>
 						<form onSubmit={onSubmit}>
-							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} />
+							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} name="username" />
 							<button onClick={editUser} className={toggleEdit ? "validate-edit" : "disabled"}>
 								Validate
 							</button>
