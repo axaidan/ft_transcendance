@@ -11,6 +11,7 @@ import { DiscussionMessageModule } from './discussion-message/discussion-message
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
 import { AppGateway } from './app.gateway';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
 	imports: [
@@ -27,6 +28,7 @@ import { AppGateway } from './app.gateway';
 		DiscussionMessageModule,
 		GameModule,
 		AvatarModule,
+		LobbyModule,
 	],
 	providers: [AppGateway]
 })
