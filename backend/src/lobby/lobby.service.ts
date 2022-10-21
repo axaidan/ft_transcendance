@@ -64,4 +64,24 @@ export class LobbyService {
     console.log(test.LobbyId);
     }
 
+    async findUserInLobbies(userId: number) {
+   //     const lobbyArray : Lobby[] = this.lobbies.values();
+    //    lobbyArray.find()
+        for (const l of this.lobbies.values()) {
+            var ret = l.usersId.find(e => e === userId);
+            if (ret) {
+                return l.LobbyId;
+            }
+        }
+        return ;
+        
+    }
+
+   async clearLobby(lobbyId: number) {
+    this.lobbies.delete(lobbyId);
+   }
+
+    async cleanLobbyMap() {
+        this.lobbies.clear();
+    }
 }
