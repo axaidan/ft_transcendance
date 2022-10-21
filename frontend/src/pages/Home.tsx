@@ -14,25 +14,26 @@ import { useCookies } from "react-cookie";
 // Assets:
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website.webm'
+import { useAxios } from "../hooks/useAxios";
+
+function LoadingHome() {
+	return (
+		<div>
+			<video src={bg_website} autoPlay loop muted className='bg_video' />
+		</div>
+	)
+}
 
 export function Home() {
 	const navigate = useNavigate();
-	const [user, setUser] = useState<IUser>(DflUser);
-	// const [socket, setSocket] = useState<Socket>();
+	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me'});
 
-	const axios = AxiosJwt();
+	if (loading) return <LoadingHome />
+	if (error !== '') return navigate('/');
+	if (!user) return navigate('/');
 	
-	useEffect(() => {
-		axios.get("/user/me")
-		.then((res: AxiosResponse<IUser>) => {
-			setUser(res.data);
-			// setSocket(GetSocket(res.data.id));
-		 })
-		.catch(() => { navigate('/'); });
-	}, []);
-
 	return (
-		<div className="set-body">
+		<div>
 			<Navbar me={user} />
 			<div className='container-body'>
 				<video src={bg_website} autoPlay loop muted className='bg_video' />

@@ -7,12 +7,14 @@ export interface IChatSocketContextState {
 	socket: Socket | undefined;
 	uid: number;
 	discussion: IDiscussion[];
+	activeDisc: number;
 }
 
 export const dflChatSocketContextState: IChatSocketContextState = {
 	socket: undefined,
 	uid: 0,
-	discussion: []
+	discussion: [],
+	activeDisc: 0,
 }
 
 export enum EChatSocketActionType {
@@ -44,20 +46,13 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			return { ...state, socket: action.payload as Socket };
 		case EChatSocketActionType.UP_UID:
 			return { ...state, uid: action.payload as number };
-		case EChatSocketActionType.UP_DISC:
-			return { ...state, newMessages: [...state.discussion, action.payload as number] };
-		case EChatSocketActionType.GET_DISC:
-			return { ...state, newMessages: action.payload as number[] };
 		case EChatSocketActionType.NEW_MSG:
+			console.log( (action.payload as IMessage) )
 			for (let i = 0; state.discussion[i]; i++)
 				if (state.discussion[i].discId == (action.payload as IMessage).discussionId) {
 					state.discussion[i].messages.push(action.payload as IMessage)
 					break ;
 				}
-					// return {
-					// 	...state,
-					// 	discussion: [...state.discussion, ...state.discussion[i].messages, [...state.discussion[i].messages, (action.payload as IMessageDto)]]
-					// };
 			return { ...state };
 		default:
 			return { ...state };

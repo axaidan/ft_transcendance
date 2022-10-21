@@ -5,7 +5,7 @@
 
 .container-nav-option {
 	display: flex;
-	width: calc(100vw - 220px);
+	width: auto;
 	justify-content: space-between;
 	align-items: center;
 }

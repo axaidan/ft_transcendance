@@ -28,11 +28,11 @@ export function Friendsbar({ userId }: FriendbarProps) {
 	return (
 		<div className='Friendsbar'>
 			<SocketContextComponent userId={userId}>
-				<HeaderFriendBar />
-				<FriendsList setDisc={updateDisc} />
-				<FooterFriendBar />
 				<ChatSocketContextComponent userId={userId}>
-					<Chat userDisc={activeDisc} userId={userId}/>
+					<HeaderFriendBar />
+					<FriendsList setDisc={updateDisc} />
+					<FooterFriendBar />
+					<Chat userDisc={activeDisc} />
 				</ChatSocketContextComponent>
 			</SocketContextComponent>
 		</div>

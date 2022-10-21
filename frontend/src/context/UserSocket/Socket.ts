@@ -6,13 +6,14 @@ export interface ISocketContextState {
     socket : Socket | undefined;
     uid: number; 
     users: number[];
-	
+	friends: IUser[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
     uid: 0,
-    users: []
+    users: [],
+    friends: [],
 }
 
 export enum ESocketActionType {
@@ -21,11 +22,12 @@ export enum ESocketActionType {
     UP_USERS = 'update_users',
     RM_USER = 'remove_user',
     GET_USERS = 'get_users',
+    GET_FRIENDS= 'get_friends',
 }
 
-export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS | ESocketActionType.GET_USERS; 
+export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS | ESocketActionType.GET_USERS | ESocketActionType.GET_FRIENDS; 
 
-export type TSocketContextPayload = number[] | number | Socket | IUser;
+export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] ;
 
 export interface ISocketContextActions {
     type: TSocketContextActions;
@@ -46,6 +48,8 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
             return { ...state, users: state.users.filter((uid) => uid !== ( action.payload as number ))};
         case ESocketActionType.GET_USERS:
             return { ...state, users: action.payload as number[] };
+        case ESocketActionType.GET_FRIENDS:
+            return { ...state, friends: action.payload as IUser[] };
         default:
             return { ...state };
     }

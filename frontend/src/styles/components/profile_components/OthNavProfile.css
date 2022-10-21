@@ -2,7 +2,7 @@
 	display: flex;
 	justify-content: space-between;
 	height: 30px;
-	width: calc(100vw - 240px);
+	width: auto;
 }
 
 .othNavProfile-title-ctn {
