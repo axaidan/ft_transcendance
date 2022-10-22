@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, DiscussionDto } from './dto';
 import { ChatGateway } from '../chat.gateway';
 import { DiscussionMessageDto } from '../discussion-message/dto';
+import { DiscussionWithUsersWithMessages } from './types/DiscussionWithUsersWithMessages';
 
 @Injectable()
 export class DiscussionService {
@@ -12,14 +13,14 @@ export class DiscussionService {
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        @Inject(forwardRef(() => ChatGateway))
-        private chatGateway: ChatGateway,
+        // @Inject(forwardRef(() => ChatGateway))
+        // private chatGateway: ChatGateway,
     ) {}
 
     //  POST /discussion/:user2Id
     //  RETURNS NEW DISCUSSION WITH messages: []
     async create(dto: CreateDiscussionDto) :
-    Promise<Discussion>
+    Promise<DiscussionWithUsersWithMessages>
     {
         const discussion = await this.prisma.discussion.create({
             data: {
@@ -32,16 +33,17 @@ export class DiscussionService {
                 messages: { select: { text: true, userId: true } }, 
             },
         });
-        const newDiscDto: DiscussionDto = {
-            user1Id: discussion.user1Id,
-            user2Id: discussion.user2Id,
-            username1: discussion.user1.username,
-            username2: discussion.user2.username,
-            id: discussion.id,
-        }
-        this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
-        this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
-        this.chatGateway.newDisc(newDiscDto);
+        // PASSED TO ChatController
+        // const newDiscDto: DiscussionDto = {
+        //     user1Id: discussion.user1Id,
+        //     user2Id: discussion.user2Id,
+        //     username1: discussion.user1.username,
+        //     username2: discussion.user2.username,
+        //     id: discussion.id,
+        // }
+        // this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
+        // this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
+        // this.chatGateway.newDisc(newDiscDto);
         return discussion;
     }
 
