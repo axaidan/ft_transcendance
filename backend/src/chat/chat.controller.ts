@@ -2,11 +2,8 @@ import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, UseGuards } f
 import { Discussion, Channel } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { ChannelService } from './channel/channel.service';
 import { CreateChannelDto } from './channel/dto/create-channel.dto';
-import { ChatGateway } from './chat.gateway';
-import { DiscussionService } from './discussion/discussion.service';
-import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
+import { ChatService } from './chat.service';
 import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWithUsersWithMessages';
 
 @UseGuards(JwtGuard)
@@ -14,15 +11,13 @@ import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWi
 export class ChatController {
 
     constructor (
-        private discService: DiscussionService,
-        private chanService: ChannelService,
-        private chatGateway: ChatGateway,
+        private chatService: ChatService,
     ) {}
 
     @Get('discussion')
     async getDiscussions(@GetUser('id') currentUserId: number):
         Promise<Discussion[]> {
-        return await this.discService.getDiscussions(currentUserId);
+        return await this.chatService.getDiscussions(currentUserId);
     }
 
     //  POST /discussion/:user2Id
@@ -33,24 +28,7 @@ export class ChatController {
     ) :
     Promise<DiscussionWithUsersWithMessages>
     {
-        const dto: CreateDiscussionDto = {
-            user1Id: currentUserId,
-            user2Id: body.user2Id,
-        };
-        const discussion: DiscussionWithUsersWithMessages = await this.discService.create(dto);
-
-        this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
-        this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
-
-        const newDiscDto: DiscussionDto = {
-            user1Id: discussion.user1Id,
-            user2Id: discussion.user2Id,
-            username1: discussion.user1.username,
-            username2: discussion.user2.username,
-            id: discussion.id,
-        }
-        this.chatGateway.newDisc(newDiscDto);
-        return discussion;
+        return this.chatService.createDiscussion(currentUserId, body.user2Id);
     }
 
     @Post('channel')
@@ -60,7 +38,7 @@ export class ChatController {
     ) :
     Promise<Channel>
     {
-        const channel = await this.chanService.create(createChanDto);
+        const channel = await this.chatService.createChannel(currentUserId, createChanDto);
         return channel;
     }
 
@@ -68,7 +46,7 @@ export class ChatController {
     async getAllChannels() :
     Promise<Channel[]>
     {
-        const channels: Channel[] = await this.chanService.getAllChannels();
+        const channels: Channel[] = await this.chatService.getAllChannels();
         return channels;
     }
 
@@ -80,6 +58,8 @@ export class ChatController {
 
     // //   UPDATE Channel/:id (name)
     // //   ONLY IF USER IS OWNER
+    // //   INVITE OTHER User
+    // //   IF CurrentUser ID ADMIN
     // @Patch('channel/:chanId')
     // async updateChan() {
     // } 
@@ -88,7 +68,7 @@ export class ChatController {
     // async getChannels(@GetUser('id') currentUserId: number)
     // Promise<Channel[]>
     // {
-        // const channels: Channel[] = await this.chanService.getChannelsByUserId(currentUserId);
+        // const channels: Channel[] = await this.channelService.getChannelsByUserId(currentUserId);
         // return channels;
     // }
 

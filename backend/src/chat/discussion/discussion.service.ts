@@ -13,8 +13,6 @@ export class DiscussionService {
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        // @Inject(forwardRef(() => ChatGateway))
-        // private chatGateway: ChatGateway,
     ) {}
 
     //  POST /discussion/:user2Id
@@ -33,17 +31,6 @@ export class DiscussionService {
                 messages: { select: { text: true, userId: true } }, 
             },
         });
-        // PASSED TO ChatController
-        // const newDiscDto: DiscussionDto = {
-        //     user1Id: discussion.user1Id,
-        //     user2Id: discussion.user2Id,
-        //     username1: discussion.user1.username,
-        //     username2: discussion.user2.username,
-        //     id: discussion.id,
-        // }
-        // this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
-        // this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
-        // this.chatGateway.newDisc(newDiscDto);
         return discussion;
     }
 

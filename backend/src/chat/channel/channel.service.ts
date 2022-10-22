@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Channel, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { domainToASCII } from 'url';
 import { CreateChannelDto } from './dto/create-channel.dto';
 
 @Injectable()
@@ -12,7 +11,11 @@ export class ChannelService {
     ) { }
 
     //  POST /channel
-    async create(dto: CreateChannelDto) :
+    //  CREATES A CHANNEL WITH name, private AND OPTIONAL hash
+    async create(
+        currentUserId: number,
+        dto: CreateChannelDto
+    ) :
     Promise<Channel>
     {
         let channel: Channel;
@@ -43,6 +46,14 @@ export class ChannelService {
         }
     }
 
+    //  GET /channel/all
+    async all() :
+    Promise<Channel[]>
+    {
+        const channels: Channel[] = await this.prisma.channel.findMany();
+        return channels;
+    }
+
     // async getChannelsByUserId(currentUserId: number) :
     // Promise<Channel[]>
     // {
@@ -65,11 +76,5 @@ export class ChannelService {
     //     return channelArr;
     // }
 
-    //  GET /channel/all
-    async getAllChannels() :
-    Promise<Channel[]>
-    {
-        const channels: Channel[] = await this.prisma.channel.findMany();
-        return channels;
-    }
+
 }

@@ -15,7 +15,7 @@ import { ChatController } from './chat.controller';
         ChatController,
     ],
     providers: [
-        // ChatService,
+        ChatService,
         ChatGateway,
     ],
 })
