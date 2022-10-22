@@ -94,7 +94,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('logoutToServer')
-    handleLogout(client: Socket, userId: number) :
+    handleLogout(
+        client: Socket,
+        userId: number
+        ) :
     void
     {
         this.logger.log(`USER ${userId} LOGGED OUT`);
@@ -102,7 +105,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('discMsgToServer')
-    async handleDiscMsg(client: Socket, dto: DiscussionMessageDto):
+    async handleDiscMsg(
+        client: Socket,
+        dto: DiscussionMessageDto):
     Promise<void>
     {
         this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);

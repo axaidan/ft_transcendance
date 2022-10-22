@@ -91,7 +91,19 @@ model DiscussionMessage {
 	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
 	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
 
+	//@id()
 	@@map("discussionMessage")
+}
+
+model Channel {
+	id				Int @id @default(autoincrement())
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+	name			String @unique
+	private			Boolean
+	hash			String?
+
+	@@map("channel")
 }
 
 model Relation {

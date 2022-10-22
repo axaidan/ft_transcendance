@@ -4,7 +4,7 @@ import { Achievement, Discussion, User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DiscussionService } from 'src/discussion/discussion.service';
+import { DiscussionService } from 'src/chat/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
@@ -1089,28 +1089,29 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		describe('Retrieve Msgs GET /discussion/user/:id', () => {
-			it('VALID - NO MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/user/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[0].access_token}`,
-				})
-				.expectStatus(200)
-				// .inspect()
-			});
+		// describe('Retrieve Msgs GET /discussion/user/:id', () => {
+		// 	it('VALID - NO MSGS', () => {
+		// 		return pactum
+		// 		.spec()
+		// 		.get(`/discussion/user/${dummyUser.id}`)
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${jwtArr[0].access_token}`,
+		// 		})
+		// 		.expectStatus(200)
+		// 		// .inspect()
+		// 	});
 
-			it('VALID - HAS MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/user/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[1].access_token}`,
-				})
-				.expectStatus(200)
-				// .inspect()
-			});
+		// 	it('VALID - HAS MSGS', () => 
+// import { GetUser } from 'src/auth/decorator';{
+		// 		return pactum
+		// 		.spec()
+		// 		.get(`/discussion/user/${dummyUser.id}`)
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${jwtArr[1].access_token}`,
+		// 		})
+		// 		.expectStatus(200)
+		// 		// .inspect()
+		// 	});
 
 			// NO WEBSOCKET ON TEST, TEST NOT POSSIBLE FOR NOW
 			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
@@ -1123,7 +1124,7 @@ describe('App e2e', () => {
 			// 	.expectStatus(200)
 			// 	// .inspect()
 			// });
-		}); // DESCRIBE (DISCUSSION/:ID)
+		// }); // DESCRIBE (DISCUSSION/:ID)
 
 
 
