@@ -4,6 +4,7 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { CreateChannelDto } from './channel/dto/create-channel.dto';
 import { ChatService } from './chat.service';
+import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWithUsersWithMessages';
 
 @UseGuards(JwtGuard)
@@ -15,8 +16,9 @@ export class ChatController {
     ) {}
 
     @Get('discussion')
-    async getDiscussions(@GetUser('id') currentUserId: number):
-        Promise<Discussion[]> {
+    async getDiscussions(@GetUser('id') currentUserId: number) :
+    Promise<Discussion[]>
+    {
         return await this.chatService.getDiscussions(currentUserId);
     }
 
@@ -24,11 +26,19 @@ export class ChatController {
     @Post('discussion')
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Body(ParseIntPipe) body : { user2Id: number }, 
+        @Body() body: CreateDiscussionBodyDto, 
     ) :
     Promise<DiscussionWithUsersWithMessages>
     {
         return this.chatService.createDiscussion(currentUserId, body.user2Id);
+    }
+
+    @Get('channel/all')
+    async getAllChannels() :
+    Promise<Channel[]>
+    {
+        const channels: Channel[] = await this.chatService.getAllChannels();
+        return channels;
     }
 
     @Post('channel')
@@ -40,14 +50,6 @@ export class ChatController {
     {
         const channel = await this.chatService.createChannel(currentUserId, createChanDto);
         return channel;
-    }
-
-    @Get('channel/all')
-    async getAllChannels() :
-    Promise<Channel[]>
-    {
-        const channels: Channel[] = await this.chatService.getAllChannels();
-        return channels;
     }
 
     // //   DELETE Channel/:id

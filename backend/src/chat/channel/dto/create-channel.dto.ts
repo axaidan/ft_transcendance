@@ -1,17 +1,21 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 export class CreateChannelDto {
 
     @IsString()
+    @IsNotEmpty()
+    @MaxLength(20)
+    @MinLength(3)
     name: string;
 
     @IsBoolean()
     private: boolean;
 
-    @IsOptional()
+    @ValidateIf(o => o.private === true) 
     @IsString()
     @IsNotEmpty()
-    @ValidateIf(o => o.private === true) 
-    hash: string;
+    @MaxLength(20)
+    @MinLength(3)
+    hash?: string;
 
 }

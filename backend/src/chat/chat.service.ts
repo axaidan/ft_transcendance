@@ -52,6 +52,14 @@ export class ChatService {
         return discussion;
     }
 
+    //  GET /channel/all
+    async getAllChannels() : 
+    Promise<Channel[]>
+    {
+        const channels: Channel[] = await this.channelService.all();
+        return channels;
+    }
+
     //  POST /channel
     async createChannel(
         currentUserId: number,
@@ -63,13 +71,6 @@ export class ChatService {
         return channel;
     }
 
-    //  GET /channel/all
-    async getAllChannels() : 
-    Promise<Channel[]>
-    {
-        const channels: Channel[] = await this.channelService.all();
-        return channels;
-    }
 
 
 

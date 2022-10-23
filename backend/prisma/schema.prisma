@@ -64,7 +64,6 @@ model Avatar {
 	owner User []
 
 	@@map("avatar")
-	
 }
 
 model Discussion {
@@ -79,6 +78,7 @@ model Discussion {
 	messages	DiscussionMessage[]
 
 	@@map("discussion")
+	@@unique([user1Id, user2Id])
 }
 
 model DiscussionMessage {

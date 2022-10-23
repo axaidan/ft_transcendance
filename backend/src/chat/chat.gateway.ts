@@ -50,7 +50,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     joinDiscRoom(userId: number, discId: number) {
         if (this.clientsMap.has(userId)) {
             const client: Socket = this.clientsMap.get(userId);
-            this.logger.log(client);
             const roomName: string = 'disc' + discId;
             if ((roomName in client.rooms) === false) {
                 this.logger.log(`USER ${userId} JOINING '${roomName}' ROOM`);
