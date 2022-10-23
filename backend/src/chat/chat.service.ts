@@ -56,7 +56,7 @@ export class ChatService {
     async getAllChannels() : 
     Promise<Channel[]>
     {
-        const channels: Channel[] = await this.channelService.all();
+        const channels: Channel[] = await this.channelService.allPublic();
         return channels;
     }
 

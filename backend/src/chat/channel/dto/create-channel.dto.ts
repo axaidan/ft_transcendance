@@ -12,7 +12,10 @@ export class CreateChannelDto {
     @IsBoolean()
     private: boolean;
 
-    @ValidateIf(o => o.private === true) 
+    @IsBoolean()
+    protected: boolean;
+
+    @ValidateIf(o => o.protected === true) 
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)

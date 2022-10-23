@@ -101,10 +101,13 @@ model Channel {
 	updatedAt		DateTime @updatedAt
 	name			String @unique
 	private			Boolean
+	protected		Boolean
 	hash			String?
 
 	@@map("channel")
 }
+
+
 
 model Relation {
 	id Int @id @default(autoincrement())

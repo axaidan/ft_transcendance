@@ -15,27 +15,18 @@ export class ChannelService {
     async create(
         currentUserId: number,
         dto: CreateChannelDto
-    ) :
-    Promise<Channel>
-    {
-        let channel: Channel;
+    ):
+        Promise<Channel> {
+        const hash = (dto.protected === true ? dto.hash : null);
         try {
-            if ('hash' in dto) {
-                channel = await this.prisma.channel.create({
+            const channel: Channel = await this.prisma.channel.create({
                     data: {
                         name: dto.name,
                         private: dto.private,
-                        hash: dto.hash,
-                    }
+                        protected: dto.protected,
+                        hash: hash,
+                    },
                 });
-            } else {
-                channel = await this.prisma.channel.create({
-                    data: {
-                        name: dto.name,
-                        private: dto.private,
-                    }
-                });
-            }
             return channel;
         } catch (e) {
             if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -47,10 +38,13 @@ export class ChannelService {
     }
 
     //  GET /channel/all
-    async all() :
-    Promise<Channel[]>
-    {
-        const channels: Channel[] = await this.prisma.channel.findMany();
+    async allPublic():
+        Promise<Channel[]> {
+        const channels: Channel[] = await this.prisma.channel.findMany({
+            where: {
+                private: false,
+            },
+        });
         return channels;
     }
 
@@ -75,6 +69,5 @@ export class ChannelService {
     //     }
     //     return channelArr;
     // }
-
 
 }

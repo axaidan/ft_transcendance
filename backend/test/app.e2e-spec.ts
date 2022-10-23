@@ -52,12 +52,36 @@ describe('App e2e', () => {
 	const seedChannels = async function() {
 		const channelArr: Channel[] = [];
 		let i = 0;
-		for ( ; i < N/2 ; i++) {
+		for ( ; i < N/4 ; i++) {
 			const name: string = 'channel' + `${i}`;
 			const channel: Channel = await prisma.channel.create({
 				data: {
 					name: name,
 					private: false,
+					protected: false,
+				},
+			});
+			channelArr.push(channel);
+		}
+		for ( ; i < N/2 ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: true,
+					protected: false,
+				},
+			});
+			channelArr.push(channel);
+		}
+		for ( ; i < N/2 + N/4 ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: false,
+					protected: true,
+					hash: `password${i}`,
 				},
 			});
 			channelArr.push(channel);
@@ -68,6 +92,7 @@ describe('App e2e', () => {
 				data: {
 					name: name,
 					private: true,
+					protected: true,
 					hash: `password${i}`,
 				},
 			});
@@ -1158,11 +1183,11 @@ describe('App e2e', () => {
 
 	});	// DESCRIBE(DISCUSSION)
 
-
 	describe('Channel', () => {
 
 		const dto : CreateChannelDto = {
 			name: 'customChannel1',
+			protected: false,
 			private: false,
 		};
 
@@ -1177,7 +1202,7 @@ describe('App e2e', () => {
 				.withBody(dto)
 				.expectStatus(201)
 				.expectBodyContains(dto.name)
-				.expectBodyContains(dto.private)
+				.expectBodyContains(dto.protected)
 				// .inspect();
 			});
 
@@ -1195,6 +1220,7 @@ describe('App e2e', () => {
 
 			it('NON VALID DTO - NO name -  should 400', () => {
 				const noNameDto = {
+					protected: false,
 					private: false,
 				};
 				return pactum
@@ -1208,9 +1234,10 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NON VALID DTO - NO private - should 400', () => {
-				const noPrivateDto = {
+			it('NON VALID DTO - NO protected - should 400', () => {
+				const noProtectedDto = {
 					name: 'customChannel1',
+					private: true,
 				}
 				return pactum
 				.spec()
@@ -1218,15 +1245,15 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
-				.withBody(noPrivateDto)
+				.withBody(noProtectedDto)
 				.expectStatus(400)
 				// .inspect();
 			});
 
-			it('VALID - should 201', () => {
-				const privateDto = {
-					name: 'privCustomChannel',
-					private: true, 
+			it('NON VALID DTO - NO private - should 400', () => {
+				const noProtectedDto = {
+					name: 'customChannel1',
+					protected: false,
 					hash: 'password',
 				}
 				return pactum
@@ -1235,18 +1262,37 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
-				.withBody(privateDto)
-				.expectStatus(201)
-				.expectBodyContains(privateDto.name)
-				.expectBodyContains(privateDto.private)
-				.expectBodyContains(privateDto.hash)
+				.withBody(noProtectedDto)
+				.expectStatus(400)
 				// .inspect();
 			});
 
-			it ('NON VALID - private NO hash - should 400', () => {
+			it('VALID - should 201', () => {
+				const protectedDto = {
+					name: 'privCustomChannel',
+					private: false,
+					protected: true, 
+					hash: 'password',
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(protectedDto)
+				.expectStatus(201)
+				.expectBodyContains(protectedDto.name)
+				.expectBodyContains(protectedDto.protected)
+				.expectBodyContains(protectedDto.hash)
+				// .inspect();
+			});
+
+			it ('NON VALID - protected NO hash - should 400', () => {
 				const noHashDto = {
 					name: 'channel',
-					private: true, 
+					private: false,
+					protected: true, 
 				}
 				return pactum
 				.spec()
@@ -1259,23 +1305,34 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			// FOR THE MOMENT NO ERROR IF private===false && hash EXISTS
-			// it ('NON VALID - public + hash - should 400', () => {
-			// 	const noHashDto = {
-			// 		name: 'channel',
-			// 		private: false, 
-			// 		hash: "password",
-			// 	}
-			// 	return pactum
-			// 	.spec()
-			// 	.post('/channel')
-			// 	.withHeaders({
-			// 		Authorization: `Bearer ${dummyJwt.access_token}`,
-			// 	})
-			// 	.withBody(noHashDto)
-			// 	.expectStatus(400)
-			// 	.inspect();
-			// });
+			it ('MALFORMED - non-protected + hash - should 200 with null hash', () => {
+				const notProtWithHashDto  = {
+					name: 'notProtWithHashchan',
+					private: false,
+					protected: false, 
+					hash: 'password',
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(notProtWithHashDto)
+				.expectStatus(201)
+				.expectBodyContains(null)
+				.expectBodyContains(notProtWithHashDto.name)
+				.expectBodyContains(notProtWithHashDto.private)
+				.expectBodyContains(notProtWithHashDto.protected)
+				//	CANNOT TEST LIKE THIS => NEED createdAt, updatedAt, id
+				// .expectBodyContains({
+				// 	name: notProtWithHashDto.name,
+				// 	hash: null,
+				// 	private: notProtWithHashDto.private,
+				// 	protected: notProtWithHashDto.protected,
+				// })
+				// .inspect();
+			});
 
 		});	// DESCRIBE(RELATION CREATE POST/channel)
 
@@ -1291,7 +1348,9 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				.expectJsonLength(22)
+				.expectJsonLength(13)
+				.expectBodyContains(chanArr[0].name)
+				.expectBodyContains(chanArr[4].name)
 				.inspect();
 			});
 
