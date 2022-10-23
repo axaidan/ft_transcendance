@@ -34,10 +34,21 @@ export class ChatController {
     }
 
     @Get('channel/all')
-    async getAllChannels() :
+    async getAllPublicChannels(@GetUser('id') currentUserId: number) :
     Promise<Channel[]>
     {
-        const channels: Channel[] = await this.chatService.getAllChannels();
+        const channels: Channel[] = await this.chatService.getAllPublicChannels(currentUserId);
+        return channels;
+    }
+
+    @Get('channel')
+    async getAllChannelsForUser(
+        @GetUser('id') currentUserId: number,
+    )
+    : Promise<Channel[]>
+    {
+        const channels: Channel[] = await this.chatService.getAllChannelsForUser(currentUserId);
+        // channels[0]['userStatus'] = 1;
         return channels;
     }
 

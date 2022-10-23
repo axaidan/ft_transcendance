@@ -53,10 +53,16 @@ export class ChatService {
     }
 
     //  GET /channel/all
-    async getAllChannels() : 
+    async getAllPublicChannels(currentUserId: number) : 
     Promise<Channel[]>
     {
-        const channels: Channel[] = await this.channelService.allPublic();
+        const channels: Channel[] = await this.channelService.allPublic(currentUserId);
+        return channels;
+    }
+
+    //  GET /channel
+    async getAllChannelsForUser(userId: number) {
+        const channels: Channel[] = await this.channelService.allForUser(userId);
         return channels;
     }
 
@@ -68,6 +74,7 @@ export class ChatService {
     Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
+        this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
 

@@ -33,6 +33,8 @@ model User {
 	discussion2 Discussion[] @relation("discussion2")
 	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
+	channelUsers ChannelUser[]
+
 	avatar Avatar? @relation(fields: [avatarId], references: [id])
 	avatarId Int?
 
@@ -82,29 +84,53 @@ model Discussion {
 }
 
 model DiscussionMessage {
+	// @@id([discussionId, userId])
 	id				Int @id @default(autoincrement())
-	createdAt		DateTime @default(now())
+
+	createdAt		DateTime	@default(now())
 	text			String
+
 	userId			Int
  	discussionId	Int
 
-	user			User @relation(fields: [userId], references: [id], onDelete: Cascade)
-	discussion		Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+	user			User		@relation(fields: [userId], references: [id], onDelete: Cascade)
+	discussion		Discussion	@relation(fields: [discussionId], references: [id], onDelete: Cascade)
 
-	//@id()
 	@@map("discussionMessage")
 }
 
 model Channel {
 	id				Int @id @default(autoincrement())
+
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
-	name			String @unique
+
+	name			String
 	private			Boolean
 	protected		Boolean
 	hash			String?
+ 
+	channelUsers	ChannelUser[]
 
 	@@map("channel")
+	@@unique([name, private])
+}
+
+model ChannelUser {
+	@@id([channelId, userId])
+
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+
+	status			Int
+	role			Int
+	userId			Int
+	channelId		Int
+
+	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	@@map("channelUser")
 }
 
 

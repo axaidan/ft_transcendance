@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Achievement, Channel, Discussion, User } from '@prisma/client';
+import { Achievement, Channel, ChannelUser, Discussion, User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,6 +10,8 @@ import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
 import { CreateDiscussionDto, DiscussionDto } from 'src/chat/discussion/dto';
 import { CreateChannelDto } from 'src/chat/channel/dto';
+import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
+import { normalize } from 'path';
 
 const N = 20;
 
@@ -28,6 +30,7 @@ describe('App e2e', () => {
 	let jwtArr: {access_token: string}[] = [];
 	let discArr: Discussion[];
 	let chanArr: Channel[];
+	let chanUserArr: ChannelUser[];
 	let achievArr: Achievement[];
 
 	const seedUsers = async function() {
@@ -59,6 +62,13 @@ describe('App e2e', () => {
 					name: name,
 					private: false,
 					protected: false,
+					channelUsers: {
+						create: [{
+							userId: userArr[0].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					}
 				},
 			});
 			channelArr.push(channel);
@@ -70,6 +80,13 @@ describe('App e2e', () => {
 					name: name,
 					private: true,
 					protected: false,
+					channelUsers: {
+						create: [{
+							userId: userArr[1].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
 				},
 			});
 			channelArr.push(channel);
@@ -82,6 +99,13 @@ describe('App e2e', () => {
 					private: false,
 					protected: true,
 					hash: `password${i}`,
+					channelUsers: {
+						create: [{
+							userId: userArr[2].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
 				},
 			});
 			channelArr.push(channel);
@@ -94,11 +118,43 @@ describe('App e2e', () => {
 					private: true,
 					protected: true,
 					hash: `password${i}`,
+					channelUsers: {
+						create: [{
+							userId: userArr[3].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
 				},
 			});
 			channelArr.push(channel);
 		}
 		return channelArr;
+	}
+
+	const seedChannelUsers = async function() {
+		const channelUserArr: ChannelUser[] = [];
+		//	CREATE 4 ChannelUsers IN chanArr[0]
+		for (let i = 1 ; i < 5 ; i++) {
+			const channelUser = await prisma.channelUser.create({
+				data: {
+					userId: userArr[i].id,
+					channelId: chanArr[0].id,
+					status: EChannelStatus.NORMAL,
+					role: EChannelStatus.NORMAL,
+				}
+			});
+			channelUserArr.push(channelUser);
+		}
+		await prisma.channelUser.create({
+			data: {
+				userId: dummyUser.id,
+				channelId: chanArr[1].id,
+				status: 0,
+				role: 0,
+			}
+		})
+		return channelUserArr;
 	}
 
 	const seedJwts = async function(users: User[]) : Promise<{access_token: string}[]>{
@@ -350,6 +406,8 @@ describe('App e2e', () => {
 		achievArr = await seedAchievements();
 		// CHANNEL SEED
 		chanArr = await seedChannels();
+		// CHANNELUSER SEED
+		chanUserArr = await seedChannelUsers();
 
 
 		kyleUser = await prisma.user.create({
@@ -1203,6 +1261,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(dto.name)
 				.expectBodyContains(dto.protected)
+				.expectBodyContains(dummyUser.id)
 				// .inspect();
 			});
 
@@ -1351,12 +1410,28 @@ describe('App e2e', () => {
 				.expectJsonLength(13)
 				.expectBodyContains(chanArr[0].name)
 				.expectBodyContains(chanArr[4].name)
+				// .inspect();
+			});
+
+		}); //	DESCRIBE (RELATION GET/all)
+
+		describe('Create GET /channel', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(200)
 				.inspect();
 			});
 
 		}); //	DESCRIBE (RELATION GET/all)
 
 	});
+
 	
 
 }); // DESCRIBE(APP-E2E)
