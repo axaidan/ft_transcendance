@@ -1259,6 +1259,24 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
+			// FOR THE MOMENT NO ERROR IF private===false && hash EXISTS
+			// it ('NON VALID - public + hash - should 400', () => {
+			// 	const noHashDto = {
+			// 		name: 'channel',
+			// 		private: false, 
+			// 		hash: "password",
+			// 	}
+			// 	return pactum
+			// 	.spec()
+			// 	.post('/channel')
+			// 	.withHeaders({
+			// 		Authorization: `Bearer ${dummyJwt.access_token}`,
+			// 	})
+			// 	.withBody(noHashDto)
+			// 	.expectStatus(400)
+			// 	.inspect();
+			// });
+
 		});	// DESCRIBE(RELATION CREATE POST/channel)
 
 

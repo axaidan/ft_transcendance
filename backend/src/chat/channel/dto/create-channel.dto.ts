@@ -1,4 +1,5 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
+import { ValidationPipe } from "@nestjs/common";
+import { IsBoolean, IsNotEmpty, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
 
 export class CreateChannelDto {
 
