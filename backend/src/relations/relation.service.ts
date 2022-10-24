@@ -3,7 +3,6 @@ import { prisma, Relation, User } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import { AchievementService } from "src/achiv/achiv.service";
 import { identity } from "rxjs";
-import { ConstraintMetadata } from "class-validator/types/metadata/ConstraintMetadata";
 
 @Injectable()
 export class RelationService{

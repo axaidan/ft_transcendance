@@ -1,94 +1,94 @@
-import { PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient()
 
 
 async function main() {
-	
+
 	const publicAvatarAxel = await prisma.avatar.upsert({
-		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg'},
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg' },
 		update: {},
 		create: {
 			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg',
 			is_public: true,
 			public_id: 'vbxxdzbgzoixomwrdxrr',
 		}
-	}) 
-	
+	})
+
 	const publicAvatarMlormois = await prisma.avatar.upsert({
-		where: {url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+		where: { url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg' },
 		update: {},
 		create: {
 			is_public: true,
 			url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
 			public_id: 'cfkfccmyazzhmuqgazr4',
 		}
-	}) 
-	
-	const AvatarVictor= await prisma.avatar.upsert({
-		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg'},
+	})
+
+	const AvatarVictor = await prisma.avatar.upsert({
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg' },
 		update: {},
 		create: {
 			is_public: false,
 			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429927/qgpd7mhqavtsjcok8euj.jpg',
 			public_id: 'qgpd7mhqavtsjcok8euj',
 		}
-	}) 
-		
-	const publicAvatarSmile= await prisma.avatar.upsert({
-		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg'},
+	})
+
+	const publicAvatarSmile = await prisma.avatar.upsert({
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg' },
 		update: {},
 		create: {
 			is_public: true,
 			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg',
 			public_id: 'btflycu1uiba5bmxte17',
 		}
-	}) 
-	
-		
-	const publicAvatarFurry= await prisma.avatar.upsert({
-		where: {url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg'},
+	})
+
+
+	const publicAvatarFurry = await prisma.avatar.upsert({
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg' },
 		update: {},
 		create: {
 			is_public: true,
 			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
 			public_id: 'cfkfccmyazzhmuqgazr4',
 		}
-	}) 
+	})
+
+
+	/*
+		const publicAvatar2 = await prisma.avatar.upsert({
+			where: {url: ''},
+			update: {},
+			create: {
+				is_pubic: true,
+				url: ''
+			}
+		}) 
 	
-
-/*
-	const publicAvatar2 = await prisma.avatar.upsert({
-		where: {url: ''},
-		update: {},
-		create: {
-			is_pubic: true,
-			url: ''
-		}
-	}) 
-
-	*/
+		*/
 
 
 	const sergent = await prisma.user.upsert({
-		where: {login: 'mlormois'}, 
+		where: { login: 'mlormois' },
 		update: {},
 		create: {
 			login: 'mlormois',
 			username: 'Sergent',
 		},
-	}) 
+	})
 
 	const Axel = await prisma.user.upsert({
-		where: {login: 'axaidan'}, 
+		where: { login: 'axaidan' },
 		update: {},
 		create: {
 			login: 'axaidan',
 			username: 'skusku',
 		},
-	}) 
+	})
 
 	const Catino = await prisma.user.upsert({
-		where: {login: 'fcatinau'},
+		where: { login: 'fcatinau' },
 		update: {},
 		create: {
 			login: 'fcatinau',
@@ -97,54 +97,54 @@ async function main() {
 	})
 
 	const viporten = await prisma.user.upsert({
-		where: {login: 'viporten'},
-		update:{},
-		create:{
+		where: { login: 'viporten' },
+		update: {},
+		create: {
 			login: 'viporten',
 			username: 'el beaugausse',
-			avatarId: AvatarVictor.id,
+			avatarUrl: AvatarVictor.url,
 		},
 	})
 
 	const wluong = await prisma.user.upsert({
-		where: {login: 'wluong'},
-		update:{},
-		create:{
+		where: { login: 'wluong' },
+		update: {},
+		create: {
 			login: 'wluong',
-			username: 'le chinois',
+			username: 'Migi',
 		},
 	})
 
 	const rmechety = await prisma.user.upsert({
-		where: {login: 'rmechety'},
-		update:{},
-		create:{
+		where: { login: 'rmechety' },
+		update: {},
+		create: {
 			login: 'rmechety',
 			username: 'Magreb Warrior',
 		},
 	})
 
 	const lchristo = await prisma.user.upsert({
-		where: {login: 'lchristo'},
-		update:{},
-		create:{
+		where: { login: 'lchristo' },
+		update: {},
+		create: {
 			login: 'lchristo',
 			username: 'M.Muscle',
 		},
 	})
 
 	const riblanc = await prisma.user.upsert({
-		where: {login: 'riblanc'},
-		update:{},
-		create:{
+		where: { login: 'riblanc' },
+		update: {},
+		create: {
 			login: 'riblanc',
 			username: 'StaffNewGen',
 		},
 	})
 
 	const achiv0 = await prisma.achievement.upsert({
-		where: {title: 'HelloWorld'},
-		update: {}, 
+		where: { title: 'HelloWorld' },
+		update: {},
 		create: {
 			title: 'HelloWorld',
 			descriptions: 'you login for the first time',
@@ -153,8 +153,8 @@ async function main() {
 	})
 
 	const achiv1 = await prisma.achievement.upsert({
-		where: {title: 'begin of a legend'},
-		update: {}, 
+		where: { title: 'begin of a legend' },
+		update: {},
 		create: {
 			title: 'begin of a legend',
 			descriptions: 'you win your first game',
@@ -163,8 +163,8 @@ async function main() {
 	})
 
 	const achiv2 = await prisma.achievement.upsert({
-		where: {title: 'play 3 game'},
-		update: {}, 
+		where: { title: 'play 3 game' },
+		update: {},
 		create: {
 			title: 'play 3 game',
 			descriptions: 'do you realy like the game?',
@@ -173,8 +173,8 @@ async function main() {
 	})
 
 	const achiv3 = await prisma.achievement.upsert({
-		where: {title: 'tiens un curly'},
-		update: {}, 
+		where: { title: 'tiens un curly' },
+		update: {},
 		create: {
 			title: 'tiens un curly',
 			descriptions: 'tu as ajouter ton premier ami',
@@ -184,8 +184,8 @@ async function main() {
 
 
 	const achiv4 = await prisma.achievement.upsert({
-		where: {title: 'U there, shutup!'},
-		update: {}, 
+		where: { title: 'U there, shutup!' },
+		update: {},
 		create: {
 			title: 'U there, shutup!',
 			descriptions: 'you block a user',
@@ -195,8 +195,8 @@ async function main() {
 
 
 	const achiv5 = await prisma.achievement.upsert({
-		where: {title: 'social club is open'},
-		update: {}, 
+		where: { title: 'social club is open' },
+		update: {},
 		create: {
 			title: 'social club is open',
 			descriptions: 'tu as rejoins une groupe',
@@ -206,8 +206,8 @@ async function main() {
 
 
 	const achiv6 = await prisma.achievement.upsert({
-		where: {title: 'huston do you ear me'},
-		update: {}, 
+		where: { title: 'huston do you ear me' },
+		update: {},
 		create: {
 			title: 'huston do you ear me',
 			descriptions: 'tu as envoyer ton premier message',
@@ -217,8 +217,8 @@ async function main() {
 
 
 	const achiv7 = await prisma.achievement.upsert({
-		where: {title: 'you have chose your name'},
-		update: {}, 
+		where: { title: 'you have chose your name' },
+		update: {},
 		create: {
 			title: 'you have chose your name',
 			descriptions: 'add a speudo',
@@ -228,8 +228,8 @@ async function main() {
 
 
 	const achiv8 = await prisma.achievement.upsert({
-		where: {title: 'custom master'},
-		update: {}, 
+		where: { title: 'custom master' },
+		update: {},
 		create: {
 			title: 'custom master',
 			descriptions: 'download a avatar',
@@ -239,8 +239,8 @@ async function main() {
 
 
 	const achiv9 = await prisma.achievement.upsert({
-		where: {title: 'here is my kingdom'},
-		update: {}, 
+		where: { title: 'here is my kingdom' },
+		update: {},
 		create: {
 			title: 'here is my kingdom',
 			descriptions: 'creer un chanel',
@@ -250,8 +250,8 @@ async function main() {
 
 
 	const achiv10 = await prisma.achievement.upsert({
-		where: {title: 'ragnarok'},
-		update: {}, 
+		where: { title: 'ragnarok' },
+		update: {},
 		create: {
 			title: 'ragnarok',
 			descriptions: 'delete un chanel',
@@ -260,8 +260,8 @@ async function main() {
 	})
 
 	const achiv11 = await prisma.achievement.upsert({
-		where: {title: 'platine'},
-		update: {}, 
+		where: { title: 'platine' },
+		update: {},
 		create: {
 			title: 'platine',
 			descriptions: 'all success unlock',
@@ -271,147 +271,147 @@ async function main() {
 
 
 	const game1 = await prisma.game.upsert({
-		where: {id:1},
+		where: { id: 1 },
 		update: {},
 		create: {
-				player1Id: 1,
-				score1: 2,
-				player2Id: 2,
-				score2: 3,
+			player1Id: 1,
+			score1: 2,
+			player2Id: 2,
+			score2: 3,
 		},
 	})
 
 	const game2 = await prisma.game.upsert({
-		where: {id:2},
+		where: { id: 2 },
 		update: {},
 		create: {
-				player1Id: 1,
-				score1: 2,
-				player2Id: 3,
-				score2: 3,
+			player1Id: 1,
+			score1: 2,
+			player2Id: 3,
+			score2: 3,
 		},
 	})
 
 	const game3 = await prisma.game.upsert({
-		where: {id:3},
+		where: { id: 3 },
 		update: {},
 		create: {
-				player1Id: 2,
-				score1: 2,
-				player2Id: 3,
-				score2: 3,
+			player1Id: 2,
+			score1: 2,
+			player2Id: 3,
+			score2: 3,
 		},
 	})
 
 	const game4 = await prisma.game.upsert({
-		where: {id:4},
+		where: { id: 4 },
 		update: {},
 		create: {
-				player1Id: 1,
-				score1: 3,
-				player2Id: 3,
-				score2: 1,
+			player1Id: 1,
+			score1: 3,
+			player2Id: 3,
+			score2: 1,
 		},
 	})
 
 	const game5 = await prisma.game.upsert({
-		where: {id:5},
+		where: { id: 5 },
 		update: {},
 		create: {
-				player1Id: 2,
-				score1: 2,
-				player2Id: 3,
-				score2: 1,
+			player1Id: 2,
+			score1: 2,
+			player2Id: 3,
+			score2: 1,
 		},
 	})
 
 	const game6 = await prisma.game.upsert({
-		where: {id:6},
+		where: { id: 6 },
 		update: {},
 		create: {
-				player1Id: 4,
-				score1: 3,
-				player2Id: 2,
-				score2: 1,
+			player1Id: 4,
+			score1: 3,
+			player2Id: 2,
+			score2: 1,
 		},
 	})
 
 	const game7 = await prisma.game.upsert({
-		where: {id:7},
+		where: { id: 7 },
 		update: {},
 		create: {
-				player1Id: 2,
-				score1: 1,
-				player2Id: 4,
-				score2: 3,
+			player1Id: 2,
+			score1: 1,
+			player2Id: 4,
+			score2: 3,
 		},
 	})
 
 	const friend1 = await prisma.relation.upsert({
-		where : {id: 1},
+		where: { id: 1 },
 		update: {},
 		create: {
-			userId: 1 ,
+			userId: 1,
 			userIWatchId: 2,
 			relation: 1,
 		},
 	})
 
 	const friend2 = await prisma.relation.upsert({
-		where : {id: 2},
+		where: { id: 2 },
 		update: {},
 		create: {
-			userId: 1 ,
+			userId: 1,
 			userIWatchId: 3,
 			relation: 1,
 		},
 	})
 
 	const friend3 = await prisma.relation.upsert({
-		where : {id: 3},
+		where: { id: 3 },
 		update: {},
 		create: {
-			userId: 1 ,
+			userId: 1,
 			userIWatchId: 4,
 			relation: 1,
 		},
 	})
 
 	const friend4 = await prisma.relation.upsert({
-		where : {id: 4},
+		where: { id: 4 },
 		update: {},
 		create: {
-			userId: 4 ,
+			userId: 4,
 			userIWatchId: 1,
 			relation: 1,
 		},
 	})
 
 	const friend5 = await prisma.relation.upsert({
-		where : {id: 5},
+		where: { id: 5 },
 		update: {},
 		create: {
-			userId: 4 ,
+			userId: 4,
 			userIWatchId: 2,
 			relation: 1,
 		},
 	})
 
 	const friend6 = await prisma.relation.upsert({
-		where : {id: 6},
+		where: { id: 6 },
 		update: {},
 		create: {
-			userId: 3 ,
+			userId: 3,
 			userIWatchId: 4,
 			relation: 1,
 		},
 	})
 
 	const friend7 = await prisma.relation.upsert({
-		where : {id: 7},
+		where: { id: 7 },
 		update: {},
 		create: {
-			userId: 3 ,
+			userId: 3,
 			userIWatchId: 4,
 			relation: 2,
 		},
@@ -424,10 +424,10 @@ async function main() {
 
 
 	const block8 = await prisma.relation.upsert({
-		where : {id: 8},
+		where: { id: 8 },
 		update: {},
 		create: {
-			userId: 4 ,
+			userId: 4,
 			userIWatchId: 3,
 			relation: 2,
 		},
@@ -435,9 +435,9 @@ async function main() {
 
 
 	//	FAKE USERS SEED
-	for (let i = 0 ; i < 10 ; i++) {
-		await prisma.user.upsert( {
-		where: {id: 9 + i},
+	for (let i = 0; i < 10; i++) {
+		await prisma.user.upsert({
+			where: { id: 9 + i },
 			update: {},
 			create: {
 				id: 9 + i,

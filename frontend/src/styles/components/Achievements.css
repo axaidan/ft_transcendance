@@ -1,0 +1,46 @@
+.all_achiev {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.unlocked_achiev {
+	justify-content: center;
+	display: flex;
+	list-style: none;
+	background-color: #020912;
+	width: 250px;
+	border: 2px solid #16222a;
+	border-radius: 10%;
+	margin: 20px;
+	height: 100px;
+}
+
+.unlocked_achiev h3 {
+	color: green;
+}
+
+#icon_unlocked {
+	margin-right: 10px;
+}
+
+#icon_locked {
+	margin-right: 10px;
+}
+
+.achiev_describe {
+	display: flex;
+	justify-content: center;
+}
+
+.locked_achiev {
+	color: gray;
+	justify-content: center;
+	display: flex;
+	list-style: none;
+	background-color: #020912;
+	width: 250px;
+	border: 2px solid gray;
+	border-radius: 10%;
+	margin: 20px;
+	height: 100px;
+}

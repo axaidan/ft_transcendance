@@ -31,7 +31,7 @@ export function Home() {
 		<div>
 			<Navbar me={user} />
 			<div className='container-body'>
-				<video src={bg_website} autoPlay loop muted className='bg_video' />
+				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
 				<Outlet context={user} />
 				<Friendsbar userId={user.id} />
 			</div>
