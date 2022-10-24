@@ -89,8 +89,8 @@ type ContactProps = { user: IUser };
 function Contact({ user }: ContactProps) {
 
 	// CECI SERA DONNE GRACE AU SOCKET STATUS
-	const status = Status.INGAME;
-	const notif: number = 5;
+	const status = Status.INQUEUE;
+	const notif: number = 1;
 
 	return (
 		<li className='contact-container'>
