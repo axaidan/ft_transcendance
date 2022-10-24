@@ -65,9 +65,6 @@ export function Home() {
 			<Navbar me={user} />
 			<div className='container-body'>
 				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
-				<form onSubmit={updateUser}>
-					<button type="submit">Submit</button>
-				</form>
 				<Outlet context={user} />
 				<Friendsbar userId={user.id} />
 			</div>

@@ -1,5 +1,5 @@
 // Extern:
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 // Intern:
@@ -12,29 +12,7 @@ import axios from "axios";
 import { useCookies } from 'react-cookie';
 import { updateUser } from "../hooks";
 import { useForm } from '../hooks/UseForm';
-
-// function updateUser() {
-// 	useEffect(() => {
-// 		axios.patch<UpdateUserResponse>('http://localhost:3000/user/',
-// 			{ username: 'victor' },
-// 			{
-// 				headers: {
-// 					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
-// 					'Content-Type': 'application/json',
-// 					Accept: 'application/json',
-// 				},
-// 			},
-// 		).catch((error) => {
-// 			if (axios.isAxiosError(error)) {
-// 				console.log('error message: ', error.message);
-// 				return error.message;
-// 			} else {
-// 				console.log('unexpected error: ', error);
-// 				return 'An unexpected error occurred';
-// 			}
-// 		})
-// 	}, []);
-// }
+import { IAvatar } from '../types/interfaces/IAvatar';
 
 type State = {
 	newUsername: string;
@@ -52,7 +30,6 @@ export function Profile() {
 
 
 	const editUser = () => {
-		// setUsername(Object.values(values));
 		axios.patch('/user',
 			values,
 			{
@@ -62,7 +39,13 @@ export function Profile() {
 					Accept: 'application/json',
 				},
 			},
-		)
+		).catch(function (error) {
+			if (error.response || error.request) {
+				console.log('this nickname is already taken');
+				return;
+			}
+			return;
+		})
 		toggleUserEdit();
 		location.reload();
 	}
@@ -80,6 +63,14 @@ export function Profile() {
 		initialState
 	)
 
+	useEffect(() => {
+		axios.get('/avatar/list').then((res) => setAvatar(res.data));
+	}, []);
+
+	const avatar_link = (avatar: IAvatar): string => {
+		return avatar.url;
+	}
+
 	return (
 		<div className="user_body" >
 			<div className="left_side">
@@ -87,6 +78,8 @@ export function Profile() {
 					<div className="user_nickname">
 						<div className={toggleEdit ? "disabled" : "user-nick"}>
 							{user.username}
+							<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
+							</button>
 						</div>
 						<form onSubmit={onSubmit}>
 							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} name="username" />
@@ -94,8 +87,6 @@ export function Profile() {
 								Validate
 							</button>
 						</form>
-						<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
-						</button>
 					</div>
 					<div className="clan">
 						My clan
@@ -107,38 +98,60 @@ export function Profile() {
 						25
 					</div>
 					<div className="profile-icon-div">
-						<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' id="profile_icon" />
+
+						<img src={user.avatarUrl} id="profile_icon" />
 					</div>
 					<div className="end-of-banner">
 					</div>
 				</div>
 				<div className="loot">
 					<div className="coffer">
-						coffre
+						0
 					</div>
 					<div className="boost">
-						boost
+						0
 					</div>
 					<div className="reroll">
-						reroll
+						0
 					</div>
 				</div>
 			</div>
 			<div className="stats">
-				<div className="rank">
-					bronze
+				<div className="empty-space">
 				</div>
-				<div className="honor">
-					none
-				</div>
-				<div className="champion">
-					morgana
-				</div>
-				<div className="trophee">
-					no trophee
-				</div>
-				<div className="clash">
-					no clash yet
+				<div className="lol-stats">
+					<div className="rank">
+						<h3>Rank</h3>
+						<div className="txt">
+							unranked
+						</div>
+					</div>
+					<div className="honor">
+						<h3>Honor</h3>
+						<div className="txt">
+							none
+						</div>
+					</div>
+					<div className="champion">
+						<h3>Victories</h3>
+						<div className="txt">
+							No game yet
+						</div>
+					</div>
+					<div className="trophee">
+						<h3>Trophee</h3>
+						<div className="txt">
+							none
+						</div>
+					</div>
+					<div className="clash">
+						<div id='stats-column'>
+							<h3>Banner</h3>
+							<div className="txt">
+								none
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div >

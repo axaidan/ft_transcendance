@@ -37,7 +37,7 @@
 	display: flex;
 	background-image: url('../../../assets/images/profile_component/nav-divider.png');
 	background-position-x: 50%;
-	background-size: 110%;
+	background-size: 120px;
 	background-repeat: no-repeat;
 	background-position-y: 40px;
 }

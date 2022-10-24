@@ -114,6 +114,11 @@
 
 .items:hover {
 	scale: 1.1;
+	background-image: url('../../assets/images/profile_component/action-timeline-glow.png');
+	background-repeat: no-repeat;
+	background-position-y: 15px;
+	background-position-x: 50%;
+	height: 100%;
 }
 
 #ladder {
@@ -190,6 +195,7 @@
 
 .user_icon {
 	width: 50px;
+	height: 50px;
 	border-radius: 50% 50%;
 }
 
