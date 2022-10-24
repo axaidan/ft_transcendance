@@ -29,8 +29,8 @@ export function Friends() {
 
 			<h1>friend:</h1>
 			<ul>
-				{friends.map((friend: IUser) => (
-					<Link to={"/home/" + friend.id}>
+				{friends.map((friend: IUser, index) => (
+					<Link key={index} to={"/home/" + friend.id}>
 						<li>{friend.username}</li>
 					</Link>
 				))}
@@ -38,8 +38,8 @@ export function Friends() {
 
 			<h1>Block:</h1>
 			<ul>
-				{blocks.map((block: IUser) => (
-					<Link to={"/home/" + block.id}>
+				{blocks.map((block: IUser, index) => (
+					<Link key={index} to={"/home/" + block.id}>
 						<li>{block.username}</li>
 					</Link>
 				))}

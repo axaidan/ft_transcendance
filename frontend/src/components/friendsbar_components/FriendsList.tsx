@@ -22,7 +22,7 @@ export function FriendsList({ setDisc }: FriendListProps) {
 	const isOnline = (uid: number, index: number, user: IUser) => {
 		if (users.includes(uid)) {
 			return (
-				<div onClick={() => {
+				<div key={index} onClick={() => {
 					setDisc(user.id)!;
 					HandleClicContact();
 				}}>
@@ -35,7 +35,7 @@ export function FriendsList({ setDisc }: FriendListProps) {
 	const isOffline = (uid: number, index: number, user: IUser) => {
 		if (users.includes(uid) == false) {
 			return (
-				<div onClick={() => {
+				<div key={index} onClick={() => {
 					setDisc(user.id)!;
 					HandleClicContact();
 				}}>

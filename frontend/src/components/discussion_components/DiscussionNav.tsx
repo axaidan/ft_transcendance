@@ -19,7 +19,7 @@ export function DiscussionNav() {
 	return (
 		<div className='discussion-container'>
 			{onlineFriend.map((user: IUser, index) => (
-				<Contact user={user} status={0} />
+				<Contact key={index} user={user} status={0} />
 			))}
 		</div>
 	)

@@ -6,7 +6,8 @@ import { defaultSocketContextState, ESocketActionType, SocketContextProvider, So
 import { useSocket } from "../../hooks/useSocket";
 import { useAxios } from "../../hooks/useAxios";
 import { IUser } from "../../types";
-import { useNavigate } from "react-router-dom";
+import { AxiosJwt } from "../../hooks";
+import { AxiosResponse } from "axios";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
     userId: number;
@@ -16,11 +17,8 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const { children } = props;
     const [ SocketState, SocketDispatch ] = useReducer( SocketReducer, defaultSocketContextState );
     const [ loadingSocket, setLoading ] = useState(true);
+	const axios = AxiosJwt();
     
-	const [loading, friends, error] = useAxios<IUser[]>({ method: 'GET', url: '/relation/list_friend'});
-    const navigate = useNavigate();
-
-
     const socket = useSocket('localhost:3000', {
         reconnectionAttempts: 5,
         reconnectionDelay: 5000,
@@ -35,9 +33,22 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             // Save the socket in context //
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
             SocketDispatch({type: ESocketActionType.UP_UID, payload: props.userId });
-            StartListeners();
-            // Send the handshake //
-            StartHandshake( props.userId );
+
+            // GET FRIENDS:
+            axios.get('/relation/list_friend')
+            .then((res: AxiosResponse<IUser[]>) => { 
+                SocketDispatch({type: ESocketActionType.UP_UID, payload: res.data }); 
+            
+                StartListeners();
+                // Send the handshake //
+                StartHandshake( props.userId );
+
+                console.log("FRIEND ON SOCKET: " , SocketState.friends);
+            });
+            // // GET BLOCKS:
+            // axios.get('/relation/list_block')
+			//     .then((res: AxiosResponse<IUser[]>) => { setBlocks(res.data) });
+
         }
     }, [props.userId])
 
@@ -78,14 +89,6 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const StartHandshake = ( userId: number ) => {
         console.info('Sending handshake to server ...');
 
-		// Recuperation des users en ligne
-
-        // while ( loading );
-        // if (error !== '') return navigate('/');
-        // if (!friends ) return navigate('/');
-
-        SocketDispatch({type: ESocketActionType.UP_UID, payload: friends! });
-
 		// Emission de notre connections au autres
 		socket.emit('loginToServer', userId);
 
@@ -94,7 +97,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     };
 
-    if (loadingSocket) return <p>Loading socket IO ... </p>;
+    if (loadingSocket  ) return <p>Loading socket IO ... </p>;
 
     return <SocketContextProvider value={{ SocketState, SocketDispatch }}>
         { children }
