@@ -7,6 +7,7 @@ export interface ISocketContextState {
     uid: number; 
     users: number[];
 	friends: IUser[];
+	blocks: IUser[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
@@ -14,6 +15,7 @@ export const defaultSocketContextState: ISocketContextState = {
     uid: 0,
     users: [],
     friends: [],
+    blocks: [],
 }
 
 export enum ESocketActionType {
@@ -23,9 +25,24 @@ export enum ESocketActionType {
     RM_USER = 'remove_user',
     GET_USERS = 'get_users',
     GET_FRIENDS= 'get_friends',
+    GET_BLOCKS= 'get_blocks',
+    ADD_FRIENDS= 'add_new_friend' ,
+    RM_FRIENDS= 'rm_new_friend' ,
+    ADD_BLOCKS= 'add_new_block' ,
+    RM_BLOCKS= 'rm_new_block' ,
 }
 
-export type TSocketContextActions = ESocketActionType.UP_SOKET | ESocketActionType.UP_UID | ESocketActionType.RM_USER | ESocketActionType.UP_USERS | ESocketActionType.GET_USERS | ESocketActionType.GET_FRIENDS; 
+export type TSocketContextActions = ESocketActionType.UP_SOKET  |
+                                    ESocketActionType.UP_UID    |
+                                    ESocketActionType.RM_USER   |
+                                    ESocketActionType.UP_USERS  |
+                                    ESocketActionType.GET_USERS |
+                                    ESocketActionType.GET_FRIENDS |
+                                    ESocketActionType.GET_BLOCKS |
+                                    ESocketActionType.ADD_FRIENDS |
+                                    ESocketActionType.RM_FRIENDS |
+                                    ESocketActionType.ADD_BLOCKS | 
+                                    ESocketActionType.RM_BLOCKS; 
 
 export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] ;
 
@@ -42,14 +59,24 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
             return { ...state, socket: action.payload as Socket};
         case ESocketActionType.UP_UID:
             return { ...state, uid: action.payload as number};
+        case ESocketActionType.GET_USERS:
+            return { ...state, users: action.payload as number[] };
         case ESocketActionType.UP_USERS:
             return { ...state, users: [ ...state.users, action.payload as number] };
         case ESocketActionType.RM_USER:
             return { ...state, users: state.users.filter((uid) => uid !== ( action.payload as number ))};
-        case ESocketActionType.GET_USERS:
-            return { ...state, users: action.payload as number[] };
         case ESocketActionType.GET_FRIENDS:
             return { ...state, friends: action.payload as IUser[] };
+        case ESocketActionType.ADD_FRIENDS:
+            return { ...state, friends: [ ...state.friends, action.payload as IUser] };
+        case ESocketActionType.RM_FRIENDS:
+            return { ...state, friends: state.friends.filter((user) => user !== ( action.payload as IUser ))};
+        case ESocketActionType.GET_BLOCKS:
+            return { ...state, blocks: action.payload as IUser[] };
+        case ESocketActionType.ADD_BLOCKS:
+            return { ...state, blocks: [ ...state.blocks, action.payload as IUser] };
+        case ESocketActionType.RM_BLOCKS:
+            return { ...state, blocks: state.blocks.filter((user) => user !== ( action.payload as IUser ))};
         default:
             return { ...state };
     }

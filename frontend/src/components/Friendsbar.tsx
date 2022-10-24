@@ -15,33 +15,14 @@ import '../styles/components/Friendsbar.css'
 
 type FriendbarProps = { userId: number; }
 export function Friendsbar({ userId }: FriendbarProps) {
-
-
-// ****************************************************************** //
-// *******      BIENTOT DELETE -> GERER DANS LE CONTEXT      ******** //
-// ****************************************************************** //
-	const [ activeDisc, setActiveDisc ] = useState<number>(0);
-
-	// Pour le type de la fonction passer a l'enfant
-	const updateDisc = (disc:number): void => {
-		setActiveDisc(disc);
-	}
-
-	useEffect(() => {
-		console.log("disc active: " + activeDisc);
-	}, [activeDisc]);
-
-// ****************************************************************** //
-
-
 	return (
 		<div className='Friendsbar'>
 			<SocketContextComponent userId={userId}>
 				<ChatSocketContextComponent userId={userId}>
 					<HeaderFriendBar />
-					<FriendsList setDisc={updateDisc} />
+					<FriendsList />
 					<FooterFriendBar />
-					<Chat userDisc={activeDisc} />
+					<Chat />
 				</ChatSocketContextComponent>
 			</SocketContextComponent>
 		</div>

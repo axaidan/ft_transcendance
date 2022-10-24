@@ -1,41 +1,34 @@
-import { AxiosResponse } from "axios";
-import { useContext, useEffect, useReducer, useState} from "react";
-import { Socket } from "socket.io-client";
-import { ChatNav, DiscussionNav } from ".";
-import { SocketContext } from "../../context";
-import { ChatSocketContext } from "../../context/ChatSocket";
-import { AxiosJwt } from "../../hooks";
 
+// Extern:
+import { useContext } from "react";
+
+// Intern:
+import { ChatNav, DiscussionNav } from ".";
+import { ChatSocketContext, SocketContext } from "../../context";
+
+// Assets:
 import '../../styles/components/discussion_components/Chat.css'
-import { dflDiscussion, DflUser, IDiscussion, IMessage, IUser } from "../../types";
+
 
 
 export function ChatBody() {
 
-	// LISTE DES DISCUSSIONS SUR LE COTE
-	// const discussion: Discussion[] = axios.get('/discussion');
 
-	//  A L'OUVERTURE D'UNE FENETRE
-	// const messages: DiscussionMessage[] = axios.get('/discussion/discussion[i].id');
+	const { discussion, index_active } = useContext(ChatSocketContext).ChatSocketState;
 
-	// DANS LA STATE
-	// - 1 DiscussionMessage
-	//	QUI CHANGE DES QUE JE RECOIS 'discMsgToClient'
+	if ( !discussion ) return <></>
 
 	return (
 		<div className='messages-body'>
-			<div>
-				awdawdawaw
-			</div>
+			{ discussion.at(index_active)?.messages.map((message, index) => { 
+				return <div key={index}>{message.text}</div>
+			 })}
 		</div>
 	)
 }
 
-type ChatProps = { userDisc: number }
-export function Chat({ userDisc }: ChatProps) {
-
+export function Chat() {
 	const { uid } = useContext(SocketContext).SocketState;
-
 
 	/* Permet d'envoyer le message au back - dans le cas ou l'input nest pas vide */
 	const handleKeyDown = ( e: any ) => {

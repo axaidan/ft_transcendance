@@ -1,15 +1,10 @@
 // Extern:
 import React from "react";
 import { useNavigate, Outlet } from 'react-router-dom'
-import { useEffect, useState } from "react"
-import { AxiosResponse } from "axios";
 
 // Intern:
 import { Friendsbar, Navbar } from '../components'
-import { AxiosJwt } from "../hooks/AxiosJwt";
-import { IUser, DflUser } from "../types";
-import io, { Socket } from 'socket.io-client';
-import { useCookies } from "react-cookie";
+import { IUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
