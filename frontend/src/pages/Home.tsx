@@ -13,25 +13,28 @@ import { useCookies } from "react-cookie";
 
 // Assets:
 import '../styles/pages/Home.css'
-import bg_website from '../assets/videos/bg_website.webm'
+import bg_website from '../assets/videos/bg_website2.webm'
+import { updateUser } from '../hooks/EditUser';
 
 
 const GetCookie = () => {
-	const [ cookies ] = useCookies();
+	const [cookies] = useCookies();
 	return cookies.access_token;
 }
 
-const GetSocket = ( userId: number ) => {
-	const newSocket = io(`http://localhost:3000`, 
-	{ extraHeaders: 
-		{ Authorization: `Bearer ${GetCookie}` }
-	});
+const GetSocket = (userId: number) => {
+	const newSocket = io(`http://localhost:3000`,
+		{
+			extraHeaders:
+				{ Authorization: `Bearer ${GetCookie}` }
+		});
 	newSocket.emit('loginToServer', userId);
 
-	const chatSocket = io(`http://localhost:3000/chatNs`, 
-	{ extraHeaders: 
-		{ Authorization: `Bearer ${GetCookie}` }
-	});
+	const chatSocket = io(`http://localhost:3000/chatNs`,
+		{
+			extraHeaders:
+				{ Authorization: `Bearer ${GetCookie}` }
+		});
 	chatSocket.emit('loginToServer', userId);
 
 	// newSocket.on("disconnect", () => {
@@ -47,21 +50,21 @@ export function Home() {
 	const [socket, setSocket] = useState<Socket>();
 
 	const axios = AxiosJwt();
-	
+
 	useEffect(() => {
 		axios.get("/user/me")
-		.then((res: AxiosResponse<IUser>) => {
-			setUser(res.data);
-			setSocket(GetSocket(res.data.id));
-		 })
-		.catch(() => { navigate('/'); });
+			.then((res: AxiosResponse<IUser>) => {
+				setUser(res.data);
+				setSocket(GetSocket(res.data.id));
+			})
+			.catch(() => { navigate('/'); });
 	}, []);
 
 	return (
 		<div className="set-body">
 			<Navbar me={user} />
 			<div className='container-body'>
-				<video src={bg_website} autoPlay loop muted className='bg_video' />
+				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
 				<Outlet context={user} />
 				<Friendsbar userId={user.id} />
 			</div>
