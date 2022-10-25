@@ -34,7 +34,7 @@ export function Home() {
 			<ChatSocketContextComponent user={user}>
 				<Navbar me={user} />
 				<div className='container-body'>
-					<video src={bg_website} autoPlay loop muted className='bg_video' />
+					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
 					<Outlet />
 				</div>
 				<Friendsbar />

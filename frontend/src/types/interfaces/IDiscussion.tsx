@@ -7,7 +7,7 @@ export type IMessage = {
 }
 
 export type IDiscussion = {
-	discId: number;
+	id: number;
 	user1: {
 		id: number;
 		username: string;

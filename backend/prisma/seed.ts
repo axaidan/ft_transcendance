@@ -450,7 +450,7 @@ async function main() {
 	}
 
 	// RELATIONS SEED
-	for (let i = 0 ; i < 10 ; i++) {
+	for (let i = 0; i < 10; i++) {
 		// FRIENDS OF mlormois
 		await prisma.relation.create({
 			data: {
@@ -484,12 +484,16 @@ async function main() {
 	});
 	// DISCUSSION SEED
 	// mlormois - user0
-	const disc1 = await prisma.discussion.create({
-		data: {
-			user1Id: 1,
-			user2Id: 9,
-		}
-	});
+	const discMax = []
+	for (let i = 9; i < 13; i++) {
+		discMax[i - 9] = await prisma.discussion.create({
+			data: {
+				user1Id: 1,
+				user2Id: i,
+			}
+		})
+	};
+
 	// axaidan - user0
 	const disc2 = await prisma.discussion.create({
 		data: {
@@ -504,29 +508,32 @@ async function main() {
 			user2Id: 9,
 		}
 	});
+
+
 	// DISCUSSIONMESSAGES SEED
 	// user0 => mlormois MESSAGES
-	for (let i = 0 ; i < 5 ; i++) {
-		await prisma.discussionMessage.create({
-			data: {
-				userId: 9,
-				discussionId: disc1.id,
-				text: "user0 msg" + i,
-			}
-		});
+	for (let j = 0; j < 5; j++) {
+		for (let i = 0; i < 5; i++) {
+			await prisma.discussionMessage.create({
+				data: {
+					userId: discMax[j].user2Id,
+					discussionId: discMax[j].id,
+					text: "user" + discMax[j].user2Id + "msg" + i,
+				}
+			});
+			await prisma.discussionMessage.create({
+				data: {
+					userId: sergent.id,
+					discussionId: discMax[j].id,
+					text: "mlormois msg" + i,
+				}
+			});
+		}
 	}
-	// mlormois => user0 MESSAGES
-	for (let i = 0 ; i < 5 ; i++) {
-		await prisma.discussionMessage.create({
-			data: {
-				userId: sergent.id,
-				discussionId: disc1.id,
-				text: "sergent msg" + i,
-			}
-		});
-	}
+
+
 	// user0 => axaidan MESSAGES
-	for (let i = 0 ; i < 5 ; i++) {
+	for (let i = 0; i < 5; i++) {
 		await prisma.discussionMessage.create({
 			data: {
 				userId: 9,
@@ -535,8 +542,8 @@ async function main() {
 			}
 		});
 	}
-	// mlormois => user0 MESSAGES
-	for (let i = 0 ; i < 5 ; i++) {
+	// axaidan => user0 MESSAGES
+	for (let i = 0; i < 5; i++) {
 		await prisma.discussionMessage.create({
 			data: {
 				userId: Axel.id,

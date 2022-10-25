@@ -24,12 +24,12 @@ export function FriendsList() {
 		if (!newDisc)
 			return;
 		console.log("Discussion 1: ", discussion)
-		let new_current = discussion.findIndex((elem) => elem.discId === newDisc.discId);
+		let new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
 		console.log("FIRST current: ", new_current)
 		if (new_current === -1) {
 			discussion.push(newDisc);
 			console.log("Discussion 2: ", discussion)
-			new_current = discussion.findIndex((elem) => elem.discId === newDisc.discId);
+			new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
 			console.log("SECOND current: ", new_current)
 		}
 		chat({ type: EChatSocketActionType.UP_CURR, payload: new_current })
