@@ -18,7 +18,7 @@ export class AuthService {
 		let user = await this.prisma.user.findFirst({ where: { login: login } });
 
 		var findAvatar = await this.prisma.avatar.findFirst({where: {is_public: true}});
-		if (!user)
+		if (!user) {
 			user = await this.prisma.user.create({
 				data: {
 					login: login,
@@ -27,11 +27,12 @@ export class AuthService {
 				}
 			});
 
-		if (findAvatar) {
-			let addAvatar = await this.prisma.user.update({where : {id: user.id},
-				data: {
-					avatarUrl: findAvatar.url,
-				},});
+			if (findAvatar) {
+				let addAvatar = await this.prisma.user.update({where : {id: user.id},
+					data: {
+						avatarUrl: findAvatar.url,
+					},});
+			}
 		}
 
 		const token = await this.signToken(user.id, user.login);
