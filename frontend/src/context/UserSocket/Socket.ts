@@ -1,10 +1,10 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { IUser } from "../../types";
+import { DflUser, IUser } from "../../types";
 
 export interface ISocketContextState {
     socket : Socket | undefined;
-    uid: number; 
+    me: IUser; 
     users: number[];
 	friends: IUser[];
 	blocks: IUser[];
@@ -12,7 +12,7 @@ export interface ISocketContextState {
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
-    uid: 0,
+    me: DflUser,
     users: [],
     friends: [],
     blocks: [],
@@ -52,13 +52,13 @@ export interface ISocketContextActions {
 }
 
 export const SocketReducer = ( state: ISocketContextState, action: ISocketContextActions ) => { 
-    console.log( `Message Receive - Action: ${action.type} - Payload : `, action.payload );
+    // console.log( `Message Receive - Action: ${action.type} - Payload : `, action.payload );
 
     switch(action.type) {
         case ESocketActionType.UP_SOKET:
             return { ...state, socket: action.payload as Socket};
         case ESocketActionType.UP_UID:
-            return { ...state, uid: action.payload as number};
+            return { ...state, uid: action.payload as IUser};
         case ESocketActionType.GET_USERS:
             return { ...state, users: action.payload as number[] };
         case ESocketActionType.UP_USERS:

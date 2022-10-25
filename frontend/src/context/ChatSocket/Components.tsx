@@ -1,20 +1,19 @@
-import { AxiosResponse } from "axios";
+// Extern:
 import { PropsWithChildren, useEffect, useReducer, useState } from "react";
-import { ChatSocketContext, ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
+
+// Intern:
+import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
-import { IDiscussion, IMessage } from "../../types";
+import { IMessage, IUser } from "../../types";
 import { AxiosJwt } from "../../hooks";
 
-
 export interface IChatSocketContextComponentProps extends PropsWithChildren {
-	userId: number;
+	user: IUser;
 }
 
-export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = (props) => {
-	const { children } = props;
+export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user}) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
 	const [ loadingSocket, setLoading ] = useState(true);
-	const axios = AxiosJwt();
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -23,35 +22,27 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 	})
 
 	useEffect(() => {
-		if (props.userId != 0) {
-			chatSocket.connect();
+		if (user.id != 0) {
+			// chatSocket.connect();
 			// Save the socket in context //
 			ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: props.userId });
-
-			axios.get('/discussion')
-			.then((res: AxiosResponse<IDiscussion[]>) => {
-				ChatSocketDispatch({ type: EChatSocketActionType.GET_DISC, payload: res.data });
-			});
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: user });
 			// Start the envent listeners // 
 			StartListeners();
-			StartHandshake(props.userId);
+			StartHandshake();
 		}
-	}, [props.userId])
+	}, [user])
 
 	const StartListeners = () => {
-
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
             console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		})
-
-
 	};
 
-	const StartHandshake = (userId: number) => {
+	const StartHandshake = () => {
 		console.info('Sending handshake to server ...');
-		chatSocket.emit('loginToServer', userId);
+		chatSocket.emit('loginToServer', user.id);
 		setLoading(false);
 	};
 

@@ -8,9 +8,13 @@
 	background-size: 25px;
 }
 
-#chat-container {
-	position: absolute;
+#chat-container-none {
 	display: none;
+}
+
+#chat-container-display {
+	position: absolute;
+	display: grid;
 	grid-template-columns: 2fr 5fr;
 	grid-column: auto;
 	bottom: 0;

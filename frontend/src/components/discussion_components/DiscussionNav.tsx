@@ -1,25 +1,16 @@
 
-import { AxiosResponse } from 'axios';
-import { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Contact } from '..';
-import { AxiosJwt } from '../../hooks';
-import { IUser } from '../../types';
-
+import { ChatSocketContext } from '../../context';
+import { IDiscussion, IUser } from '../../types';
 
 export function DiscussionNav() {
-
-	const axios = AxiosJwt();
-	const [onlineFriend, setOnlineFriend] = useState<IUser[]>([]);
-
-	useEffect(() => {
-		axios.get('/user/all')
-			.then((res: AxiosResponse<IUser[]>) => { setOnlineFriend(res.data) });
-	});
+	const { me, discussion } = useContext(ChatSocketContext).ChatSocketState;
 
 	return (
 		<div className='discussion-container'>
-			{onlineFriend.map((user: IUser, index) => (
-				<Contact key={index} user={user} status={0} />
+			{discussion?.map((disc: IDiscussion, index) => (
+				<p>{me.id !== disc.user1Id ? disc.user2.username : disc.user1.username}</p>
 			))}
 		</div>
 	)

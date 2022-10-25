@@ -1,5 +1,5 @@
 // Extern:
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
+import React, { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 // Intern:
@@ -13,13 +13,16 @@ import { useCookies } from 'react-cookie';
 import { updateUser } from "../hooks";
 import { useForm } from '../hooks/UseForm';
 import { IAvatar } from '../types/interfaces/IAvatar';
+import { SocketContext } from "../context";
 
 type State = {
 	newUsername: string;
 };
 
 export function Profile() {
-	let user: IUser = useOutletContext();
+
+	const { me } = useContext(SocketContext).SocketState;
+
 	const [avatar, setAvatar] = useState('');
 	const [toggleEdit, setToggleEdit] = useState(false);
 	const axios = AxiosJwt();

@@ -9,11 +9,10 @@ import { AxiosJwt } from "../../hooks";
 import { AxiosResponse } from "axios";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
-    userId: number;
+    user: IUser;
 }
 
-const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = (props) => {
-    const { children } = props;
+const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = ({ children, user }) => {
     const [ SocketState, SocketDispatch ] = useReducer( SocketReducer, defaultSocketContextState );
     const [ loadingSocket, setLoading ] = useState(true);
 	const axios = AxiosJwt();
@@ -25,11 +24,11 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     })
 
     useEffect(() => {
-        if (props.userId != 0)
+        if (user.id != 0)
         {
-            socket.connect();
+            // socket.connect();
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
-            SocketDispatch({type: ESocketActionType.UP_UID, payload: props.userId });
+            SocketDispatch({type: ESocketActionType.UP_UID, payload: user });
             // GET FRIENDS:
             axios.get('/relation/list_friend')
             .then((res: AxiosResponse<IUser[]>) => { 
@@ -41,9 +40,9 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
                 SocketDispatch({type: ESocketActionType.GET_BLOCKS, payload: res.data }); 
             });
             StartListeners();
-            StartHandshake( props.userId );
+            StartHandshake();
         }
-    }, [props.userId])
+    }, [user])
 
     const StartListeners = () => {
 
@@ -97,11 +96,11 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         // });
     };
 
-    const StartHandshake = ( userId: number ) => {
+    const StartHandshake = () => {
         console.info('Sending handshake to server ...');
 
 		// Emission de notre connections au autres
-		socket.emit('loginToServer', userId);
+		socket.emit('loginToServer', user.id);
 
 		// Fin de l'ecan d'affichage d'erreur
         setLoading( false );

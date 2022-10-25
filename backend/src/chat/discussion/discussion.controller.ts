@@ -16,18 +16,21 @@ export class DiscussionController {
         private discService: DiscussionService
     ) { }
 
-    //  GET /discussion
-    @Get()
-    async getDiscussions(@GetUser('id') currentUserId: number):
-        Promise<Discussion[]> {
-        return await this.discService.getDiscussions(currentUserId);
+    //  GET /discussion/:id
+    @Get(':id')
+    async getDiscussions(
+			@GetUser('id') currentUserId: number,
+			@Param('id', ParseIntPipe) userId: number
+		) :
+        Promise<Discussion> {
+        return await this.discService.getDiscussions(currentUserId, userId);
     }
 
     //  POST /discussion/:user2Id
     @Post()
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Body(/*ParseIntPipe*/) body : { user2Id: number }, 
+        @Body() body : { user2Id: number }, 
     ) :
     Promise<Discussion>
     {

@@ -16,7 +16,7 @@ export class UserService {
 				login: login,
 				username: login,
 				email: login + '@student.42.fr',
-				avatarId: 1,
+				avatarUrl: "",
 			}
 		});
 	}
