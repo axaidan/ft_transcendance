@@ -98,8 +98,8 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     const StartHandshake = () => {
         console.info('Sending handshake to server ...');
-
-		// Emission de notre connections au autres
+		
+		socket.emit('getOnlineUsersToServer');
 		socket.emit('loginToServer', user.id);
 
 		// Fin de l'ecan d'affichage d'erreur

@@ -10,9 +10,9 @@ export interface IChatSocketContextComponentProps extends PropsWithChildren {
 	user: IUser;
 }
 
-export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user}) => {
+export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
-	const [ loadingSocket, setLoading ] = useState(true);
+	const [loadingSocket, setLoading] = useState(true);
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -36,11 +36,11 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 	const StartListeners = () => {
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
-            console.info('J\'ai recu un nouveau message.');
+			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		})
 		// chatSocket.on('newDiscToClient', (message: IMessage) => {
-        //     console.info('J\'ai recu un nouveau message.');
+		//     console.info('J\'ai recu un nouveau message.');
 		// 	ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		// })
 
@@ -53,7 +53,7 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		setLoading(false);
 	};
 
-	if ( loadingSocket ) return <p>Loading socket IO ... </p>;
+	if (loadingSocket) return <p>Loading socket IO ... </p>;
 
 	return (<ChatSocketContextProvider value={{ ChatSocketState, ChatSocketDispatch }}>
 		{children}

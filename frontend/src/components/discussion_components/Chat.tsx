@@ -28,7 +28,7 @@ export function ChatBody() {
 	useEffect(() => {
 		let element = document.getElementById("messages-body");
 		element!.scrollTop = element!.scrollHeight;
-	}, [])
+	})
 
 	return (
 		<div id='messages-body'>
@@ -40,7 +40,7 @@ export function ChatBody() {
 }
 
 export function Chat() {
-	const { chat_display, socket, index_active } = useContext(ChatSocketContext).ChatSocketState;
+	const { me, chat_display, socket, index_active, discussion } = useContext(ChatSocketContext).ChatSocketState;
 
 	/* Permet d'envoyer le message au back - dans le cas ou l'input nest pas vide */
 	const handleKeyDown = (e: any) => {
@@ -48,7 +48,7 @@ export function Chat() {
 		if (e.key === 'Enter') {
 			if (input.value.length != 0) {
 
-				socket!.emit('discMsgToServer', {discId: 1, userId: 1, text: input.value});
+				socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });
 
 				// ICI je doit emit le message au back!
 				// il me faut donc: - socket - userId - input.value - discId
@@ -62,7 +62,7 @@ export function Chat() {
 		<div id={chat_display ? "chat-container-display" : "chat-container-none"}>
 			<DiscussionNav />
 			<div className='messages-container'>
-				{( index_active != -1 ? <><ChatNav /><ChatBody /></> : <></> )}
+				{(index_active != -1 ? <><ChatNav /><ChatBody /></> : <></>)}
 				<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
 			</div>
 		</div>

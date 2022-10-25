@@ -75,6 +75,7 @@ async function main() {
 		create: {
 			login: 'mlormois',
 			username: 'Sergent',
+			avatarUrl: publicAvatarMlormois.url,
 		},
 	})
 
@@ -509,7 +510,6 @@ async function main() {
 		}
 	});
 
-
 	// DISCUSSIONMESSAGES SEED
 	// user0 => mlormois MESSAGES
 	for (let j = 0; j < 5; j++) {
@@ -530,7 +530,6 @@ async function main() {
 			});
 		}
 	}
-
 
 	// user0 => axaidan MESSAGES
 	for (let i = 0; i < 5; i++) {

@@ -20,32 +20,30 @@ export const dflChatSocketContextState: IChatSocketContextState = {
 }
 
 export enum EChatSocketActionType {
-	UP_SOKET	= 'update_socket',
-	UP_UID		= 'update_uid',
-	GET_DISC	= 'get_discussion',
-	UP_DISC		= 'add_discussion',				// AJOUT D'UNE NOUVELLE DISCUSION
-	RM_DISC		= 'remove_discussion',			// REMOVE D'UNE DISCUSSION 
-	UP_CURR		= 'up_current_discussion',		// INDEX DE LA DISCUSSION AFFICHEE
-	SEND_MSG	= 'send_message',				// SEND D'UN MESSAGE AU BACK
-	NEW_MSG		= 'receive_message',			// RECU D'UN NOUVEAU MESSAGE
-	DISPLAY		= 'change_chat_display'
+	UP_SOKET = 'update_socket',
+	UP_UID = 'update_uid',
+	GET_DISC = 'get_discussion',
+	UP_DISC = 'add_discussion',				// AJOUT D'UNE NOUVELLE DISCUSION
+	RM_DISC = 'remove_discussion',			// REMOVE D'UNE DISCUSSION 
+	UP_CURR = 'up_current_discussion',		// INDEX DE LA DISCUSSION AFFICHEE
+	NEW_MSG = 'receive_message',			// RECU D'UN NOUVEAU MESSAGE
+	DISPLAY = 'change_chat_display'
 }
 
-export type TChatSocketContextAction =	EChatSocketActionType.UP_SOKET	|
-										EChatSocketActionType.UP_UID	|
-										EChatSocketActionType.GET_DISC	|
-										EChatSocketActionType.UP_DISC	|
-										EChatSocketActionType.RM_DISC	|
-										EChatSocketActionType.UP_CURR	|
-										EChatSocketActionType.SEND_MSG	|
-										EChatSocketActionType.NEW_MSG	|
-										EChatSocketActionType.DISPLAY	;
+export type TChatSocketContextAction = EChatSocketActionType.UP_SOKET |
+	EChatSocketActionType.UP_UID |
+	EChatSocketActionType.GET_DISC |
+	EChatSocketActionType.UP_DISC |
+	EChatSocketActionType.RM_DISC |
+	EChatSocketActionType.UP_CURR |
+	EChatSocketActionType.NEW_MSG |
+	EChatSocketActionType.DISPLAY;
 
 export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage | IDiscussion | IUser | boolean;
 
 export interface IChatSocketContextAction {
-	type:		TChatSocketContextAction;
-	payload:	TChatSocketContextPayload;
+	type: TChatSocketContextAction;
+	payload: TChatSocketContextPayload;
 }
 
 export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatSocketContextAction) => {
@@ -59,24 +57,15 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_DISC:
 			return { ...state, discussion: [...state.discussion, action.payload as IDiscussion] };
 		case EChatSocketActionType.RM_DISC:
-			return { ...state, discussion: state.discussion.filter((did) => did.id !== ( action.payload as number ))};
+			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_CURR:
 			return { ...state, index_active: action.payload as number };
 		case EChatSocketActionType.DISPLAY:
 			return { ...state, chat_display: action.payload as boolean };
-
-		// case EChatSocketActionType.SEND_MSG:
-		// 	console.log( (action.payload ) )
-		// 	return { ...state };
 		case EChatSocketActionType.NEW_MSG:
-
-			// if (discId == activeDiscId)
-			//	push dans le tableau
-			// else
-			//  notifier que la disc avec discId comme id a un nouveau msg
-
+			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
+			state.discussion[index].messages.push(action.payload as IMessage);
 			return { ...state };
-
 		default:
 			return { ...state };
 	}
