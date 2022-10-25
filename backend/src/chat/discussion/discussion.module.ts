@@ -9,13 +9,13 @@ import { DiscussionService } from './discussion.service';
     imports: [
         DiscussionMessageModule,
     ],
-    controllers: [
-        DiscussionController,
-    ],
+    // controllers: [
+    //     // DiscussionController,
+    // ],
     providers: [
         DiscussionService,
         DiscussionMessageService,
-        ChatGateway,
+        // ChatGateway,
     ],
     exports: [
         DiscussionService,
