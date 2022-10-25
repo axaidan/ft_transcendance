@@ -1,22 +1,23 @@
 .othNavProfile-container {
-	display: flex;
+	display: grid;
 	justify-content: space-between;
 	height: 30px;
-	width: calc(100vw - 240px);
+	width: auto;
 }
 
 .othNavProfile-title-ctn {
-	display: flex;
+	display: grid;
 	justify-content: center;
 	align-items: center;
-	height: 60px;
+	top: 0;
+	height: 40px;
 	width: 400px;
 	background: url(../../../assets/images/othNavProfile/profile_active_bg.png) no-repeat;
-	background-size: cover;
+	background-size: 400px;
 }
 
 #othNavProfile-title {
-	display: flex;
+	display: grid;
 	justify-content: center;
 	align-items: center;
 	padding: 0;
@@ -24,4 +25,340 @@
 	color: #938f75;
 	font-family: 'Friz Quadrata Std Bold';
 	font-size: medium;
+}
+
+/*****************************
+******************************
+			BODY
+******************************
+******************************/
+
+.user-body {
+	display: grid;
+	width: 100%;
+	height: 100%;
+	grid-template: 10% 10% 80% / 40% 60%;
+}
+
+/*****************************
+******************************
+			LEFT
+******************************
+******************************/
+
+.user-left-side {
+	display: grid;
+	grid-row-start: 3;
+	height: 100%;
+	width: 100%;
+	grid-template-rows: 80% 20%;
+	background-image: url('../../assets/images/profile_component/solidbanner_still.png');
+	background-size: 350px;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	background-position-y: -220px;
+}
+
+.user-banner {
+	display: grid;
+	grid-template-rows: 2fr 2fr 1fr 2fr 8fr 4fr;
+	font-family: Friz Quadrata Std Bold;
+}
+
+/*****************************
+******************************
+			NICKNAME
+******************************
+******************************/
+
+.user-nickname {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	grid-template-columns: 50% 50%;
+	grid-row-start: 2;
+	font-size: xx-large;
+}
+
+.user-nick {
+	display: grid;
+	grid-column-start: 1;
+	align-items: center;
+}
+
+.user-no-edit {
+	display: grid;
+	grid-column-start: 2;
+	justify-content: center;
+	margin-left: 20px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/edit_hover.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 200%;
+	border-radius: 50%;
+}
+
+.user-no-edit:active {
+	margin-left: 20px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/edit_click.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 200%;
+}
+
+.user-no-edit:hover {
+	box-shadow: 0 0 20px 2px white;
+	border-radius: 50% 50%;
+}
+
+.user-edit-up {
+	margin-left: 10px;
+	border: none;
+	width: 40px;
+	height: 40px;
+	background: none;
+	background-image: url('../../assets/images/profile_component/red_x_mark.png');
+	background-position-x: 50%;
+	background-position-y: 50%;
+	background-size: 100%;
+	background-repeat: no-repeat;
+}
+
+.user-edit-up:active {
+	scale: 0.8;
+}
+
+.user-disabled {
+	display: none;
+}
+
+/*****************************
+******************************
+			XP BAR
+******************************
+******************************/
+
+.user-xp-bar {
+	display: grid;
+	grid-row-start: 4;
+	background-image: url('../../assets/images/profile_component/level-bar-bottom.png');
+	background-size: 200px;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	background-position-y: center;
+	grid-column-start: 1;
+}
+
+.user-xp-fill {
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	justify-content: center;
+	align-items: center;
+	background-image: url('../../assets/images/profile_component/level-bar-fill.png');
+	background-position-y: center;
+	background-position-x: calc(50% - 20px);
+	background-size: 180px;
+	background-repeat: no-repeat;
+}
+
+
+
+.user-xp-nbr {
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	background-image: url('../../assets/images/profile_component/level-bar-top.png');
+	background-position-x: calc(50% - 100px);
+	background-position-y: 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+}
+
+.user-xp-value {
+	color: white;
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	font-size: smaller;
+	margin-left: calc(50% - 105px);
+	align-items: center;
+	margin-top: 5px;
+}
+
+.user-clan {
+	display: grid;
+	grid-row-start: 3;
+	justify-content: center;
+	color: #938f75;
+}
+
+.user-profile-icon-div {
+	display: grid;
+	grid-row-start: 5;
+	justify-content: center;
+	align-items: center;
+	background-image: url('../../assets/images/avatar-border.png');
+	background-position: center;
+	background-size: 250px;
+	background-repeat: no-repeat;
+}
+
+#user-profile-icon {
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+}
+
+.user-end-of-banner {
+	display: grid;
+	grid-row-start: 6;
+	background-image: url('../../assets/images/profile_component/banner-bottom.png');
+	background-position-x: center;
+	background-repeat: no-repeat;
+	background-size: 350px;
+}
+
+.user-loot {
+	display: grid;
+	grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
+	height: 100%;
+	justify-content: center;
+}
+
+.user-coffer {
+	background-image: url('../../assets/images/profile_component/perks_chest.png');
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+	background-size: 80px;
+	display: grid;
+	justify-content: center;
+	grid-column-start: 2;
+}
+
+.user-boost {
+	display: grid;
+	justify-content: center;
+	background-image: url('../../assets/images/profile_component/perks_boost.png');
+	background-size: 80px;
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+}
+
+.user-reroll {
+	display: grid;
+	justify-content: center;
+	background-image: url('../../assets/images/profile_component/perks_reroll.png');
+	background-size: 80px;
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+}
+
+.user-stats {
+	display: grid;
+	grid-template-rows: repeat(2, 1fr);
+}
+
+.user-setting {
+	display: grid;
+	height: 100%;
+	align-items: center;
+}
+
+.user-2auth {
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-right: 20%;
+}
+
+#user-checkbox {
+	align-items: center;
+	background: none;
+	border: 1px solid red;
+
+}
+
+#user-checkbox-label {
+	align-items: center;
+	margin-left: 20px;
+
+}
+
+#user-2auth-description {
+	margin-top: 10px;
+	font-size: small;
+	font-style: italic;
+}
+
+.user-email {
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+.user-lol-stats {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	width: 100%;
+	height: 100%;
+}
+
+.user-stats h3 {
+	display: grid;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	color: #938f75;
+	width: 100%;
+	justify-content: center;
+}
+
+
+.user-rank {
+	background-image: url('../../assets/images/profile_component/profile_unranked.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.user-honor {
+	background-image: url('../../assets/images/profile_component/honor_empty.png');
+	background-size: 250px;
+	background-position: 50% 35px;
+	background-repeat: no-repeat;
+}
+
+.user-champion {
+	background-image: url('../../assets/images/profile_component/master.png');
+	background-size: 250px;
+	background-position: 50% -150px;
+	background-repeat: no-repeat;
+}
+
+.user-trophee {
+	background-image: url('../../assets/images/profile_component/trophy_empty.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.user-clash {
+	background-image: url('../../assets/images/profile_component/banner_empty.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.user-txt {
+	display: flex;
+	justify-content: center;
 }

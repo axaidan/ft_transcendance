@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
 import { MailService } from '../mail/mail.service';
 import { find, NotFoundError } from 'rxjs';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
 		private prisma: PrismaService,
 		private conf: ConfigService,
 		private jwt: JwtService,
+		private userService: UserService,
 		private mailService: MailService) { }
 
 
@@ -18,7 +20,7 @@ export class AuthService {
 		let user = await this.prisma.user.findFirst({ where: { login: login } });
 
 		var findAvatar = await this.prisma.avatar.findFirst({where: {is_public: true}});
-		if (!user)
+		if (!user) {
 			user = await this.prisma.user.create({
 				data: {
 					login: login,
@@ -27,11 +29,12 @@ export class AuthService {
 				}
 			});
 
-		if (findAvatar) {
-			let addAvatar = await this.prisma.user.update({where : {id: user.id},
-				data: {
-					avatarUrl: findAvatar.url,
-				},});
+			if (findAvatar) {
+				let addAvatar = await this.prisma.user.update({where : {id: user.id},
+					data: {
+						avatarUrl: findAvatar.url,
+					},});
+			}
 		}
 
 		const token = await this.signToken(user.id, user.login);

@@ -1,73 +1,44 @@
 // Extern:
 import React from "react";
 import { useNavigate, Outlet } from 'react-router-dom'
-import { useEffect, useState } from "react"
-import { AxiosResponse } from "axios";
 
 // Intern:
 import { Friendsbar, Navbar } from '../components'
-import { AxiosJwt } from "../hooks/AxiosJwt";
-import { IUser, DflUser } from "../types";
-import io, { Socket } from 'socket.io-client';
-import { useCookies } from "react-cookie";
+import { IUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
-import bg_website from '../assets/videos/bg_website2.webm'
-import { updateUser } from '../hooks/EditUser';
+import bg_website from '../assets/videos/bg_website.webm'
+import { useAxios } from "../hooks/useAxios";
+import SocketContextComponent from "../context/UserSocket/Components";
+import { ChatSocketContextComponent } from "../context";
 
-
-const GetCookie = () => {
-	const [cookies] = useCookies();
-	return cookies.access_token;
-}
-
-const GetSocket = (userId: number) => {
-	const newSocket = io(`http://localhost:3000`,
-		{
-			extraHeaders:
-				{ Authorization: `Bearer ${GetCookie}` }
-		});
-	newSocket.emit('loginToServer', userId);
-
-	const chatSocket = io(`http://localhost:3000/chatNs`,
-		{
-			extraHeaders:
-				{ Authorization: `Bearer ${GetCookie}` }
-		});
-	chatSocket.emit('loginToServer', userId);
-
-	// newSocket.on("disconnect", () => {
-	// 	newSocket.emit('logoutToServer', userId);
-	// });
-
-	return (newSocket);
+function LoadingHome() {
+	return (
+		<div>
+			<video src={bg_website} autoPlay loop muted className='bg_video' />
+		</div>
+	)
 }
 
 export function Home() {
 	const navigate = useNavigate();
-	const [user, setUser] = useState<IUser>(DflUser);
-	const [socket, setSocket] = useState<Socket>();
+	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me' });
 
-	const axios = AxiosJwt();
-
-	useEffect(() => {
-		axios.get("/user/me")
-			.then((res: AxiosResponse<IUser>) => {
-				setUser(res.data);
-				setSocket(GetSocket(res.data.id));
-			})
-			.catch(() => { navigate('/'); });
-	}, []);
+	if (loading) return <LoadingHome />
+	if (error !== '') return navigate('/');
+	if (!user) return navigate('/');
 
 	return (
-		<div className="set-body">
-			<Navbar me={user} />
-			<div className='container-body'>
-				{/* <video src={bg_website} autoPlay loop className='bg_video' /> */}
-				<Outlet context={user} />
-				<Friendsbar userId={user.id} />
-			</div>
-		</div>
+		<SocketContextComponent user={user}>
+			<ChatSocketContextComponent user={user}>
+				<Navbar me={user} />
+				<div className='container-body'>
+					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
+					<Outlet context={user} />
+				</div>
+				<Friendsbar />
+			</ChatSocketContextComponent>
+		</SocketContextComponent>
 	)
 }

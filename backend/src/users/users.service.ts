@@ -1,10 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto/edit-user.dto';
 
 @Injectable()
 export class UserService {
-	constructor(private prisma: PrismaService) {};
+
+    private websockets = new Map<number, string>();
+
+	constructor( private prisma: PrismaService ) {};
+
+	async createUser(login : string) {
+	return await this.prisma.user.create({
+			data: {
+				login: login,
+				username: login,
+				email: login + '@student.42.fr',
+				avatarUrl: "",
+			}
+		});
+	}
 
 	async getUser( userId: number ) {
 		return await this.prisma.user.findUnique({where: { id: userId }});
@@ -15,14 +30,23 @@ export class UserService {
 	}
 
 	async editUser(userId: number, dto: EditUserDto) {
-		const user = await this.prisma.user.update({
-			where: {
-				id: userId,
-			},
-			data: {
-				...dto,				
+		try {
+			const user = await this.prisma.user.update({
+				where: {
+					id: userId,
+				},
+				data: {
+					...dto,				
+				}
+			});
+			return user;
+		}
+		catch(e) {
+			if (e instanceof Prisma.PrismaClientKnownRequestError) {
+				if (e.code === 'P2002') {
+					throw new ForbiddenException('username already taken')
+				} 
 			}
-		});
-		return user;
+		}
 	}
 }

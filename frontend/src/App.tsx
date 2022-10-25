@@ -5,7 +5,7 @@ import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement 
 
 export default function App() {
 	return (
-		<div>
+		<div className='container-page'>
 			<Routes>
 				<Route path='/' element={<Welcomer />} />
 				<Route path='/home' element={<Home />}>

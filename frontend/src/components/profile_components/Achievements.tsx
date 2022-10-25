@@ -17,7 +17,7 @@ export function Achievement() {
 	const [locked, setLocked] = useState([]);
 
 	useEffect(() => {
-		axios.get('/achiv/list_unlock')
+		axios.get('/achiv/list_unlock/')
 			.then((res) => setUnlocked(res.data));
 
 		axios.get('/achiv/list_lock')

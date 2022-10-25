@@ -4,8 +4,10 @@ import { UserService } from './users.service';
 import { FtStrategy } from '../auth/strategie';
 
 @Module({
-	imports: [],
 	controllers: [UserController],
-	providers: [UserService, FtStrategy]
+	providers: [
+		UserService,
+		FtStrategy,
+	],
 })
 export class UserModule {}

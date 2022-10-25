@@ -1,0 +1,37 @@
+.footer-friend {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	border-top: 1px solid #16222a;
+	border-bottom: 1px solid #16222a;
+	height: 35px;
+}
+
+.footer-friend button {
+	height: 35px;
+	width: 35px;
+	margin: 0px;
+	padding: 0px;
+	border: 1px solid #785a28;
+	background: #16222a;
+}
+
+.footer-friend p {
+	font-size:medium;
+	color: #333c42;
+}
+
+#btn-footer-discussion {
+	background: url(../../../assets/images/chat/chat-enabled.png) #16222a  no-repeat center;
+	background-size: 25px;
+}
+
+#btn-footer-mission {
+	background: url(../../../assets/images/chat/rewardicons_mission.png) #16222a  no-repeat center;
+	background-size: 20px;
+}
+
+#btn-footer-help {
+	background: url(../../../assets/images/chat/rewardicons_ward.png) #16222a no-repeat center;
+	background-size: 25px;
+}

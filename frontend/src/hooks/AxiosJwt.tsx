@@ -1,3 +1,5 @@
+// CETTE METHODE VA BIENTOT DISPARAITRE.
+
 import React from "react";
 import axios from 'axios';
 import { useCookies } from "react-cookie";

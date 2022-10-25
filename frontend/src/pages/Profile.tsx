@@ -1,32 +1,33 @@
 // Extern:
-import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
+import React, { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 // Intern:
 import { IUser } from "../types";
+import { IAvatar } from '../types/interfaces/IAvatar';
+
+//Hooks
+import { AxiosJwt } from '../hooks/AxiosJwt';
+import { useCookies } from 'react-cookie';
+import { useForm } from '../hooks/UseForm';
 
 // Assets:
 import '../styles/pages/Profile.css'
-import { AxiosJwt } from '../hooks/AxiosJwt';
-import axios from "axios";
-import { useCookies } from 'react-cookie';
-import { updateUser } from "../hooks";
-import { useForm } from '../hooks/UseForm';
-import { IAvatar } from '../types/interfaces/IAvatar';
 
 type State = {
 	newUsername: string;
 };
 
 export function Profile() {
-	let user: IUser = useOutletContext();
-	const [avatar, setAvatar] = useState('');
+
+	const user: IUser = useOutletContext();
+
 	const [toggleEdit, setToggleEdit] = useState(false);
+	const [toggle2facheckbox, set2facheckbox] = useState(user.twoFactorAuth);
 	const axios = AxiosJwt();
 
 	const [cookies] = useCookies();
 	const jwtToken = cookies.access_token;
-	const [username, setUsername] = useState([user.username]);
 
 
 	const editUser = () => {
@@ -50,6 +51,26 @@ export function Profile() {
 		location.reload();
 	}
 
+	const toggleTFA = () => {
+		set2facheckbox(!toggle2facheckbox);
+		axios.patch('/user',
+			{ twoFactorAuth: true },
+			{
+				headers: {
+					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
+			},
+		).catch(function (error) {
+			if (error.response || error.request) {
+				console.log('this nickname is already taken');
+				return;
+			}
+			return;
+		})
+	}
+
 	const toggleUserEdit = () => {
 		setToggleEdit(!toggleEdit);
 	}
@@ -61,93 +82,103 @@ export function Profile() {
 	const { onChange, onSubmit, values } = useForm(
 		editUser,
 		initialState
-	)
+	);
 
 	useEffect(() => {
-		axios.get('/avatar/list').then((res) => setAvatar(res.data));
-	}, []);
-
-	const avatar_link = (avatar: IAvatar): string => {
-		return avatar.url;
-	}
+		document.title = user.username + "'s profile";
+	}, [user]);
 
 	return (
-		<div className="user_body" >
-			<div className="left_side">
-				<div className="banner">
-					<div className="user_nickname">
-						<div className={toggleEdit ? "disabled" : "user-nick"}>
+		<div className="user-body" >
+			<div className="user-left-side">
+				<div className="user-banner">
+					<div className="user-nickname">
+						<div className={toggleEdit ? "user-disabled" : "user-nick"}>
 							{user.username}
-							<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
+							<button onClick={toggleUserEdit} className={toggleEdit === true ? "user-edit-up" : "user-no-edit"}>
 							</button>
 						</div>
 						<form onSubmit={onSubmit}>
-							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} name="username" />
-							<button onClick={editUser} className={toggleEdit ? "validate-edit" : "disabled"}>
+							<input className={toggleEdit ? "user-edit-input" : "user-disabled"} placeholder={user.username} onChange={onChange} name="username" />
+							<button onClick={editUser} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
 								Validate
 							</button>
 						</form>
 					</div>
-					<div className="clan">
+					<div className="user-clan">
 						My clan
 					</div>
-					<div className="xp_bar"></div>
-					<div className="xp_fill"></div>
-					<div className="xp_nbr"></div>
-					<div className="xp_value">
+					<div className="user-xp-bar"></div>
+					<div className="user-xp-fill"></div>
+					<div className="user-xp-nbr"></div>
+					<div className="user-xp-value">
 						25
 					</div>
-					<div className="profile-icon-div">
+					<div className="user-profile-icon-div">
 
-						<img src={user.avatarUrl} id="profile_icon" />
+						<img src={user.avatarUrl} id="user-profile-icon" />
 					</div>
-					<div className="end-of-banner">
+					<div className="user-end-of-banner">
 					</div>
 				</div>
-				<div className="loot">
-					<div className="coffer">
+				<div className="user-loot">
+					<div className="user-coffer">
 						0
 					</div>
-					<div className="boost">
+					<div className="user-boost">
 						0
 					</div>
-					<div className="reroll">
+					<div className="user-reroll">
 						0
 					</div>
 				</div>
 			</div>
-			<div className="stats">
-				<div className="empty-space">
+			<div className="user-stats">
+				<div className="user-setting">
+					<div className="user-2auth">
+						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} />
+						<label id='user-checkbox-label'>
+							2F-Auth
+						</label>
+						<div id='user-2auth-description'>
+							Two-factor authentication is a security feature that helps protect your account and your password.
+							If you set up two-factor authentication, you'll receive a notification on your e-mail address
+							when someone tries logging into your account from a device we don't recognize.
+						</div>
+					</div>
+					<div className="user-email">
+						E-MAIL : {user.email}
+					</div>
 				</div>
-				<div className="lol-stats">
-					<div className="rank">
+				<div className="user-lol-stats">
+					<div className="user-rank">
 						<h3>Rank</h3>
-						<div className="txt">
+						<div className="user-txt">
 							unranked
 						</div>
 					</div>
-					<div className="honor">
+					<div className="user-honor">
 						<h3>Honor</h3>
-						<div className="txt">
+						<div className="user-txt">
 							none
 						</div>
 					</div>
-					<div className="champion">
+					<div className="user-champion">
 						<h3>Victories</h3>
-						<div className="txt">
+						<div className="user-txt">
 							No game yet
 						</div>
 					</div>
-					<div className="trophee">
+					<div className="user-trophee">
 						<h3>Trophee</h3>
-						<div className="txt">
+						<div className="user-txt">
 							none
 						</div>
 					</div>
-					<div className="clash">
-						<div id='stats-column'>
+					<div className="user-clash">
+						<div id='user-stats-column'>
 							<h3>Banner</h3>
-							<div className="txt">
+							<div className="user-txt">
 								none
 							</div>
 						</div>
