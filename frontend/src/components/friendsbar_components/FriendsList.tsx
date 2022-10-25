@@ -9,18 +9,18 @@ import { AxiosJwt } from "../../hooks";
 import { IDiscussion, IUser } from "../../types";
 
 export function FriendsList() {
+	
 	const { users, friends } = useContext(SocketContext).SocketState;
-	const { me, discussion } = useContext(ChatSocketContext).ChatSocketState;
+	const { discussion } = useContext(ChatSocketContext).ChatSocketState;
 	const chat = useContext(ChatSocketContext).ChatSocketDispatch;
+
 	const axios = AxiosJwt();
+	
 	const [newDisc, setNewDisc] = useState<IDiscussion>()
+
 
 	useEffect(() => {
 		console.log("New: ", newDisc);
-		if (!newDisc) {
-			// await axios.post('/discussion', { body: { user2Id: uid } })
-			// 	.then((res: AxiosResponse<IDiscussion>) => { setNewDisc(res.data) })
-		}
 		if (!newDisc)
 			return;
 		console.log("Discussion 1: ", discussion)
@@ -36,9 +36,17 @@ export function FriendsList() {
 		chat({ type: EChatSocketActionType.DISPLAY, payload: true })
 	}, [newDisc])
 
-	function UpDateActiveDiscusion(uid: number) {
-		axios.get('/discussion/' + uid)
-			.then((res: AxiosResponse<IDiscussion | undefined>) => { setNewDisc(res.data); })
+	async function UpDateActiveDiscusion(uid: number) {
+		await axios.get('/discussion/' + uid)
+			.then((res: AxiosResponse<IDiscussion | undefined>) => { 
+				setNewDisc(res.data);
+			})
+		if (newDisc == undefined) {
+			await axios.post('/discussion', { body: { user2Id: uid }})
+			.then((res: AxiosResponse<IDiscussion>) => { 
+				setNewDisc(res.data);
+			})
+		}
 	}
 
 	// .then(async (res: AxiosResponse<IDiscussion | undefined>) => {

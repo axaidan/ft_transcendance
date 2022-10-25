@@ -27,6 +27,8 @@ export class AuthController {
 				response.redirect("http://localhost:4200/home");
 			})
 			.catch((e) => {
+				console.log("ERROR");
+				console.log(e);
 				response.redirect("http://localhost:4200");
 			})
 	}
@@ -58,7 +60,7 @@ export class AuthController {
 				response.redirect("http://localhost:4200/home");
 			})
 			.catch((e) => {
-				response.redirect("http://localhost:4200/signinTes");
+				response.redirect("http://localhost:4200/signinTest");
 			})
 	}
 }

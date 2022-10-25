@@ -33,7 +33,8 @@ services:
       - "5555:5555"
     # command: "tail -f"
     command: sh -c "npm i -g @nestjs/cli; npm install; npx prisma generate && npx prisma migrate dev && npx prisma db seed; npm run start:dev;"
-    volumes:
+a
+   volumes:
       - "./backend:/back"
     working_dir: /back
 
