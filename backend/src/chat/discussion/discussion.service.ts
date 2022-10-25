@@ -19,6 +19,7 @@ export class DiscussionService {
     //  RETURNS NEW DISCUSSION WITH messages: []
     async create(dto: CreateDiscussionDto):
         Promise<DiscussionWithUsers> {
+        console.log(`discService.create(${dto.user1Id}, ${dto.user2Id})`);
         try {
             const discussion = await this.prisma.discussion.create({
                 data: {
@@ -31,8 +32,10 @@ export class DiscussionService {
                     messages: true,
                 },
             });
+            console.log(`discService.create() - returning - ${discussion}`);
             return discussion;
         } catch(e) {
+            console.log(`discService.create() - throwing Forbidden`);
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code === 'P2002') {
                     throw new ForbiddenException('Discussion already exists');
@@ -67,6 +70,7 @@ export class DiscussionService {
     async findOneByUserIds(currentUserId: number, user2Id: number) :
     Promise<Discussion>
     {
+        console.log(`discService - findOneByUserIds(${currentUserId}, ${user2Id})`);
         const discussion = await this.prisma.discussion.findFirst({
             where: {
                 OR: [
@@ -80,6 +84,7 @@ export class DiscussionService {
                 messages: true,
             },
         });
+        console.log(`discService - findOneByUserIds() - returning ${discussion}`);
         return discussion;
     }
 

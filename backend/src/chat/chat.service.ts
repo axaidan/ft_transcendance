@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser } from '@prisma/client';
+import { Discussion, Channel } from '@prisma/client';
 import { ChannelService } from './channel/channel.service';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
@@ -69,6 +69,10 @@ export class ChatService {
         return discussion;
     }
 
+    //////////////////////
+    // CHANNEL METHODS  //
+    //////////////////////
+
     //  GET /channel/all
     async getAllPublicChannels(currentUserId: number) : 
     Promise<Channel[]>
@@ -93,7 +97,7 @@ export class ChatService {
     Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
-        this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        // this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
 

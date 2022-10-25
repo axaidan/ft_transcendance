@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser } from '@prisma/client';
+import { Discussion, Channel } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
+import { domainToASCII } from 'url';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
@@ -41,10 +42,13 @@ export class ChatController {
     async getDiscussionByUserId(
         @GetUser('id') currentUserId: number,
         @Param('id', ParseIntPipe) user2Id: number,
-    ) :
-    Promise<Discussion>
+    )
+    // : Promise<Discussion>
     {
         const discussion = await this.chatService.getDiscussionByUserIds(currentUserId, user2Id);
+        if (discussion === null) {
+            return (JSON.stringify(null));
+        }
         return discussion;
     }
 
@@ -56,7 +60,10 @@ export class ChatController {
     ) :
     Promise<DiscussionWithUsers>
     {
-        return this.chatService.createDiscussion(currentUserId, body.user2Id);
+        console.log(body);
+        console.log('POST(\'discussion\')createDiscussion() - body.user2Id = ' + body.user2Id);
+        console.log('POST(\'discussion\')createDiscussion() - currentUserId = ' + currentUserId);
+        return await this.chatService.createDiscussion(currentUserId, body.user2Id);
     }
 
     //////////////////////////

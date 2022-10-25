@@ -26,18 +26,38 @@
 }
 
 .message-right {
-	text-align: right;
-	background-color: brown;
+	max-width: 350px;
+	clear: both;
+	padding: 5px 10px 5px 10px; 
+	border-radius: 10px;
+	margin-bottom: 3px;
+	margin-right: 10px;
+	float: right;
+	background-color: #785a28;
+	word-wrap: break-word; 
 }
 
 .message-left {
-	text-align: left;
-	background-color: blueviolet;
+	clear: both;
+	max-width: 350px;
+	padding: 5px 10px 5px 10px; 
+	border-radius: 10px;
+	margin-bottom: 2px;
+	margin-left: 10px;
+	float: left;
+	background-color: #273946;
+	word-wrap: break-word; 
+}
+
+#messages-body {
+	overflow: scroll;
+	overflow-x: hidden;
 }
 
 .messages-container {
+	position: relative;
 	display: grid;
-	grid-template-rows: 65px auto 45px;
+	grid-template-rows: 65px 490px 45px;
 	border-left: 1px solid #16222a;
 }
 

@@ -10,7 +10,7 @@ export function DiscussionNav() {
 	return (
 		<div className='discussion-container'>
 			{discussion?.map((disc: IDiscussion, index) => (
-				<p key={index}>{me.id !== disc.user1Id ? disc.user2.username : disc.user1.username}</p>
+				<p key={index}>{me.id == disc.user1Id ? disc.user2.username : disc.user1.username}</p>
 			))}
 		</div>
 	)

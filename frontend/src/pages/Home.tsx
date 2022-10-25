@@ -29,6 +29,8 @@ export function Home() {
 	if (error !== '') return navigate('/');
 	if (!user) return navigate('/');
 	
+	console.log("USER: " , user)
+
 	return (
 		<SocketContextComponent user={user}>
 			<ChatSocketContextComponent user={user}>

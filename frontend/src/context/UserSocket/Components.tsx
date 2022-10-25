@@ -26,7 +26,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     useEffect(() => {
         if (user.id != 0)
         {
-            // socket.connect();
+            socket.connect();
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
             SocketDispatch({type: ESocketActionType.UP_UID, payload: user });
             // GET FRIENDS:

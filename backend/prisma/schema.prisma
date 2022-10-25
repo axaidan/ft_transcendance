@@ -33,6 +33,8 @@ model User {
 	discussion2 Discussion[] @relation("discussion2")
 	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
+	channelUsers ChannelUser[]
+
 	avatar Avatar? @relation(fields: [avatarUrl], references: [url])
 	avatarUrl String?
 

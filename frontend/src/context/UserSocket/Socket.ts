@@ -58,7 +58,7 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
         case ESocketActionType.UP_SOKET:
             return { ...state, socket: action.payload as Socket};
         case ESocketActionType.UP_UID:
-            return { ...state, uid: action.payload as IUser};
+            return { ...state, me: action.payload as IUser};
         case ESocketActionType.GET_USERS:
             return { ...state, users: action.payload as number[] };
         case ESocketActionType.UP_USERS:

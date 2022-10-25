@@ -1,5 +1,5 @@
 // Extern:
-import { AxiosResponse } from "axios";
+import { AxiosHeaders, AxiosResponse } from "axios";
 import { useContext, useEffect, useState } from "react";
 
 // Intern:
@@ -21,8 +21,10 @@ export function FriendsList() {
 
 	useEffect(() => {
 		console.log("New: ", newDisc);
-		if (!newDisc)
+		if (!newDisc) {
+			console.log( " U ARE HERE ");
 			return;
+		}
 		console.log("Discussion 1: ", discussion)
 		let new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
 		console.log("FIRST current: ", new_current)
@@ -37,15 +39,21 @@ export function FriendsList() {
 	}, [newDisc])
 
 	async function UpDateActiveDiscusion(uid: number) {
-		await axios.get('/discussion/' + uid)
-			.then((res: AxiosResponse<IDiscussion | undefined>) => { 
-				setNewDisc(res.data);
-			})
-		if (newDisc == undefined) {
-			await axios.post('/discussion', { body: { user2Id: uid }})
-			.then((res: AxiosResponse<IDiscussion>) => { 
-				setNewDisc(res.data);
-			})
+		const test: IDiscussion = (await axios.get('/discussion/user/' + uid)).data;
+		console.log('test = ', test);
+		// const discussions: IDiscussion[] = (await axios.get('/discussion')).data;
+		// console.log('discussion[] = ', discussions);
+		// for (const discussion of discussions) {
+		// 	if (discussion.user1Id === uid || discussion.user2Id === uid) {
+		// 		setNewDisc(discussion);
+		// 		return;
+		// 	}
+		// }
+		if (!test) {
+			const createdDiscussion = (await axios.post('/discussion', {user2Id: uid})).data;
+			setNewDisc(createdDiscussion);
+		} else {
+			setNewDisc(test);
 		}
 	}
 

@@ -15,13 +15,14 @@ export const dflChatSocketContextState: IChatSocketContextState = {
 	socket: undefined,
 	me: DflUser,
 	discussion: [],
-	index_active: 0,
+	index_active: -1,
 	chat_display: false,
 }
 
 export enum EChatSocketActionType {
 	UP_SOKET	= 'update_socket',
 	UP_UID		= 'update_uid',
+	GET_DISC	= 'get_discussion',
 	UP_DISC		= 'add_discussion',				// AJOUT D'UNE NOUVELLE DISCUSION
 	RM_DISC		= 'remove_discussion',			// REMOVE D'UNE DISCUSSION 
 	UP_CURR		= 'up_current_discussion',		// INDEX DE LA DISCUSSION AFFICHEE
@@ -32,6 +33,7 @@ export enum EChatSocketActionType {
 
 export type TChatSocketContextAction =	EChatSocketActionType.UP_SOKET	|
 										EChatSocketActionType.UP_UID	|
+										EChatSocketActionType.GET_DISC	|
 										EChatSocketActionType.UP_DISC	|
 										EChatSocketActionType.RM_DISC	|
 										EChatSocketActionType.UP_CURR	|
@@ -53,11 +55,11 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_SOKET:
 			return { ...state, socket: action.payload as Socket };
 		case EChatSocketActionType.UP_UID:
-			return { ...state, uid: action.payload as IUser };
+			return { ...state, me: action.payload as IUser };
 		case EChatSocketActionType.UP_DISC:
 			return { ...state, discussion: [...state.discussion, action.payload as IDiscussion] };
 		case EChatSocketActionType.RM_DISC:
-			return { ...state, discussion: state.discussion.filter((did) => did.discId !== ( action.payload as number ))};
+			return { ...state, discussion: state.discussion.filter((did) => did.id !== ( action.payload as number ))};
 		case EChatSocketActionType.UP_CURR:
 			return { ...state, index_active: action.payload as number };
 		case EChatSocketActionType.DISPLAY:
@@ -66,9 +68,14 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		// case EChatSocketActionType.SEND_MSG:
 		// 	console.log( (action.payload ) )
 		// 	return { ...state };
-		// case EChatSocketActionType.NEW_MSG:
-		// 	console.log( (action.payload ) )
-		// 	return { ...state };
+		case EChatSocketActionType.NEW_MSG:
+
+			// if (discId == activeDiscId)
+			//	push dans le tableau
+			// else
+			//  notifier que la disc avec discId comme id a un nouveau msg
+
+			return { ...state };
 
 		default:
 			return { ...state };
