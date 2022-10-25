@@ -36,7 +36,17 @@ export class ChatController {
         const discussion = await this.chatService.getDiscussionById(currentUserId, discId);
         return discussion;
     }
-    
+
+    @Get('discussion/user/:id')
+    async getDiscussionByUserId(
+        @GetUser('id') currentUserId: number,
+        @Param('id', ParseIntPipe) user2Id: number,
+    ) :
+    Promise<Discussion>
+    {
+        const discussion = await this.chatService.getDiscussionByUserIds(currentUserId, user2Id);
+        return discussion;
+    }
 
     //  POST /discussion/:user2Id
     @Post('discussion')
