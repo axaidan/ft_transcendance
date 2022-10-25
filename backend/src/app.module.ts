@@ -10,8 +10,8 @@ import { DiscussionModule } from './discussion/discussion.module';
 import { DiscussionMessageModule } from './discussion-message/discussion-message.module';
 import { GameModule } from './game/game.module';
 import { AvatarModule } from './avatar/avatar.module';
-import { AppGateway } from './app.gateway';
 import { LobbyModule } from './lobby/lobby.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
 	imports: [
@@ -29,7 +29,8 @@ import { LobbyModule } from './lobby/lobby.module';
 		GameModule,
 		AvatarModule,
 		LobbyModule,
+		SocketModule,
 	],
-	providers: [AppGateway]
+	providers: []
 })
 export class AppModule {}

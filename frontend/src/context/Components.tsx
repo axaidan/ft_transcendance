@@ -18,7 +18,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     useEffect(() => {
         // Connect to the Web Socket // 
-        socket.connect();
+      //  socket.connect();
         // Save the socket in context //
         SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
         // Start the envent listeners // 

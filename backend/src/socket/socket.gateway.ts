@@ -1,15 +1,16 @@
 import { Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { JwtGuard } from './auth/guard';
-import { OnlineStatusDto } from './users/dto';
+import { JwtGuard } from '../auth/guard';
+import { OnlineStatusDto } from '../users/dto';
 
 @WebSocketGateway({ cors: '*:*' })
-export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
   @WebSocketServer() wss: Server;
 
   private logger: Logger = new Logger('AppGateway');
+  //map<User.id, client.id //
   private clientsMap = new Map<number, string>();
 
   ////////////////////////////////////
@@ -21,29 +22,30 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   @UseGuards(JwtGuard)
   handleConnection(client: Socket, ...args: any[]) {
-    // this.logger.log(`CLIENT ${client.id} CONNECTED`);
+     this.logger.log(`CLIENT ${client.id} CONNECTED via appGateway`);
   }
 
   handleDisconnect(client: Socket) {
-    // this.logger.log(`CLIENT ${client.id} DISCONNECTED`);
+     this.logger.log(`CLIENT ${client.id} DISCONNECTED via appGateway`);
     for (const [id, value] of this.clientsMap) {
       if (client.id === value) {
-        // this.logger.log(`USER ${id} LOGGED OUT`);
+         this.logger.log(`USER ${id} LOGGED OUT`);
         this.wss.emit('logoutToClient', id);
         this.clientsMap.delete(id);
         break ;
       }
     }
-    // this.dispayClientsMap();
+	this.logger.log('Client map on disconnection:');
+     this.dispayClientsMap();
   }
 
   //////////////
   //  METHODS //
   //////////////
   dispayClientsMap() {
-    // this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
+     this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount )
     for (const [key, value] of this.clientsMap) {
-      // this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
+       this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
     }
   }
 
@@ -53,19 +55,22 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   @SubscribeMessage('loginToServer')
   handleLogin(client: Socket, userId: number) {
     if (this.clientsMap.has(userId)) {
-      // this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
-      throw new WsException(`double connection`);
+       this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
       client.disconnect(true);
+      throw new WsException(`double connection`);
     }
+	else {
     this.clientsMap.set(userId, client.id);
-    // this.logger.log(`USER ${userId} LOGGED IN`);
+     this.logger.log(`USER ${userId} LOGGED IN`);
     client.broadcast.emit('loginToClient', userId);
-    // this.dispayClientsMap();
+	this.logger.log('handleLogin display map');
+     this.dispayClientsMap();
+	}
   }
 
   @SubscribeMessage('logoutToServer')
   handleLogout(client: Socket, userId: number) {
-    // this.logger.log(`USER ${userId} LOGGED OUT`);
+     this.logger.log(`USER ${userId} LOGGED OUT`);
     client.broadcast.emit('logoutToClient', userId);
     this.clientsMap.delete(userId);
   }
