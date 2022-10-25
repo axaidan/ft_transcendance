@@ -82,16 +82,12 @@ export class ChannelService {
                     some: { userId: userId }
                 },
             },
-            include: {
-                channelUsers: true,
-                // channelMessages: true,
-            },
         });
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             channel['userStatus'] = channelUser.status;
             channel['userRole'] = channelUser.role;
-            channel['userJoined'] = (channelUser.status === EChannelStatus.BANNED) ? false : true;
+            channel['userJoined'] = true;
         }
         return channelArr;
     }
@@ -101,7 +97,7 @@ export class ChannelService {
     //  check hash if channel protected
     //  check status expiration if channel already joined
     async join(currentUserId: number, channelDto: ChannelDto) :
-    Promise<ChanWusersWmsgsWstatus>
+    Promise<Channel>
     {
         const channel = await this.findOne(channelDto.id);
         if (channel === null) {
@@ -121,9 +117,9 @@ export class ChannelService {
     }
 
     async findOne(channelId: number) :
-    Promise<ChanWusersWmsgs>
+    Promise<Channel>
     {
-        const channel: ChanWusersWmsgs = await this.prisma.channel.findUnique({
+        const channel: Channel = await this.prisma.channel.findUnique({
             where: {
                 id: channelId,
             },

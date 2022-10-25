@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { ChannelService } from './channel/channel.service';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
-import { ChanWusersWmsgsWstatus } from './channel/types/chan-w-users-w-msgs-w-status';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
-import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWithUsersWithMessages';
+import { DiscussionWithUsers } from './discussion/types';
 
 @Injectable()
 export class ChatService {
@@ -25,19 +24,27 @@ export class ChatService {
         return discussions;
     }
 
+    //  GET /discussion/:id
+    //  RETURNS A Discussion FOR GIVEN :id
+    async getDiscussionById(currentUserId: number, discId: number) :
+    Promise<Discussion>
+    {
+        const discussion = await this.discService.findOne(currentUserId, discId);
+        return discussion;
+    }
 
     //  POST /discussion
     async createDiscussion(
         currentUserId: number,
         user2Id: number,
     ) :
-    Promise<DiscussionWithUsersWithMessages>
+    Promise<DiscussionWithUsers>
     {
         const dto: CreateDiscussionDto = {
             user1Id: currentUserId,
             user2Id: user2Id,
         };
-        const discussion: DiscussionWithUsersWithMessages = await this.discService.create(dto);
+        const discussion: DiscussionWithUsers = await this.discService.create(dto);
 
         this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
         this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
@@ -63,9 +70,9 @@ export class ChatService {
 
     //  GET /channel
     async getAllChannelsForUser(userId: number) :
-    Promise<ChanWusersWmsgsWstatus[]>
+    Promise<Channel[]>
     {
-        const channels: ChanWusersWmsgsWstatus[] = await this.channelService.allForUser(userId);
+        const channels: Channel[] = await this.channelService.allForUser(userId);
         return channels;
     }
 
@@ -74,7 +81,7 @@ export class ChatService {
         currentUserId: number,
         dto: CreateChannelDto
     ) :
-    Promise<ChanWusersWmsgsWstatus>
+    Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
@@ -86,9 +93,9 @@ export class ChatService {
         currentUserId: number,
         dto: ChannelDto,
     ) : 
-    Promise<ChanWusersWmsgsWstatus>
+    Promise<Channel>
     {
-        const channel: ChanWusersWmsgsWstatus = await this.channelService.join(currentUserId, dto);
+        const channel: Channel = await this.channelService.join(currentUserId, dto);
         return channel;
     }
 

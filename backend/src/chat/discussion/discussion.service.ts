@@ -3,9 +3,8 @@ import { Discussion, DiscussionMessage } from '@prisma/client';
 import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, DiscussionDto } from './dto';
-import { ChatGateway } from '../chat.gateway';
 import { DiscussionMessageDto } from '../discussion-message/dto';
-import { DiscussionWithUsersWithMessages } from './types/DiscussionWithUsersWithMessages';
+import { DiscussionWithUsers } from './types';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
@@ -19,7 +18,7 @@ export class DiscussionService {
     //  POST /discussion/:user2Id
     //  RETURNS NEW DISCUSSION WITH messages: []
     async create(dto: CreateDiscussionDto):
-        Promise<DiscussionWithUsersWithMessages> {
+        Promise<DiscussionWithUsers> {
         try {
             const discussion = await this.prisma.discussion.create({
                 data: {
@@ -29,17 +28,38 @@ export class DiscussionService {
                 include: {
                     user1: { select: { id: true, username: true } },
                     user2: { select: { id: true, username: true } },
-                    messages: { select: { text: true, userId: true } },
+                    messages: true,
                 },
             });
             return discussion;
         } catch(e) {
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code === 'P2002') {
-                    throw new  ForbiddenException('Discussion already exists');
+                    throw new ForbiddenException('Discussion already exists');
                 }
             }
         }
+    }
+
+    //  GET /discussion/:id
+    //  RETURNS A Discussion FOR GIVEN :id
+    async findOne(currentUserId: number, discId: number) :
+    Promise<Discussion>
+    {
+        const discussion = await this.prisma.discussion.findUnique({
+            where: {
+                id: discId,
+            },
+            include: {
+                user1: true,
+                user2: true,
+                messages: true,
+            }
+        });
+        if (currentUserId !== discussion.user1Id && currentUserId !== discussion.user2Id) {
+            throw new ForbiddenException('You are not a member of this discussion');
+        }
+        return discussion;
     }
 
     //  GET /discussion
@@ -53,7 +73,6 @@ export class DiscussionService {
             include: {
                 user1: { select: { id: true, username: true, } },
                 user2: { select: { id: true, username: true, } },
-                messages: { select: { text: true, userId: true } },
             },
         });
         return discussions;

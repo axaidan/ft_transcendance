@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
-import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWithUsersWithMessages';
+import { DiscussionWithUsers } from './discussion/types';
 
 @UseGuards(JwtGuard)
 @Controller()
@@ -15,6 +15,10 @@ export class ChatController {
         private chatService: ChatService,
     ) {}
 
+    //////////////////////////
+    //  DISCUSSION REQUESTS //
+    //////////////////////////
+
     @Get('discussion')
     async getDiscussions(@GetUser('id') currentUserId: number) :
     Promise<Discussion[]>
@@ -22,16 +26,32 @@ export class ChatController {
         return await this.chatService.getDiscussions(currentUserId);
     }
 
+    @Get('discussion/:id')
+    async getDiscussionById(
+        @GetUser('id') currentUserId: number,
+        @Param('id', ParseIntPipe) discId: number,
+    ) :
+    Promise<Discussion>
+    {
+        const discussion = await this.chatService.getDiscussionById(currentUserId, discId);
+        return discussion;
+    }
+    
+
     //  POST /discussion/:user2Id
     @Post('discussion')
     async createDiscussion(
         @GetUser('id') currentUserId: number,
         @Body() body: CreateDiscussionBodyDto, 
     ) :
-    Promise<DiscussionWithUsersWithMessages>
+    Promise<DiscussionWithUsers>
     {
         return this.chatService.createDiscussion(currentUserId, body.user2Id);
     }
+
+    //////////////////////////
+    //  CHANNEL REQUESTS    //
+    //////////////////////////
 
     @Get('channel/all')
     async getAllPublicChannels(@GetUser('id') currentUserId: number) :

@@ -1067,7 +1067,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(userId)
 				.expectBodyContains(dummyUser.id)
-				// .inspect();
+				.inspect();
 			});
 // 
 			it('NON VALID DTO- should 201', () => {
@@ -1237,6 +1237,25 @@ describe('App e2e', () => {
 			// });
 		// }); // DESCRIBE (DISCUSSION/:ID)
 
+		describe('GET  /discussion/:id', () => {
+			it('VALID - should 201', () => {
+				const userId = userArr[6].id;
+				const dto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.get(`/discussion/${discArr[0].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(200)
+				.expectBodyContains(userArr[0].id)
+				.expectBodyContains(userArr[1].id)
+				.inspect();
+			});
+		});
 
 
 	});	// DESCRIBE(DISCUSSION)
@@ -1407,10 +1426,9 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				.expectJsonLength(13)
-				.expectBodyContains(chanArr[0].name)
-				.expectBodyContains(chanArr[4].name)
-				.expect
+				// .expectJsonLength(13)
+				// .expectBodyContains(chanArr[0].name)
+				// .expectBodyContains(chanArr[4].name)
 				// .inspect();
 			});
 
@@ -1426,7 +1444,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.expectStatus(200)
-				.inspect();
+				// .inspect();
 			});
 
 		}); //	DESCRIBE (RELATION GET/all)
