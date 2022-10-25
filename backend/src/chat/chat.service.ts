@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Discussion, Channel } from '@prisma/client';
+import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { ChannelService } from './channel/channel.service';
-import { CreateChannelDto } from './channel/dto';
+import { ChannelDto, CreateChannelDto } from './channel/dto';
+import { ChanWusersWmsgsWstatus } from './channel/types/chan-w-users-w-msgs-w-status';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
@@ -61,8 +62,10 @@ export class ChatService {
     }
 
     //  GET /channel
-    async getAllChannelsForUser(userId: number) {
-        const channels: Channel[] = await this.channelService.allForUser(userId);
+    async getAllChannelsForUser(userId: number) :
+    Promise<ChanWusersWmsgsWstatus[]>
+    {
+        const channels: ChanWusersWmsgsWstatus[] = await this.channelService.allForUser(userId);
         return channels;
     }
 
@@ -71,16 +74,22 @@ export class ChatService {
         currentUserId: number,
         dto: CreateChannelDto
     ) :
-    Promise<Channel>
+    Promise<ChanWusersWmsgsWstatus>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
 
-
-
-
-
+    //  POST /channel/join + ChannelDto
+    async joinChannel(
+        currentUserId: number,
+        dto: ChannelDto,
+    ) : 
+    Promise<ChanWusersWmsgsWstatus>
+    {
+        const channel: ChanWusersWmsgsWstatus = await this.channelService.join(currentUserId, dto);
+        return channel;
+    }
 
 }

@@ -1,9 +1,13 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Channel, ChannelUser, Prisma } from '@prisma/client';
+import { channel } from 'diagnostics_channel';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
+import { CreateChanelUserDto } from './channel-user/dto/create-channel-user.dto';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
+import { ChannelDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
+import { ChanWusersWmsgs, ChanWusersWmsgsWstatus } from './types';
 
 @Injectable()
 export class ChannelService {
@@ -34,7 +38,7 @@ export class ChannelService {
                                 status: EChannelStatus.NORMAL,
                                 role: EChannelRoles.OWNER,
                             }],
-                        }
+                        },
                     },
                     include: {
                         channelUsers: true,
@@ -72,20 +76,6 @@ export class ChannelService {
     async allForUser(userId: number):
     Promise<Channel[]>
     {
-        // const channelArr: Channel[] = await this.prisma.channel.findMany({
-        //     where: {
-        //         channelUsers: {
-        //             every: { userId: userId }
-        //         },
-        //     },
-        //     include : {
-        //         channelUsers: {
-                    // where: {
-                    //     userId: userId,
-                    // }
-        //         }
-        //     }
-        // });
         const channelArr: Channel[] = await this.prisma.channel.findMany({
             where: {
                 channelUsers: {
@@ -101,9 +91,48 @@ export class ChannelService {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             channel['userStatus'] = channelUser.status;
             channel['userRole'] = channelUser.role;
-            channel['joined'] = true;
+            channel['userJoined'] = (channelUser.status === EChannelStatus.BANNED) ? false : true;
         }
         return channelArr;
+    }
+
+    //  POST /channel/join + ChannelDto
+    //  reject if channel is private
+    //  check hash if channel protected
+    //  check status expiration if channel already joined
+    async join(currentUserId: number, channelDto: ChannelDto) :
+    Promise<ChanWusersWmsgsWstatus>
+    {
+        const channel = await this.findOne(channelDto.id);
+        if (channel === null) {
+            throw new NotFoundException(`channel ${channelDto.id} NOT FOUND`);
+        }
+        let channelUser: ChannelUser = await this.channelUserService.findOne(currentUserId, channelDto.id);
+        if (channelUser === null) {
+            const createChannelUserDto: CreateChanelUserDto = {
+                userId: currentUserId,
+                channelId: channelDto.id,
+                status: EChannelStatus.NORMAL,
+                role: EChannelRoles.NORMAL,
+            }
+            channelUser = await this.channelUserService.create(createChannelUserDto);
+        }
+        return channel;
+    }
+
+    async findOne(channelId: number) :
+    Promise<ChanWusersWmsgs>
+    {
+        const channel: ChanWusersWmsgs = await this.prisma.channel.findUnique({
+            where: {
+                id: channelId,
+            },
+            include : {
+                channelUsers: true,
+                // messages: true,
+            }
+        })
+        return channel;
     }
 
 }

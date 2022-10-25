@@ -1410,6 +1410,7 @@ describe('App e2e', () => {
 				.expectJsonLength(13)
 				.expectBodyContains(chanArr[0].name)
 				.expectBodyContains(chanArr[4].name)
+				.expect
 				// .inspect();
 			});
 

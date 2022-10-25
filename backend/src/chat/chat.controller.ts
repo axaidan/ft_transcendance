@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { Discussion, Channel } from '@prisma/client';
+import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { CreateChannelDto } from './channel/dto/create-channel.dto';
+import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsersWithMessages } from './discussion/types/DiscussionWithUsersWithMessages';
@@ -48,7 +48,6 @@ export class ChatController {
     : Promise<Channel[]>
     {
         const channels: Channel[] = await this.chatService.getAllChannelsForUser(currentUserId);
-        // channels[0]['userStatus'] = 1;
         return channels;
     }
 
@@ -59,9 +58,28 @@ export class ChatController {
     ) :
     Promise<Channel>
     {
-        const channel = await this.chatService.createChannel(currentUserId, createChanDto);
+        const channel: Channel = await this.chatService.createChannel(currentUserId, createChanDto);
         return channel;
     }
+
+    @Post('channel/join')
+    async joinChannel(
+        @GetUser('id') currentUserId: number,
+        @Body() channelDto: ChannelDto,
+        ) : Promise<Channel> {
+            const channel: Channel = await this.chatService.joinChannel(currentUserId, channelDto);
+            return channel;
+    }
+
+    // @Post('channel/leave')
+    // async leaveChannel() {
+
+    // }
+
+    // @Patch('channel')
+    // async editChannel() {
+
+    // }
 
     // //   DELETE Channel/:id
     // //   ONLY IF USER IS OWNER
