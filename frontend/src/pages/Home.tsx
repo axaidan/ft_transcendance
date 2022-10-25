@@ -23,19 +23,19 @@ function LoadingHome() {
 
 export function Home() {
 	const navigate = useNavigate();
-	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me'});
+	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me' });
 
 	if (loading) return <LoadingHome />
 	if (error !== '') return navigate('/');
 	if (!user) return navigate('/');
-	
+
 	return (
 		<SocketContextComponent user={user}>
 			<ChatSocketContextComponent user={user}>
 				<Navbar me={user} />
 				<div className='container-body'>
 					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
-					<Outlet />
+					<Outlet context={user} />
 				</div>
 				<Friendsbar />
 			</ChatSocketContextComponent>
