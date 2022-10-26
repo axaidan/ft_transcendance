@@ -14,10 +14,15 @@ import { IMessage } from "../../types";
 type DiscMessageProps = { msg: IMessage }
 export function DiscMessage({ msg }: DiscMessageProps) {
 	const { me } = useContext(SocketContext).SocketState;
+
+	// COMPARE LES UIDS, RENVOIE LA CLASSE CSS APPROPRIER. 
+	const message_side = () => { return ((me.id != msg.userId ? "left" : "right")); }
+
 	return (
-		<div className={"message-" + (me.id != msg.userId ? "left" : "right")}>
-			<p>{msg.text}</p>
-		</div>
+			<div className={"message-" + message_side()}>
+				<div id={"triangle-" + message_side()}></div>
+				<p>{msg.text}</p>
+			</div>
 	)
 }
 

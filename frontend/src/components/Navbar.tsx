@@ -83,7 +83,7 @@ export function Navbar({ me }: NavProps) {
 					</NavLink>
 				</li>
 				<div className="nav_user">
-					<div className="avatar">
+				<div className="avatar">
 						<img src={me.avatarUrl} className="user_icon">
 						</img>
 					</div>
