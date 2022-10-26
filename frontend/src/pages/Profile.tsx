@@ -42,19 +42,20 @@ export function Profile() {
 			},
 		).catch(function (error) {
 			if (error.response || error.request) {
+				alert('pseudonyme deja pris');
 				console.log('this nickname is already taken');
 				return;
 			}
 			return;
 		})
 		toggleUserEdit();
-		location.reload();
+		// location.reload();
 	}
 
 	const toggleTFA = () => {
 		set2facheckbox(!toggle2facheckbox);
 		axios.patch('/user',
-			{ twoFactorAuth: true },
+			{ twoFactorAuth: { toggle2facheckbox } },
 			{
 				headers: {
 					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
@@ -65,9 +66,9 @@ export function Profile() {
 		).catch(function (error) {
 			if (error.response || error.request) {
 				console.log('this nickname is already taken');
-				return;
+				return false;
 			}
-			return;
+			return toggle2facheckbox;
 		})
 	}
 
@@ -136,7 +137,7 @@ export function Profile() {
 			<div className="user-stats">
 				<div className="user-setting">
 					<div className="user-2auth">
-						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} />
+						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} checked={true} />
 						<label id='user-checkbox-label'>
 							2F-Auth
 						</label>

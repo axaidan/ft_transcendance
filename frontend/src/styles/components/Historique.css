@@ -1,6 +1,10 @@
 .container-history {
-	width: 600px;
 	border: 1px solid black;
+	background-color: red;
+}
+
+.hist-unique-game {
+	background-color: gray;
 }
 
 .li-game {
@@ -22,6 +26,7 @@
 	text-decoration: none;
 }
 
-.center_box:hover, .center_box:visited {
+.center_box:hover,
+.center_box:visited {
 	color: currentColor;
 }
