@@ -1,13 +1,17 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Achievement, Discussion, User } from '@prisma/client';
+import { Achievement, Channel, ChannelUser, Discussion, User } from '@prisma/client';
 import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { DiscussionService } from 'src/discussion/discussion.service';
+import { DiscussionService } from 'src/chat/discussion/discussion.service';
 import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
+import { CreateDiscussionDto, DiscussionDto } from 'src/chat/discussion/dto';
+import { CreateChannelDto } from 'src/chat/channel/dto';
+import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
+import { normalize } from 'path';
 
 const N = 20;
 
@@ -25,6 +29,8 @@ describe('App e2e', () => {
 	let userArr: User[] = [];
 	let jwtArr: {access_token: string}[] = [];
 	let discArr: Discussion[];
+	let chanArr: Channel[];
+	let chanUserArr: ChannelUser[];
 	let achievArr: Achievement[];
 
 	const seedUsers = async function() {
@@ -44,6 +50,111 @@ describe('App e2e', () => {
 			userArr.push(user);
 		}
 		return userArr;
+	}
+
+	const seedChannels = async function() {
+		const channelArr: Channel[] = [];
+		let i = 0;
+		for ( ; i < N/4 ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: false,
+					protected: false,
+					channelUsers: {
+						create: [{
+							userId: userArr[0].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					}
+				},
+			});
+			channelArr.push(channel);
+		}
+		for ( ; i < N/2 ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: true,
+					protected: false,
+					channelUsers: {
+						create: [{
+							userId: userArr[1].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
+				},
+			});
+			channelArr.push(channel);
+		}
+		for ( ; i < N/2 + N/4 ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: false,
+					protected: true,
+					hash: `password${i}`,
+					channelUsers: {
+						create: [{
+							userId: userArr[2].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
+				},
+			});
+			channelArr.push(channel);
+		}
+		for ( ; i < N ; i++) {
+			const name: string = 'channel' + `${i}`;
+			const channel: Channel = await prisma.channel.create({
+				data: {
+					name: name,
+					private: true,
+					protected: true,
+					hash: `password${i}`,
+					channelUsers: {
+						create: [{
+							userId: userArr[3].id,
+							status: EChannelStatus.NORMAL,
+							role: EChannelRoles.OWNER,
+						}],
+					},
+				},
+			});
+			channelArr.push(channel);
+		}
+		return channelArr;
+	}
+
+	const seedChannelUsers = async function() {
+		const channelUserArr: ChannelUser[] = [];
+		//	CREATE 4 ChannelUsers IN chanArr[0]
+		for (let i = 1 ; i < 5 ; i++) {
+			const channelUser = await prisma.channelUser.create({
+				data: {
+					userId: userArr[i].id,
+					channelId: chanArr[0].id,
+					status: EChannelStatus.NORMAL,
+					role: EChannelStatus.NORMAL,
+				}
+			});
+			channelUserArr.push(channelUser);
+		}
+		await prisma.channelUser.create({
+			data: {
+				userId: dummyUser.id,
+				channelId: chanArr[1].id,
+				status: 0,
+				role: 0,
+			}
+		})
+		return channelUserArr;
 	}
 
 	const seedJwts = async function(users: User[]) : Promise<{access_token: string}[]>{
@@ -283,7 +394,6 @@ describe('App e2e', () => {
 				email: 'dummy@student.42.fr',
 			}
 		});
-
 		// USER ARRAY SEED
 		userArr = await seedUsers();
 		// CURRENT USERS JWTs SEED
@@ -294,6 +404,10 @@ describe('App e2e', () => {
 		seedDiscussionMessages(userArr);
 		// ACHIEVEMENT SEED
 		achievArr = await seedAchievements();
+		// CHANNEL SEED
+		chanArr = await seedChannels();
+		// CHANNELUSER SEED
+		chanUserArr = await seedChannelUsers();
 
 
 		kyleUser = await prisma.user.create({
@@ -937,93 +1051,90 @@ describe('App e2e', () => {
 
 	describe('Discussion', () => {
 
-		// describe('Create POST /discussion/create', () => {
-		// 	it('VALID - should 201', () => {
-		// 		const userId = userArr[0].id;
-		// 		const dto: DiscussionDto = {
-		// 			user2Id: userId,
-		// 		};
-		// 		return pactum
-		// 		.spec()
-		// 		.post('/discussion/create')
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
-		// 		})
-		// 		.withBody(dto)
-		// 		.expectStatus(201)
-		// 		.expectBodyContains(userId)
-		// 		.expectBodyContains(dummyUser.id)
-		// 		// .inspect();
-		// 	});
-
-		// 	it('NON VALID DTO- should 201', () => {
-		// 		const userId = userArr[0].id;
-		// 		const dto = {
-		// 			// user2Id: userId,
-		// 		};
-		// 		return pactum
-		// 		.spec()
-		// 		.post('/discussion/create')
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
-		// 		})
-		// 		.withBody(dto)
-		// 		.expectStatus(400)
-		// 		// .expectBodyContains(userId)
-		// 		// .expectBodyContains(dummyUser.id)
-		// 		.inspect();
-		// 	});
-
-		// 	it('NO DTO- should 201', () => {
-		// 		const userId = userArr[0].id;
-		// 		const dto = {
-		// 			// user2Id: userId,
-		// 		};
-		// 		return pactum
-		// 		.spec()
-		// 		.post('/discussion/create')
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
-		// 		})
-		// 		// .withBody(dto)
-		// 		.expectStatus(400)
-		// 		// .expectBodyContains(userId)
-		// 		// .expectBodyContains(dummyUser.id)
-		// 		.inspect();
-		// 	});
-
-		// 	it('NO JWT - should 401', () => {
-		// 		const userId = userArr[0].id;
-		// 		const dto: DiscussionDto = {
-		// 			user2Id: userId,
-		// 		};
-		// 		return pactum
-		// 		.spec()
-		// 		.post('/discussion/create')
-		// 		// .withHeaders({
-		// 		// 	Authorization: `Bearer ${dummyJwt.access_token}`,
-		// 		// })
-		// 		.withBody(dto)
-		// 		.expectStatus(401)
-		// 		// .inspect();
-		// 	});
-			
-		// 	it('ALREADY EXISTS - should 400', () => {
-		// 		const userId = userArr[0].id;
-		// 		const dto: DiscussionDto = {
-		// 			user2Id: userId,
-		// 		};
-		// 		return pactum
-		// 		.spec()
-		// 		.post('/discussion/create')
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${dummyJwt.access_token}`,
-		// 		})
-		// 		.withBody(dto)
-		// 		.expectStatus(400)
-		// 		// .inspect();
-		// 	});
-		// });	// DESCRIBE(DISCUSSION/CREATE)
+		describe('Create POST /discussion', () => {
+			it('VALID - should 201', () => {
+				const userId = userArr[6].id;
+				const dto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(201)
+				.expectBodyContains(userId)
+				.expectBodyContains(dummyUser.id)
+				.inspect();
+			});
+// 
+			it('NON VALID DTO- should 201', () => {
+				const userId = userArr[0].id;
+				const dto = {
+					// user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(400)
+				// .expectBodyContains(userId)
+				// .expectBodyContains(dummyUser.id)
+				// .inspect();
+			});
+// 
+			it('NO DTO- should 400', () => {
+				const userId = userArr[0].id;
+				return pactum
+				.spec()
+				.post('/discussion')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				// .withBody(dto)
+				.expectStatus(400)
+				// .expectBodyContains(userId)
+				// .expectBodyContains(dummyUser.id)
+				// .inspect();
+			});
+// 
+			it('NO JWT - should 401', () => {
+				const userId = userArr[0].id;
+				const dto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion')
+				// .withHeaders({
+				// 	Authorization: `Bearer ${dummyJwt.access_token}`,
+				// })
+				.withBody(dto)
+				.expectStatus(401)
+				// .inspect();
+			});
+			// 
+			it('ALREADY EXISTS - should 403', () => {
+				const userId = userArr[0].id;
+				const dto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.post('/discussion')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+		});	// DESCRIBE(DISCUSSION/CREATE)
 
 
 		describe('Retrieve GET /discussion/', () => {
@@ -1048,7 +1159,7 @@ describe('App e2e', () => {
 				.expectBodyContains(userArr[3].username)
 				.expectBodyContains(userArr[4].id)
 				.expectBodyContains(userArr[4].username)
-				.expectJsonLength(5)
+				.expectJsonLength(6)
 				// .inspect();
 			});
 
@@ -1089,28 +1200,29 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		describe('Retrieve Msgs GET /discussion/user/:id', () => {
-			it('VALID - NO MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/user/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[0].access_token}`,
-				})
-				.expectStatus(200)
-				// .inspect()
-			});
+		// describe('Retrieve Msgs GET /discussion/user/:id', () => {
+		// 	it('VALID - NO MSGS', () => {
+		// 		return pactum
+		// 		.spec()
+		// 		.get(`/discussion/user/${dummyUser.id}`)
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${jwtArr[0].access_token}`,
+		// 		})
+		// 		.expectStatus(200)
+		// 		// .inspect()
+		// 	});
 
-			it('VALID - HAS MSGS', () => {
-				return pactum
-				.spec()
-				.get(`/discussion/user/${dummyUser.id}`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[1].access_token}`,
-				})
-				.expectStatus(200)
-				// .inspect()
-			});
+		// 	it('VALID - HAS MSGS', () => 
+// import { GetUser } from 'src/auth/decorator';{
+		// 		return pactum
+		// 		.spec()
+		// 		.get(`/discussion/user/${dummyUser.id}`)
+		// 		.withHeaders({
+		// 			Authorization: `Bearer ${jwtArr[1].access_token}`,
+		// 		})
+		// 		.expectStatus(200)
+		// 		// .inspect()
+		// 	});
 
 			// NO WEBSOCKET ON TEST, TEST NOT POSSIBLE FOR NOW
 			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
@@ -1123,10 +1235,222 @@ describe('App e2e', () => {
 			// 	.expectStatus(200)
 			// 	// .inspect()
 			// });
-		}); // DESCRIBE (DISCUSSION/:ID)
+		// }); // DESCRIBE (DISCUSSION/:ID)
 
+		describe('GET  /discussion/:id', () => {
+			it('VALID - should 201', () => {
+				const userId = userArr[6].id;
+				const dto = {
+					user2Id: userId,
+				};
+				return pactum
+				.spec()
+				.get(`/discussion/${discArr[0].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(200)
+				.expectBodyContains(userArr[0].id)
+				.expectBodyContains(userArr[1].id)
+				.inspect();
+			});
+		});
 
 
 	});	// DESCRIBE(DISCUSSION)
+
+	describe('Channel', () => {
+
+		const dto : CreateChannelDto = {
+			name: 'customChannel1',
+			protected: false,
+			private: false,
+		};
+
+		describe('Create POST /channel', () => {
+			it('VALID - should 201', () => {
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(201)
+				.expectBodyContains(dto.name)
+				.expectBodyContains(dto.protected)
+				.expectBodyContains(dummyUser.id)
+				// .inspect();
+			});
+
+			it('ALREADY EXISTS - should 403', () => {
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NON VALID DTO - NO name -  should 400', () => {
+				const noNameDto = {
+					protected: false,
+					private: false,
+				};
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(noNameDto)
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			it('NON VALID DTO - NO protected - should 400', () => {
+				const noProtectedDto = {
+					name: 'customChannel1',
+					private: true,
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(noProtectedDto)
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			it('NON VALID DTO - NO private - should 400', () => {
+				const noProtectedDto = {
+					name: 'customChannel1',
+					protected: false,
+					hash: 'password',
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(noProtectedDto)
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			it('VALID - should 201', () => {
+				const protectedDto = {
+					name: 'privCustomChannel',
+					private: false,
+					protected: true, 
+					hash: 'password',
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(protectedDto)
+				.expectStatus(201)
+				.expectBodyContains(protectedDto.name)
+				.expectBodyContains(protectedDto.protected)
+				.expectBodyContains(protectedDto.hash)
+				// .inspect();
+			});
+
+			it ('NON VALID - protected NO hash - should 400', () => {
+				const noHashDto = {
+					name: 'channel',
+					private: false,
+					protected: true, 
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(noHashDto)
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			it ('MALFORMED - non-protected + hash - should 200 with null hash', () => {
+				const notProtWithHashDto  = {
+					name: 'notProtWithHashchan',
+					private: false,
+					protected: false, 
+					hash: 'password',
+				}
+				return pactum
+				.spec()
+				.post('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(notProtWithHashDto)
+				.expectStatus(201)
+				.expectBodyContains(null)
+				.expectBodyContains(notProtWithHashDto.name)
+				.expectBodyContains(notProtWithHashDto.private)
+				.expectBodyContains(notProtWithHashDto.protected)
+				//	CANNOT TEST LIKE THIS => NEED createdAt, updatedAt, id
+				// .expectBodyContains({
+				// 	name: notProtWithHashDto.name,
+				// 	hash: null,
+				// 	private: notProtWithHashDto.private,
+				// 	protected: notProtWithHashDto.protected,
+				// })
+				// .inspect();
+			});
+
+		});	// DESCRIBE(RELATION CREATE POST/channel)
+
+
+		describe('Create GET /channel/all', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get('/channel/all')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(200)
+				// .expectJsonLength(13)
+				// .expectBodyContains(chanArr[0].name)
+				// .expectBodyContains(chanArr[4].name)
+				// .inspect();
+			});
+
+		}); //	DESCRIBE (RELATION GET/all)
+
+		describe('Create GET /channel', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get('/channel')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(200)
+				// .inspect();
+			});
+
+		}); //	DESCRIBE (RELATION GET/all)
+
+	});
+
+	
 
 }); // DESCRIBE(APP-E2E)

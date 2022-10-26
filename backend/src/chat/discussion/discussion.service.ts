@@ -1,10 +1,11 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Discussion, DiscussionMessage } from '@prisma/client';
 import { DiscussionMessageService } from 'src/chat/discussion-message/discussion-message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateDiscussionDto, DiscussionDto } from './dto';
-import { ChatGateway } from '../chat.gateway';
 import { DiscussionMessageDto } from '../discussion-message/dto';
+import { DiscussionWithUsers } from './types';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
 export class DiscussionService {
@@ -12,77 +13,88 @@ export class DiscussionService {
     constructor(
         private prisma: PrismaService,
         private discMsgService: DiscussionMessageService,
-        @Inject(forwardRef(() => ChatGateway))
-        private chatGateway: ChatGateway,
-    ) {}
+    ) { }
 
     //  POST /discussion/:user2Id
     //  RETURNS NEW DISCUSSION WITH messages: []
-    async create(dto: CreateDiscussionDto) :
+    async create(dto: CreateDiscussionDto):
+        Promise<DiscussionWithUsers> {
+        try {
+            const discussion = await this.prisma.discussion.create({
+                data: {
+                    user1Id: dto.user1Id,
+                    user2Id: dto.user2Id,
+                },
+                include: {
+                    user1: { select: { id: true, username: true } },
+                    user2: { select: { id: true, username: true } },
+                    messages: true,
+                },
+            });
+            return discussion;
+        } catch(e) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                if (e.code === 'P2002') {
+                    throw new ForbiddenException('Discussion already exists');
+                }
+            }
+        }
+    }
+
+    //  GET /discussion/:id
+    //  RETURNS A Discussion FOR GIVEN :id
+    async findOne(currentUserId: number, discId: number) :
     Promise<Discussion>
     {
-        const discussion = await this.prisma.discussion.create({
-            data: {
-                user1Id: dto.user1Id,
-                user2Id: dto.user2Id,
+        const discussion = await this.prisma.discussion.findUnique({
+            where: {
+                id: discId,
             },
             include: {
-                user1: { select: { id: true, username: true } },
-                user2: { select: { id: true, username: true } },
-                messages: { select: { text: true, userId: true } }, 
-            },
+                user1: true,
+                user2: true,
+                messages: true,
+            }
         });
-        const newDiscDto: DiscussionDto = {
-            user1Id: discussion.user1Id,
-            user2Id: discussion.user2Id,
-            username1: discussion.user1.username,
-            username2: discussion.user2.username,
-            id: discussion.id,
+        if (currentUserId !== discussion.user1Id && currentUserId !== discussion.user2Id) {
+            throw new ForbiddenException('You are not a member of this discussion');
         }
-        this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
-        this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
-        this.chatGateway.newDisc(newDiscDto);
         return discussion;
     }
 
     //  GET /discussion
     //  RETURNS ALL DISCUSSIONS OF GIVEN USER
-    async getDiscussions(currentUserId: number) :
-    Promise<Discussion[]>
-    {
+    async getDiscussions(currentUserId: number):
+        Promise<Discussion[]> {
         const discussions: Discussion[] = await this.prisma.discussion.findMany({
             where: {
-                OR: [ { user1Id: currentUserId }, { user2Id: currentUserId } ]
+                OR: [{ user1Id: currentUserId }, { user2Id: currentUserId }]
             },
             include: {
                 user1: { select: { id: true, username: true, } },
                 user2: { select: { id: true, username: true, } },
-                messages: { select: { text: true, userId: true } },
             },
-        }); 
+        });
         return discussions;
     }
 
-    async getDiscussionsIds(currentUserId: number) :
-    Promise<Discussion[]>
-    {
+    async getDiscussionsIds(currentUserId: number):
+        Promise<Discussion[]> {
         const discussions: Discussion[] = await this.prisma.discussion.findMany({
             where: {
-                OR: [ { user1Id: currentUserId }, { user2Id: currentUserId } ]
+                OR: [{ user1Id: currentUserId }, { user2Id: currentUserId }]
             },
-        }); 
+        });
         return discussions;
     }
 
-    async createDiscMsg(dto: DiscussionMessageDto) :
-    Promise<DiscussionMessage>
-    {
+    async createDiscMsg(dto: DiscussionMessageDto):
+        Promise<DiscussionMessage> {
         return await this.discMsgService.create(dto);
     }
 
-    async messagesCount(discId: number) :
-    Promise<number> 
-    {
+    async messagesCount(discId: number):
+        Promise<number> {
         const messagesCount = await this.prisma.discussion.findUnique({
             where: {
                 id: discId,
