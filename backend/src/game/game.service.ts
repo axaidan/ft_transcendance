@@ -25,9 +25,9 @@ export class GameService {
                 take : 10,
 				select : {
 					score1: true,
-					player1 : {select : {id: true,username: true,},},
+					player1 : {select : {id: true,username: true, avatarUrl: true,},},
 					score2: true,
-					player2 : {select : {id: true, username: true},},
+					player2 : {select : {id: true, username: true, avatarUrl: true,},},
 				}
 
 				},);

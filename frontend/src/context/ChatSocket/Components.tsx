@@ -5,15 +5,14 @@ import { PropsWithChildren, useEffect, useReducer, useState } from "react";
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
 import { IMessage, IUser } from "../../types";
-import { AxiosJwt } from "../../hooks";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {
 	user: IUser;
 }
 
-export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user}) => {
+export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
-	const [ loadingSocket, setLoading ] = useState(true);
+	const [loadingSocket, setLoading] = useState(true);
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -23,7 +22,9 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 	useEffect(() => {
 		if (user.id != 0) {
-			// chatSocket.connect();
+			console.log("UserId: ", user.id);
+
+			chatSocket.connect();
 			// Save the socket in context //
 			ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
 			ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: user });
@@ -35,9 +36,15 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 	const StartListeners = () => {
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
-            console.info('J\'ai recu un nouveau message.');
+			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		})
+		// chatSocket.on('newDiscToClient', (message: IMessage) => {
+		//     console.info('J\'ai recu un nouveau message.');
+		// 	ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
+		// })
+
+
 	};
 
 	const StartHandshake = () => {
@@ -46,7 +53,7 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		setLoading(false);
 	};
 
-	if ( loadingSocket ) return <p>Loading socket IO ... </p>;
+	if (loadingSocket) return <p>Loading socket IO ... </p>;
 
 	return (<ChatSocketContextProvider value={{ ChatSocketState, ChatSocketDispatch }}>
 		{children}

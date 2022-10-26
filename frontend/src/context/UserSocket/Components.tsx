@@ -26,7 +26,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     useEffect(() => {
         if (user.id != 0)
         {
-            // socket.connect();
+            socket.connect();
             SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
             SocketDispatch({type: ESocketActionType.UP_UID, payload: user });
             // GET FRIENDS:
@@ -98,8 +98,8 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     const StartHandshake = () => {
         console.info('Sending handshake to server ...');
-
-		// Emission de notre connections au autres
+		
+		socket.emit('getOnlineUsersToServer');
 		socket.emit('loginToServer', user.id);
 
 		// Fin de l'ecan d'affichage d'erreur
