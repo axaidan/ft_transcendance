@@ -85,6 +85,7 @@ async function main() {
 		create: {
 			login: 'axaidan',
 			username: 'skusku',
+			avatarUrl: publicAvatarAxel.url,
 		},
 	})
 
@@ -94,6 +95,7 @@ async function main() {
 		create: {
 			login: 'fcatinau',
 			username: 'ouinouin',
+			avatarUrl: publicAvatarFurry.url,
 		},
 	})
 
@@ -113,6 +115,7 @@ async function main() {
 		create: {
 			login: 'wluong',
 			username: 'Migi',
+			avatarUrl: publicAvatarSmile.url,
 		},
 	})
 
@@ -122,6 +125,7 @@ async function main() {
 		create: {
 			login: 'rmechety',
 			username: 'Magreb Warrior',
+			avatarUrl: publicAvatarFurry.url,
 		},
 	})
 
@@ -131,6 +135,7 @@ async function main() {
 		create: {
 			login: 'lchristo',
 			username: 'M.Muscle',
+			avatarUrl: publicAvatarSmile.url,
 		},
 	})
 
@@ -140,6 +145,7 @@ async function main() {
 		create: {
 			login: 'riblanc',
 			username: 'StaffNewGen',
+			avatarUrl: publicAvatarSmile.url,
 		},
 	})
 
