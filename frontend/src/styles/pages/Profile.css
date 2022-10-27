@@ -89,25 +89,77 @@
 	border-radius: 50% 50%;
 }
 
-.user-edit-up {
-	margin-left: 10px;
-	border: none;
-	width: 40px;
-	height: 40px;
-	background: none;
-	background-image: url('../../assets/images/profile_component/red_x_mark.png');
-	background-position-x: 50%;
-	background-position-y: 50%;
-	background-size: 100%;
-	background-repeat: no-repeat;
-}
-
-.user-edit-up:active {
-	scale: 0.8;
-}
 
 .user-disabled {
 	display: none;
+}
+
+#user-validate {
+	background-image: url('../../assets/images/profile_component/status_checkmark.png');
+	background-color: transparent;
+	background-position: center;
+	background-size: 35px;
+	height: 30px;
+	width: 30px;
+	border: none;
+}
+
+#user-validate:hover {
+	scale: 1.1;
+}
+
+.user-input-kit {
+	display: flex;
+}
+
+#user-cancel {
+	margin-left: 10px;
+	background-image: url('../../assets/images/profile_component/red_x_mark.png');
+	background-color: transparent;
+	background-position: center;
+	background-size: 35px;
+	height: 30px;
+	width: 30px;
+	border: none;
+}
+
+#user-cancel:hover {
+	scale: 1.1;
+}
+
+#user-input {
+	width: 180px;
+	height: 20px;
+	color: aliceblue;
+	background-color: #091720;
+	border-color: #938f75;
+	border-style: groove;
+	margin-right: 10px
+}
+
+
+#user-inputbox-error {
+	width: 180px;
+	height: 20px;
+	color: aliceblue;
+	background-color: #091720;
+	border-color: red;
+	border-style: groove;
+	margin-right: 10px
+}
+
+#user-input:focus {
+	outline: none;
+}
+
+#user-inputbox-error:focus {
+	outline: none;
+}
+
+#user-error-input {
+	color: red;
+	font-size: small;
+	font-style: italic;
 }
 
 /*****************************

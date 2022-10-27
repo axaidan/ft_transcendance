@@ -6,12 +6,47 @@ import "../../styles/components/profile_components/MyNavProfile.css";
 // Intern:
 import { DflUser, IUser } from "../../types";
 import { AxiosJwt } from '../../hooks';
-import { useEffect, useState } from 'react';
-import { AxiosResponse } from 'axios';
+import { useForm, Resolver } from 'react-hook-form';
+import { FormValues } from '../../pages/Profile';
+import { useContext, useState } from 'react';
+import { SocketContext, ESocketActionType } from '../../context/UserSocket/Socket';
 
 export function MyNavProfile() {
 
-	const user: IUser = useOutletContext();
+	const navigate = useNavigate();
+	const dispatch = useContext(SocketContext).SocketDispatch
+	const { me } = useContext(SocketContext).SocketState;
+	const axios = AxiosJwt();
+
+	const [nick, setNick] = useState(false);
+
+	const ExistantUsername = (value: string) => {
+		axios.get('/user/is_user/' + value).then((res) => setNick(res.data));
+		return nick;
+	}
+
+	const resolver: Resolver<FormValues> = async (values) => {
+		return {
+			values: values.username ? values : {},
+			errors: !ExistantUsername(values.username) ?
+				{
+					username: {
+						type: 'required',
+						message: '',
+					}
+				}
+				: {}
+		};
+	};
+
+
+	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
+
+	const onSubmit = handleSubmit((data) => {
+		// if (ExistantUsername(data.username)) {
+		axios.get('/user/get_user_by_name/' + data.username).then((res) => navigate('/home/' + res.data));
+		// }
+	});
 
 
 	return (
@@ -31,11 +66,13 @@ export function MyNavProfile() {
 					Achievement
 				</NavLink>
 				<div className="user_search">
-					<input className='input_search' type="text" placeholder="Recherche d'invocateur" >
-					</input>
+					<form onSubmit={onSubmit}>
+						<input {...register("username")} placeholder="Recherche d'invocateur" maxLength={20} className='input_search' />
+						{errors?.username && <p id='user-error-input'>{errors.username.message}</p>}
+					</form>
 				</div>
-			</ul>
-			<Outlet context={user} />
+			</ul >
+			<Outlet />
 		</div >
 	)
 }

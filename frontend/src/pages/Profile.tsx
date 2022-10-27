@@ -4,18 +4,17 @@ import { useOutletContext } from "react-router-dom";
 
 // Intern:
 import { IUser } from "../types";
-import { IAvatar } from '../types/interfaces/IAvatar';
 
 //Hooks
 import { AxiosJwt } from '../hooks/AxiosJwt';
 import { useCookies } from 'react-cookie';
-// import { useForme } from '../hooks/UseForm';
 import { useForm, Resolver } from 'react-hook-form'
+import { ESocketActionType, SocketContext } from "../context";
 
 // Assets:
 import '../styles/pages/Profile.css'
 
-type FormValues = {
+export type FormValues = {
 	username: string;
 };
 
@@ -23,24 +22,19 @@ type FormValues = {
 
 export function Profile() {
 
-	const user: IUser = useOutletContext();
+	const dispatch = useContext(SocketContext).SocketDispatch
+	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
 
 
-	const [toggle2facheckbox, set2facheckbox] = useState(user.twoFactorAuth);
+	const [toggle2facheckbox, set2facheckbox] = useState(me.twoFactorAuth);
 	const [toggleEdit, setToggleEdit] = useState(false);
+	const [nick, setNick] = useState(false);
 
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	const [users, setUsers] = useState<string[]>([]);
-
-	useEffect(() => {
-		axios.get('/user/all').then((res) => setUsers(res.data.username));
-	});
-
-	const checkExistantNickname = (us: string[], value: string): boolean => {
-		return users.includes(value);
-	};
+	const ExistantUsername = (value: string) => {
+		axios.get('/user/is_user/' + value).then((res) => setNick(res.data));
+		return nick;
+	}
 
 	const resolver: Resolver<FormValues> = async (values) => {
 		return {
@@ -49,7 +43,7 @@ export function Profile() {
 				? {
 					username: {
 						type: 'required',
-						message: 'This is required.',
+						message: 'Enter a new username or cancel.',
 					},
 				}
 				: {}
@@ -63,11 +57,11 @@ export function Profile() {
 					}
 					: {}
 						&&
-						checkExistantNickname(users, values.username) ?
+						ExistantUsername(values.username) ?
 						{
 							username: {
-								type: "required",
-								message: 'This username is already taken.'
+								type: 'required',
+								message: 'This username is already taken',
 							}
 						}
 						: {}
@@ -76,8 +70,8 @@ export function Profile() {
 
 
 	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
+
 	const onSubmit = handleSubmit((data) => {
-		console.log(data);
 		axios.patch('/user', data)
 			.catch(function (error) {
 				if (error.response && error.request) {
@@ -85,20 +79,8 @@ export function Profile() {
 				}
 			})
 		toggleUserEdit();
-		user.username = data.username;
+		dispatch({ type: ESocketActionType.UP_USERNAME, payload: data.username });
 	});
-
-	const editUser = (e: React.ChangeEvent<HTMLInputElement>): void => {
-		axios.patch('/user', values)
-			.catch(function (error) {
-				if (error.response && error.request) {
-					alert('pseudonyme deja pris');
-					console.log('this nickname is already taken');
-				}
-			})
-		toggleUserEdit();
-		// location.reload();
-	}
 
 
 
@@ -119,18 +101,9 @@ export function Profile() {
 		setToggleEdit(!toggleEdit);
 	}
 
-	// const initialState = {
-	// 	username: ''
-	// };
-
-	// const { onChange, onSubmit, values } = useForm(
-	// 	editUser,
-	// 	initialState
-	// );
-
 	useEffect(() => {
-		document.title = user.username + "'s profile";
-	}, [user]);
+		document.title = me.username + "'s profile";
+	}, [me]);
 
 	return (
 		<div className="user-body" >
@@ -138,21 +111,19 @@ export function Profile() {
 				<div className="user-banner">
 					<div className="user-nickname">
 						<div className={toggleEdit ? "user-disabled" : "user-nick"}>
-							{user.username}
-							<button onClick={toggleUserEdit} className={toggleEdit === true ? "user-edit-up" : "user-no-edit"}>
+							{me.username}
+							<button onClick={toggleUserEdit} className="user-no-edit">
 							</button>
 						</div>
 						<form onSubmit={onSubmit} className={toggleEdit ? "user-edit-input" : "user-disabled"}>
-							{/* <input className={toggleEdit ? "user-edit-input" : "user-disabled"} placeholder={user.username} onChange={onChange} name="username" ref={inputRef} /> */}
-							<input {...register("username")} placeholder={user.username} />
-							{/* <button onClick={on} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
-								Validate
-							</button> */}
-
-							<button onClick={onSubmit} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
-								Validate
-							</button>
-							{errors?.username && <p>{errors.username.message}</p>}
+							<div className="user-input-kit">
+								<input {...register("username")} placeholder={me.username} maxLength={20} id={errors.username ? 'user-inputbox-error' : 'user-input'} />
+								<div className="user-buttons">
+									<button onClick={onSubmit} id='user-validate' />
+									<button onClick={toggleUserEdit} id='user-cancel' />
+								</div>
+							</div>
+							{errors?.username && <p id='user-error-input'>{errors.username.message}</p>}
 
 						</form>
 					</div>
@@ -167,7 +138,7 @@ export function Profile() {
 					</div>
 					<div className="user-profile-icon-div">
 
-						<img src={user.avatarUrl} id="user-profile-icon" />
+						<img src={me.avatarUrl} id="user-profile-icon" />
 					</div>
 					<div className="user-end-of-banner">
 					</div>
@@ -187,7 +158,7 @@ export function Profile() {
 			<div className="user-stats">
 				<div className="user-setting">
 					<div className="user-2auth">
-						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} checked={true} />
+						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} checked={nick} />
 						<label id='user-checkbox-label'>
 							2F-Auth
 						</label>
@@ -198,7 +169,7 @@ export function Profile() {
 						</div>
 					</div>
 					<div className="user-email">
-						E-MAIL : {user.email}
+						E-MAIL : {me.email}
 					</div>
 				</div>
 				<div className="user-lol-stats">
