@@ -1,8 +1,11 @@
 import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import { Channel, ChannelUser } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionMessageDto } from 'src/chat/discussion-message/dto/discussion-message.dto';
+import { ChannelUserService } from './channel/channel-user/channel-user.service';
+import { ChannelService } from './channel/channel.service';
 import { DiscussionService } from './discussion/discussion.service';
 import { DiscussionDto } from './discussion/dto/discussion.dto';
 
@@ -12,6 +15,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(
         @Inject(forwardRef(() => DiscussionService))
         private discService: DiscussionService,
+        private channelService: ChannelService,
+        private channelUserService: ChannelUserService,
     ) { }
 
     @WebSocketServer() wss: Server;
@@ -50,7 +55,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     joinDiscRoom(userId: number, discId: number) {
         if (this.clientsMap.has(userId)) {
             const client: Socket = this.clientsMap.get(userId);
-            this.logger.log(client);
             const roomName: string = 'disc' + discId;
             if ((roomName in client.rooms) === false) {
                 this.logger.log(`USER ${userId} JOINING '${roomName}' ROOM`);
@@ -63,6 +67,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const discussions = await this.discService.getDiscussionsIds(userId);
         for (const discussion of discussions) {
             this.joinDiscRoom(userId, discussion.id);
+        }
+    }
+
+    joinChannelRoom(userId: number, chanId: number) {
+        if (this.clientsMap.has(userId)) {
+            const client: Socket = this.clientsMap.get(userId);
+            const roomName: string = 'chan' + chanId;
+            if ((roomName in client.rooms) === false) {
+                this.logger.log(`USER ${userId} JOINING '${roomName}' ROOM`);
+                client.join(roomName);
+            }
+        }
+    }
+
+    async joinAllNonBannedChannel(userId: number) {
+        const channelUsers: ChannelUser[] =
+            await this.channelUserService.getAllNonBannedChannelUsers(userId);
+        for (const channelUser of channelUsers) {
+            this.joinChannelRoom(userId, channelUser.channelId);
         }
     }
 
@@ -91,10 +114,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.clientsMap.set(userId, client);
         this.displayClientsMap();
         await this.joinAllDiscRooms(userId);
+        await this.joinAllNonBannedChannel(userId);
     }
 
     @SubscribeMessage('logoutToServer')
-    handleLogout(client: Socket, userId: number) :
+    handleLogout(
+        client: Socket,
+        userId: number
+        ) :
     void
     {
         this.logger.log(`USER ${userId} LOGGED OUT`);
@@ -102,13 +129,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('discMsgToServer')
-    async handleDiscMsg(client: Socket, dto: DiscussionMessageDto):
+    async handleDiscMsg(
+        client: Socket,
+        dto: DiscussionMessageDto):
     Promise<void>
     {
         this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         const message = await this.discService.createDiscMsg(dto);
         const roomName = `disc${dto.discId}`;
-        this.wss.to(roomName).emit('discMsgToclient', message);
+        this.wss.to(roomName).emit('discMsgToClient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
     }
 }

@@ -9,65 +9,109 @@ import { IAvatar } from '../types/interfaces/IAvatar';
 //Hooks
 import { AxiosJwt } from '../hooks/AxiosJwt';
 import { useCookies } from 'react-cookie';
-import { useForm } from '../hooks/UseForm';
+// import { useForme } from '../hooks/UseForm';
+import { useForm, Resolver } from 'react-hook-form'
 
 // Assets:
 import '../styles/pages/Profile.css'
 
-type State = {
-	newUsername: string;
+type FormValues = {
+	username: string;
 };
+
+
 
 export function Profile() {
 
 	const user: IUser = useOutletContext();
-
-	const [toggleEdit, setToggleEdit] = useState(false);
-	const [toggle2facheckbox, set2facheckbox] = useState(user.twoFactorAuth);
 	const axios = AxiosJwt();
 
-	const [cookies] = useCookies();
-	const jwtToken = cookies.access_token;
+
+	const [toggle2facheckbox, set2facheckbox] = useState(user.twoFactorAuth);
+	const [toggleEdit, setToggleEdit] = useState(false);
+
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	const [users, setUsers] = useState<string[]>([]);
+
+	useEffect(() => {
+		axios.get('/user/all').then((res) => setUsers(res.data.username));
+	});
+
+	const checkExistantNickname = (us: string[], value: string): boolean => {
+		return users.includes(value);
+	};
+
+	const resolver: Resolver<FormValues> = async (values) => {
+		return {
+			values: values.username ? values : {},
+			errors: !values.username
+				? {
+					username: {
+						type: 'required',
+						message: 'This is required.',
+					},
+				}
+				: {}
+					&&
+					(values.username.length < 3) ?
+					{
+						username: {
+							type: 'required',
+							message: 'You must have at least 3 characters.',
+						}
+					}
+					: {}
+						&&
+						checkExistantNickname(users, values.username) ?
+						{
+							username: {
+								type: "required",
+								message: 'This username is already taken.'
+							}
+						}
+						: {}
+		};
+	};
 
 
-	const editUser = () => {
-		axios.patch('/user',
-			values,
-			{
-				headers: {
-					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-			},
-		).catch(function (error) {
-			if (error.response || error.request) {
-				console.log('this nickname is already taken');
-				return;
-			}
-			return;
-		})
+	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
+	const onSubmit = handleSubmit((data) => {
+		console.log(data);
+		axios.patch('/user', data)
+			.catch(function (error) {
+				if (error.response && error.request) {
+					console.log('this nickname is already taken');
+				}
+			})
 		toggleUserEdit();
-		location.reload();
+		user.username = data.username;
+	});
+
+	const editUser = (e: React.ChangeEvent<HTMLInputElement>): void => {
+		axios.patch('/user', values)
+			.catch(function (error) {
+				if (error.response && error.request) {
+					alert('pseudonyme deja pris');
+					console.log('this nickname is already taken');
+				}
+			})
+		toggleUserEdit();
+		// location.reload();
 	}
+
+
 
 	const toggleTFA = () => {
 		set2facheckbox(!toggle2facheckbox);
 		axios.patch('/user',
-			{ twoFactorAuth: true },
-			{
-				headers: {
-					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-			},
+			{ twoFactorAuth: { toggle2facheckbox } },
 		).catch(function (error) {
 			if (error.response || error.request) {
 				console.log('this nickname is already taken');
-				return;
+				return false;
 			}
-			return;
+			return toggle2facheckbox;
 		})
 	}
 
@@ -75,14 +119,14 @@ export function Profile() {
 		setToggleEdit(!toggleEdit);
 	}
 
-	const initialState = {
-		username: ''
-	};
+	// const initialState = {
+	// 	username: ''
+	// };
 
-	const { onChange, onSubmit, values } = useForm(
-		editUser,
-		initialState
-	);
+	// const { onChange, onSubmit, values } = useForm(
+	// 	editUser,
+	// 	initialState
+	// );
 
 	useEffect(() => {
 		document.title = user.username + "'s profile";
@@ -98,11 +142,18 @@ export function Profile() {
 							<button onClick={toggleUserEdit} className={toggleEdit === true ? "user-edit-up" : "user-no-edit"}>
 							</button>
 						</div>
-						<form onSubmit={onSubmit}>
-							<input className={toggleEdit ? "user-edit-input" : "user-disabled"} placeholder={user.username} onChange={onChange} name="username" />
-							<button onClick={editUser} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
+						<form onSubmit={onSubmit} className={toggleEdit ? "user-edit-input" : "user-disabled"}>
+							{/* <input className={toggleEdit ? "user-edit-input" : "user-disabled"} placeholder={user.username} onChange={onChange} name="username" ref={inputRef} /> */}
+							<input {...register("username")} placeholder={user.username} />
+							{/* <button onClick={on} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
+								Validate
+							</button> */}
+
+							<button onClick={onSubmit} className={toggleEdit ? "user-validate-edit" : "user-disabled"}>
 								Validate
 							</button>
+							{errors?.username && <p>{errors.username.message}</p>}
+
 						</form>
 					</div>
 					<div className="user-clan">
@@ -136,7 +187,7 @@ export function Profile() {
 			<div className="user-stats">
 				<div className="user-setting">
 					<div className="user-2auth">
-						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} />
+						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} checked={true} />
 						<label id='user-checkbox-label'>
 							2F-Auth
 						</label>
