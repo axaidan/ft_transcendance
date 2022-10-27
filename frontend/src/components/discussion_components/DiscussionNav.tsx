@@ -1,6 +1,5 @@
 
 import { useContext, useEffect } from 'react';
-import { Contact } from '..';
 import { ChatSocketContext, EChatSocketActionType } from '../../context';
 import { IDiscussion, IMessage, IUser } from '../../types';
 
@@ -20,6 +19,7 @@ function DiscUser({ user, index, msg, did }:DiscUserProps) {
 	const removeDisc = () => { 
 		dispatch({ type: EChatSocketActionType.RM_DISC, payload: did})
 		if (index_active == index) dispatch({ type: EChatSocketActionType.UP_CURR, payload: (discussion.length - 2)})
+		if (discussion.length <= 1) dispatch({ type: EChatSocketActionType.DISPLAY, payload: false});
 	};
 	
 	return (

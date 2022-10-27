@@ -62,9 +62,9 @@ export function FriendsList() {
 	return (
 		<ul id='contact-list'>
 			<p>CHANNELS</p>
-			<p>ONLINE</p>
+			<p>ONLINE ({friends.filter((friend) => { return (users.includes(friend.id) == true)}).length})</p>
 			{friends.map((user: IUser, index) => (isOnline(user, index)))}
-			<p>OFFLINE</p>
+			<p>HORS LIGNE ({friends.filter((friend) => {return (users.includes(friend.id) == false)}).length})</p>
 			{friends.map((user: IUser, index) => (isOffline(user, index)))}
 		</ul>
 	)

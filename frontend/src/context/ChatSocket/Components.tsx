@@ -4,7 +4,7 @@ import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "
 // Intern:
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
-import { IMessage, IUser } from "../../types";
+import { IDiscussion, IMessage, IUser } from "../../types";
 import { SocketContext } from "../UserSocket";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {}
@@ -37,9 +37,9 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		});
 
-		// chatSocket.on('newDiscToClient', (message: IMessage) => {
-		//     console.info('J\'ai recu un nouveau message.');
-		// 	ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
+		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
+		//     console.info('J\'ai recu une nouvelle discussion.');
+		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
 		// })
 	};
 

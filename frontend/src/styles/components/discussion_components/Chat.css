@@ -106,6 +106,16 @@
 	border-radius: 50% 50%;
 }
 
+#disc-create-message {
+	font-size: 0.8em;
+	margin-bottom: 3px;
+}
+
+#disc-create-submess {
+	font-size: 0.6em;
+	color: gray;
+}
+
 #disc-username {
 	font-size: 1.1em;
 }
@@ -209,6 +219,14 @@
 	grid-template-rows: 65px 490px 45px;
 	border-left: 1px solid #16222a;
 }
+
+.messages-container-search {
+	position: relative;
+	display: grid;
+	grid-template-rows: 65px 45px 490px;
+	border-left: 1px solid #16222a;
+}
+
 
 .messages-nav {
 	display: flex;
