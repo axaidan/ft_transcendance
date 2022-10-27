@@ -37,6 +37,7 @@ export function ChatBody() {
 
 	return (
 		<div id='messages-body'>
+			<p id='messages-careful'>N'oubliez pas que notre equipe transendence ne vous demandera jamais votre mot de passe pour vous aider.</p>
 			{discussion[index_active]?.messages?.map((message, index) => {
 				return <DiscMessage key={index} msg={message} />
 			})}
@@ -63,12 +64,19 @@ export function Chat() {
 		}
 	}
 
+	const ChatAble = () => { return (
+		<>
+			<ChatNav />
+			<ChatBody />
+			<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
+		</>
+	);}
+
 	return (
 		<div id={chat_display ? "chat-container-display" : "chat-container-none"}>
 			<DiscussionNav />
 			<div className='messages-container'>
-				{(index_active != -1 ? <><ChatNav /><ChatBody /></> : <></>)}
-				<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
+				{(index_active != -1 ? < ChatAble/> : <></>)}
 			</div>
 		</div>
 	)

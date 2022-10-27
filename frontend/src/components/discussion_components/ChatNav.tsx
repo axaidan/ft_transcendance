@@ -1,31 +1,32 @@
 import { useContext } from "react";
 import { ChatSocketContext, EChatSocketActionType } from "../../context";
+import { IUser } from "../../types";
 
 
 
 function ChatNavUser() {
 	const { me, discussion, index_active } = useContext(ChatSocketContext).ChatSocketState;
 
-	function othUsername() {
-		const user1: string = discussion[index_active].user1.username;
-		const user2: string = discussion[index_active].user2.username;
-		return ( me.username != user1 ? user1 : user2 );
+	function othUser() {
+		const user1: IUser = discussion[index_active].user1;
+		const user2: IUser = discussion[index_active].user2;
+		return ( me.id != user1.id ? user1 : user2 );
 	}
+
+	const oth_User = othUser();
 
 	return (
 		<div className="chat-user">	
 			<div className="chat-user-avatar">
-				<img src={me.avatarUrl} className="chat-user-icon" />
+				<img src={oth_User.avatarUrl} className="chat-user-icon" />
 			</div>
 			<div>
-				<p id="chat-username">{me.username}</p>
-				<p id="chat-user-origin">{me.login + " #EUW"}</p>
+				<p id="chat-username">{oth_User.username}</p>
+				<p id="chat-user-origin">{oth_User.login + " #EUW"}</p>
 			</div>
 		</div>
 	)
 }
-
-
 
 export function ChatNav() {
 	const chat = useContext(ChatSocketContext).ChatSocketDispatch;

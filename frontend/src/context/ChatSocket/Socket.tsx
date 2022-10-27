@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { AxiosJwt } from "../../hooks";
 import { DflUser, IDiscussion, IMessage, IUser } from "../../types";
 
 export interface IChatSocketContextState {
@@ -55,7 +54,7 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_UID:
 			return { ...state, me: action.payload as IUser };
 		case EChatSocketActionType.UP_DISC:
-			return { ...state, discussion: [...state.discussion, action.payload as IDiscussion] };
+			return { ...state, discussion: [ ...state.discussion ] };
 		case EChatSocketActionType.RM_DISC:
 			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_CURR:
