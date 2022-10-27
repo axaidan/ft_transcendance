@@ -1238,7 +1238,7 @@ describe('App e2e', () => {
 		// }); // DESCRIBE (DISCUSSION/:ID)
 
 		describe('GET  /discussion/:id', () => {
-			it('VALID - should 201', () => {
+			it('VALID - should 200', () => {
 				const userId = userArr[6].id;
 				const dto = {
 					user2Id: userId,
@@ -1253,8 +1253,24 @@ describe('App e2e', () => {
 				.expectStatus(200)
 				.expectBodyContains(userArr[0].id)
 				.expectBodyContains(userArr[1].id)
+				// .inspect();
+			});
+		});
+
+		describe('GET  /discussion/user/:id', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get(`/discussion/user/${userArr[0].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.expectStatus(200)
+				.expectBodyContains(userArr[0].id)
 				.inspect();
 			});
+
 		});
 
 

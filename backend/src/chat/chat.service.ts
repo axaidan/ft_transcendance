@@ -29,7 +29,16 @@ export class ChatService {
     async getDiscussionById(currentUserId: number, discId: number) :
     Promise<Discussion>
     {
-        const discussion = await this.discService.findOne(currentUserId, discId);
+        const discussion = await this.discService.findOneById(currentUserId, discId);
+        return discussion;
+    }
+
+    //  GET /discussion/user/:id
+    //  RETURNS A Discussion W/ A GIVEN user2Id
+    async getDiscussionByUserIds(currentUserId: number, user2Id: number) :
+    Promise<Discussion>
+    {
+        const discussion = await this.discService.findOneByUserIds(currentUserId, user2Id);
         return discussion;
     }
 
