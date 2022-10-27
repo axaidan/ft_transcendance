@@ -57,9 +57,11 @@ export class LobbyService {
             // lance une game
 
         // at first je creer une room
-        this.socket.joinGameRoom(u1, lobbyId);
-        this.socket.joinGameRoom(u2, lobbyId);
+        await this.socket.joinGameRoom(u1, lobbyId);
+        await this.socket.joinGameRoom(u2, lobbyId);
 
+        var lobby = this.lobbies.get(lobbyId);
+        this.socket.wss.to('game'+ lobbyId).emit("startGame", lobby);
         //start la game
 
     };
