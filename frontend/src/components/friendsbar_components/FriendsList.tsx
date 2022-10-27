@@ -18,21 +18,12 @@ export function FriendsList() {
 	
 	const [newDisc, setNewDisc] = useState<IDiscussion>()
 
-
 	useEffect(() => {
-		console.log("New: ", newDisc);
-		if (!newDisc) {
-			console.log( " U ARE HERE ");
-			return;
-		}
-		console.log("Discussion 1: ", discussion)
+		if (!newDisc) { return; }
 		let new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
-		console.log("FIRST current: ", new_current)
 		if (new_current === -1) {
 			discussion.push(newDisc);
-			console.log("Discussion 2: ", discussion)
 			new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
-			console.log("SECOND current: ", new_current)
 		}
 		chat({ type: EChatSocketActionType.UP_CURR, payload: new_current })
 		chat({ type: EChatSocketActionType.DISPLAY, payload: true })
@@ -40,15 +31,6 @@ export function FriendsList() {
 
 	async function UpDateActiveDiscusion(uid: number) {
 		const test: IDiscussion = (await axios.get('/discussion/user/' + uid)).data;
-		console.log('test = ', test);
-		// const discussions: IDiscussion[] = (await axios.get('/discussion')).data;
-		// console.log('discussion[] = ', discussions);
-		// for (const discussion of discussions) {
-		// 	if (discussion.user1Id === uid || discussion.user2Id === uid) {
-		// 		setNewDisc(discussion);
-		// 		return;
-		// 	}
-		// }
 		if (!test) {
 			const createdDiscussion = (await axios.post('/discussion', {user2Id: uid})).data;
 			setNewDisc(createdDiscussion);
@@ -57,33 +39,10 @@ export function FriendsList() {
 		}
 	}
 
-	// .then(async (res: AxiosResponse<IDiscussion | undefined>) => {
-	// 	if (res.data != undefined) {
-	// 		console.log('DATA: ', res.data)
-	// 		discussion.push(res.data);
-	// 		console.log("Discussion: ", discussion)
-	// 		new_current = discussion.indexOf(res.data);
-	// 		chat({ type: EChatSocketActionType.UP_CURR, payload: new_current })
-	// 		chat({ type: EChatSocketActionType.DISPLAY, payload: true })
-	// 	} else {
-	// 		await axios.post('/discussion/' + uid, { body: { user2Id: uid } })
-	// 			.then((res: AxiosResponse<IDiscussion>) => {
-	// 				console.log('DATA: ', res.data)
-	// 				discussion.push(res.data);
-	// 				console.log("Discussion: ", discussion)
-	// 				new_current = discussion.indexOf(res.data);
-	// 				chat({ type: EChatSocketActionType.UP_CURR, payload: new_current })
-	// 				chat({ type: EChatSocketActionType.DISPLAY, payload: true })
-	// 			})
-	// 	}
-	// })
-
 	const isOnline = (user: IUser, index: number) => {
 		if (users.includes(user.id)) {
 			return (
-				<div key={index} onClick={() => {
-					UpDateActiveDiscusion(user.id);
-				}}>
+				<div key={index} onClick={() => { UpDateActiveDiscusion(user.id); }}>
 					<Contact user={user} status={0} />
 				</div>
 			)
@@ -93,9 +52,7 @@ export function FriendsList() {
 	const isOffline = (user: IUser, index: number) => {
 		if (users.includes(user.id) == false) {
 			return (
-				<div key={index} onClick={() => {
-					UpDateActiveDiscusion(user.id);
-				}}>
+				<div key={index} onClick={() => { UpDateActiveDiscusion(user.id); }}>
 					<Contact user={user} status={4} />
 				</div>
 			)

@@ -452,6 +452,7 @@ async function main() {
 				username: `USERNAME${i}`,
 				email: `user${i}@student.42.fr`,
 				twoFactorAuth: false,
+				avatarUrl: publicAvatarSmile.url,
 			}
 		});
 	}

@@ -1,18 +1,20 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { colorStatus, ContactStatus } from ".";
 import { IUser } from "../../../types";
 
 import '../../../styles/components/friendsbar_components/Contact.css'
+import { ChatSocketContext } from "../../../context";
 
 type ContactProps = { user: IUser, status: number };
 export function Contact({ user, status }: ContactProps) {
+	const {discussion} = useContext(ChatSocketContext).ChatSocketState;
+	const notif: number = discussion[0]?.notif;
 
-	// CECI SERA DONNE GRACE AU SOCKET STATUS
-	const notif: number = 0;
+	// console.log(notif, '  ', discussion.find(disc => {disc.user1Id == user.id || disc.user2Id == user.id}) )
 
 	return (
 		<li className='contact-container'>
-			<img src='https://2.bp.blogspot.com/-sT67LUsB61k/Ul7ocxgFhTI/AAAAAAAACdc/iAQ2LgxMvG4/s1600/image+115.jpg' className="contact_icon" />
+			<img src={user.avatarUrl} className="contact_icon" />
 			<div className='contact-info'>
 				<div id={colorStatus(status, 'username', notif ? true : false)} className="contact-name">
 					{user.username}
@@ -20,10 +22,9 @@ export function Contact({ user, status }: ContactProps) {
 				<ContactStatus mode={status} />
 			</div>
 			{notif ?
-				<div className='contact-notification'>
-					{notif}
-				</div> : <></>
-			}
+			<div className='contact-notification'>
+				{notif}
+			</div> : <></>}
 		</li>
 	)
 }

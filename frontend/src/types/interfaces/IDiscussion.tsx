@@ -15,6 +15,7 @@ export type IDiscussion = {
 	user2: IUser;
 	user2Id: number;
 	messages: IMessage[];
+	notif: number
 }
 
 export const dflDiscussion = {
@@ -24,4 +25,5 @@ export const dflDiscussion = {
 	user2: DflUser,
 	user2Id: 0,
 	messages: [],
+	notif: 0
 }

@@ -58,12 +58,20 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.RM_DISC:
 			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_CURR:
-			return { ...state, index_active: action.payload as number };
+			const newIndex = action.payload as number;
+			if (newIndex != -1) {
+				state.discussion[newIndex].notif = 0;
+				console.log("reset notif: ", state.discussion[newIndex].notif);
+			}
+			return { ...state, index_active: newIndex };
 		case EChatSocketActionType.DISPLAY:
 			return { ...state, chat_display: action.payload as boolean };
 		case EChatSocketActionType.NEW_MSG:
 			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
 			state.discussion[index].messages.push(action.payload as IMessage);
+			state.discussion[index].notif += 1;
+			console.log("index ", index, " inc notif: ", state.discussion[index].notif);
+			console.log("disc: ", state.discussion);
 			return { ...state };
 		default:
 			return { ...state };

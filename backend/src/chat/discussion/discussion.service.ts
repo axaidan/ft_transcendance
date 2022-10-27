@@ -27,8 +27,8 @@ export class DiscussionService {
                     user2Id: dto.user2Id,
                 },
                 include: {
-                    user1: { select: { id: true, username: true } },
-                    user2: { select: { id: true, username: true } },
+                    user1: true,
+                    user2: true,
                     messages: true,
                 },
             });
@@ -97,8 +97,8 @@ export class DiscussionService {
                 OR: [{ user1Id: currentUserId }, { user2Id: currentUserId }]
             },
             include: {
-                user1: { select: { id: true, username: true, } },
-                user2: { select: { id: true, username: true, } },
+                user1: true,
+                user2: true,
             },
         });
         return discussions;
