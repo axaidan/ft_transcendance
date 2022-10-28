@@ -1,16 +1,41 @@
 // Extern:
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
 import { useOutletContext, Link } from "react-router-dom";
 import { AxiosResponse } from "axios";
+import '../../styles/components/profile_components/Friends.css'
 
 // Intern:
 import { IUser } from "../../types/interfaces/IUser"
 import { AxiosJwt } from "../../hooks";
+import { SocketContext } from '../../context/UserSocket/Socket';
 
+
+type FriendProps = {
+	friend: IUser;
+}
+
+function FriendList({ friend }: FriendProps) {
+	return (
+		<div className="friend-bloc">
+			<img src={friend.avatarUrl} id='friend-avatar' />
+			<div className="friend-username">
+				{friend.username}
+			</div>
+			<Link to={"/home/" + friend.id}>
+				<button id='friend-redirect'>
+				</button>
+			</Link>
+			<div className="friend-right-button">
+				<button id='friend-chat'>Chat</button>
+				<button id='friend-unfriend'></button>
+			</div>
+		</div>
+	)
+}
 
 export function Friends() {
 	const axios = AxiosJwt();
-	const user: IUser = useOutletContext();
+	const { me } = useContext(SocketContext).SocketState;
 	const [friends, setFriends] = useState<IUser[]>([]);
 	const [blocks, setBlocks] = useState<IUser[]>([]);
 
@@ -24,20 +49,16 @@ export function Friends() {
 	}, [])
 
 	return (
-		<div>
-			<div> FRIEND PAGE of: {user.login}</div>
-
-			<h1>friend:</h1>
+		<div className="friends-body">
 			<ul>
-				{friends.map((friend: IUser, index) => (
-					<Link key={index} to={"/home/" + friend.id}>
-						<li>{friend.username}</li>
-					</Link>
+				<h1>friend:</h1>
+				{friends.map((friend: IUser, index: number) => (
+					<FriendList key={index} friend={friend} />
 				))}
 			</ul>
 
-			<h1>Block:</h1>
 			<ul>
+				<h1>Block:</h1>
 				{blocks.map((block: IUser, index) => (
 					<Link key={index} to={"/home/" + block.id}>
 						<li>{block.username}</li>

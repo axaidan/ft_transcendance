@@ -1,9 +1,25 @@
 import '../styles/pages/Acceuil.css'
+import accueilbg from '../assets/videos/accueil-bg.webm'
+import { Link } from 'react-router-dom'
 
 export function Acceuil() {
 	return (
 		<div className='acc-body'>
-			<p>CECI EST LA PAGE D'ACCEUIL</p>
+			<div id='acc-title'>The 13th season is coming !</div>
+			<div className='acc-video-div'>
+				<video src={accueilbg} playsInline autoPlay loop muted className='acc-video' />
+			</div>
+			<div className='acc-worlds'>
+				<a href='https://www.youtube.com/watch?v=UUhjpTuZunw'>
+					<img src='https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt481add8b70ff4bd9/634f52cbbb329010566dee4e/Top10-YT-Template-Faker.jpg' id='acc-faker' />
+					<div className="acc-faker-desc">
+						<div className="acc-esport">E-SPORT</div>
+						<div className='acc-esport-title'>Group Stage Top 10 !</div>
+						<div className='acc-esport-desc'>A look back at the best moves from the group stage.</div>
+						<div className='acc-esport-publish'>Lolesports Staff - 8 days ago.</div>
+					</div>
+				</a>
+			</div>
 		</div>
 	)
 }

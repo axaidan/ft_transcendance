@@ -1,6 +1,6 @@
 // Extern:
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation, useOutletContext, useParams } from "react-router-dom";
+import { Link, useNavigate, useLocation, useOutletContext, useParams, Outlet } from "react-router-dom";
 
 // Intern:
 import { AxiosJwt } from '../../hooks/AxiosJwt'
@@ -31,6 +31,7 @@ function Game({ game }: GameProps) {
 }
 
 export function History() {
+
 	const axios = AxiosJwt();
 	const user: IUser = useOutletContext();
 	const [games, setGames] = useState<IGame[]>([]);
@@ -40,7 +41,7 @@ export function History() {
 		axios.get('/game/historique/' + user.id)
 			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
 		axios.get('user/all').then((res: AxiosResponse<IUser[]>) => { setUsers(res.data) });
-	}, [])
+	}, []);
 
 	return (
 		<div className='container-history'>

@@ -12,6 +12,8 @@ import bg_website from '../assets/videos/bg_website.webm'
 import { useAxios } from "../hooks/useAxios";
 import SocketContextComponent from "../context/UserSocket/Components";
 import { ChatSocketContextComponent } from "../context";
+import { Acceuil } from "./Acceuil";
+import { Profile } from "./Profile";
 
 function LoadingHome() {
 	return (
@@ -29,15 +31,13 @@ export function Home() {
 	if (error !== '') return navigate('/');
 	if (!user) return navigate('/');
 
-	console.log("USER: ", user)
-
 	return (
 		<SocketContextComponent user={user}>
 			<ChatSocketContextComponent user={user}>
 				<Navbar />
 				<div className='container-body'>
 					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
-					<Outlet context={user} />
+					<Outlet />
 				</div>
 				<Friendsbar />
 			</ChatSocketContextComponent>

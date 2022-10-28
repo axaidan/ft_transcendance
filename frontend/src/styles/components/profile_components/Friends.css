@@ -1,0 +1,57 @@
+.friend-bloc {
+	display: flex;
+	align-items: center;
+	background-color: #091720;
+	height: 80px;
+	border-bottom: 2px solid red;
+	background-image: url('../../../assets/images/avatar-border.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-position-x: 27px;
+	background-size: 85px;
+}
+
+#friend-avatar {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	margin-left: 40px;
+}
+
+.friend-username {
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: x-large;
+	margin-left: 20px;
+	margin-right: 10px;
+}
+
+.friend-right-button {
+	margin-left: auto;
+	margin-right: 50px;
+}
+
+#friend-chat {
+	margin-right: 10px;
+	height: 60px;
+	width: 60px;
+	background-color: yellowgreen;
+}
+
+#friend-unfriend {
+	height: 60px;
+	width: 60px;
+	background-color: yellowgreen;
+}
+
+#friend-redirect {
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/person_mask.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+}

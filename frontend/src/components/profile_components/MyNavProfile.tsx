@@ -28,14 +28,15 @@ export function MyNavProfile() {
 	const resolver: Resolver<FormValues> = async (values) => {
 		return {
 			values: values.username ? values : {},
-			errors: !ExistantUsername(values.username) ?
+			errors: ExistantUsername(values.username) ?
+				{} :
 				{
 					username: {
 						type: 'required',
-						message: '',
+						message: 'This user does not exist.',
 					}
 				}
-				: {}
+
 		};
 	};
 
@@ -72,7 +73,7 @@ export function MyNavProfile() {
 					</form>
 				</div>
 			</ul >
-			<Outlet />
+			<Outlet context={me} />
 		</div >
 	)
 }
