@@ -1,0 +1,18 @@
+*:not(canvas) {
+    margin: 0;
+    padding: 0;
+  }
+
+#canvas {
+    width: 500px !important;
+  height: 500px !important;  
+    background: black !important;
+    padding: 50px !important;
+    border: .4rem solid white;
+    position: sticky;
+    margin-bottom: 50px;
+    transition-duration: 1s;
+    width: 75% !important;
+    height: 100% !important;
+    // padding-top: 50% !important;
+  }
