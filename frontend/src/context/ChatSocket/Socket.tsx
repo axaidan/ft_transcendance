@@ -48,7 +48,6 @@ export interface IChatSocketContextAction {
 export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatSocketContextAction) => {
 	console.log(`ChatContext - Action: ${action.type} - Payload : `, action.payload);
 
-
 	switch (action.type) {
 		case EChatSocketActionType.UP_SOKET:
 			return { ...state, socket: action.payload as Socket };
@@ -61,8 +60,8 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_CURR:
 			const newIndex = action.payload as number;
 			if (newIndex != -1) {
-				state.discussion[newIndex].notif = 0;
-				console.log("reset notif: ", state.discussion[newIndex].notif);
+				// state.discussion[newIndex].notif = 0;
+				// console.log("reset notif: ", state.discussion[newIndex].notif);
 			}
 			return { ...state, index_active: newIndex };
 		case EChatSocketActionType.DISPLAY:
@@ -71,10 +70,8 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
 			if (index != -1) {
 				state.discussion[index].messages.push(action.payload as IMessage);
-				state.discussion[index].notif += 1;
+				// state.discussion[index].notif += 1;
 			}
-			console.log("index ", index, " inc notif: ", state.discussion[index].notif);
-			console.log("disc: ", state.discussion);
 			return { ...state };
 		default:
 			return { ...state };

@@ -15,7 +15,7 @@
 #chat-container-display {
 	position: absolute;
 	display: grid;
-	grid-template-columns: 2fr 5fr;
+	grid-template-columns: 2.5fr 5fr;
 	grid-column: auto;
 	bottom: 0;
 	left: -701px;
@@ -133,18 +133,20 @@
 .disc-user-active:hover #disc-close{
 	position: absolute;
 	display: block;
-	left: 170px;
-	height: 15px;
-	width: 15px;
-	background-color: aqua;
+	left: 200px;
+	height: 20px;
+	width: 20px;
+	background: url('../../../assets/images/socialOption/close.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 100%;
+	border: none;
 }
-
-
 
 /* ------------------------ */
 
 #chat-username {
-	font-size: 1.2em;
+	font-size: 1em;
 }
 
 #chat-user-origin {
@@ -152,6 +154,10 @@
 	color: gray;
 }
 
+#chat-search-friends {
+	overflow: scroll;
+	overflow-x: hidden;
+}
 
 .message-right {
 	position: relative;

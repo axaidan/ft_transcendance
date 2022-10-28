@@ -17,3 +17,24 @@
 .bg_video {
 	background-color: black;
 }
+
+/* width */
+::-webkit-scrollbar {
+	width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+	background: #020912;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: rgb(196, 150, 26);
+	border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+	background: rgb(221, 198, 135);
+}

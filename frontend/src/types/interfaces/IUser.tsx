@@ -12,10 +12,11 @@ export type IUser = {
 export const DflUser: IUser = {
 	id: 0,
 	login: "username",
-	username: "string",
+	username: "Nouveau message",
 	email: "string",
 	createdAt: "string",
 	updatedAt: "string",
 	twoFactorAuth: false,
-	avatarUrl: ""
+	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg"
 }
+

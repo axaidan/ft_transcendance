@@ -1,21 +1,19 @@
 
 // Extern:
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 
 // Intern:
-import { ChatNav, DiscussionNav } from ".";
-import { ChatSocketContext, EChatSocketActionType, SocketContext } from "../../context";
+import { ChatNav, DiscussionNav, ChatOption, ChatUser, UserCreateChat } from ".";
+import { ChatSocketContext, SocketContext } from "../../context";
+import { DflUser, IMessage } from "../../types";
 
 // Assets:
 import '../../styles/components/discussion_components/Chat.css'
-import { IMessage, IUser } from "../../types";
 
 
 type DiscMessageProps = { msg: IMessage }
 export function DiscMessage({ msg }: DiscMessageProps) {
 	const { me } = useContext(SocketContext).SocketState;
-
-	// COMPARE LES UIDS, RENVOIE LA CLASSE CSS APPROPRIER. 
 	const message_side = () => { return ((me.id != msg.userId ? "left" : "right")); }
 
 	return (
@@ -48,18 +46,10 @@ export function ChatBody() {
 export function Chat() {
 	const { me, chat_display, socket, index_active, discussion } = useContext(ChatSocketContext).ChatSocketState;
 
-	/* Permet d'envoyer le message au back - dans le cas ou l'input nest pas vide */
 	const handleKeyDown = (e: any) => {
 		const input = document.getElementById('messages-input') as HTMLInputElement;
 		if (e.key === 'Enter') {
-			if (input.value.length != 0) {
-
-				socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });
-
-				// ICI je doit emit le message au back!
-				// il me faut donc: - socket - userId - input.value - discId
-			}
-			// Flush du contenu d'input:
+			if (input.value.length != 0) {socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });}
 			input.value = "";
 		}
 	}
@@ -77,18 +67,16 @@ export function Chat() {
 		);
 	}
 
-	const ChatNotAble = () => {
-		return (
+	const ChatNotAble = () => { return (
 			<>
 				<DiscussionCreate />
 				<div className='messages-container-search'>
 					<ChatSearch />
-					<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
+					<input id="messages-input" placeholder='  Filter' onKeyDown={handleKeyDown} />
 					<ChatSearchFriends />
 				</div>
 			</>
-		)
-	}
+	)}
 
 	return (
 		<div id={chat_display ? "chat-container-display" : "chat-container-none"}>
@@ -97,45 +85,23 @@ export function Chat() {
 	)
 }
 
-type ChatUserProps = { user: IUser };
-const ChatUser = ({ user }: ChatUserProps) => {
-	return (
-		<div className="chat-user">
-			<div className="chat-user-avatar">
-				<img src={user.avatarUrl} className="chat-user-icon" />
-			</div>
-			<div>
-				<p id="chat-username">{user.username}</p>
-				<p id="chat-user-origin">{user.login + " #EUW"}</p>
-			</div>
-		</div>
-	)
-}
-
-
 function ChatSearchFriends() {
 	const { friends } = useContext(SocketContext).SocketState;
-	return (<div id='chat-search-friends'>{friends.map(friend => { return < ChatUser user={friend} /> })}</div>)
+	return (
+		<div id='chat-search-friends'>{friends.map(friend => { return (
+			<UserCreateChat user={friend}>
+				<div className="disc-user">
+					<ChatUser user={friend} msg={friend.login + " #EUW"} />
+				</div>
+			</UserCreateChat>
+		)})}</div>)
 }
 
 function ChatSearch() {
-	const chat = useContext(ChatSocketContext).ChatSocketDispatch;
-	function reduceChat() { chat({ type: EChatSocketActionType.DISPLAY, payload: false }) }
-
 	return (
 		<div className='messages-nav'>
-			<div className="chat-user">
-				<div className="disc-user-avatar">
-					<img className="disc-user-icon" />
-				</div>
-				<div>
-					<p>Nouveau message</p>
-				</div>
-			</div>
-			<div className='messages-options'>
-				<button id='btn-messages-reduction' onClick={() => reduceChat()}></button>
-				<button id='btn-messages-panel'></button>
-			</div>
+			<ChatUser user={DflUser} msg={undefined} />
+			<ChatOption />
 		</div>
 	)
 }
@@ -144,14 +110,8 @@ function DiscussionCreate() {
 	return (
 		<div className='discussion-container'>
 			<div className='disc-user-active'>
-				<div className="disc-box-active"></div>
-				<div className="disc-user-avatar">
-					<img className="disc-user-icon" />
-				</div>
-				<div>
-					<p id="disc-create-message">Nouveau message</p>
-					<p id="disc-create-submess">creation d'un nouveau...</p>
-				</div>
+				<div className="disc-box-active" />
+				<ChatUser user={DflUser} msg={'creation d\'un nouveau...'} />
 			</div>
 		</div>
 	)

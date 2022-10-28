@@ -1,47 +1,42 @@
+// Extern:
 import { useContext } from "react";
-import { ChatSocketContext, EChatSocketActionType } from "../../context";
+
+// Intern:
+import { ChatSocketContext } from "../../context";
 import { IUser } from "../../types";
+import { ChatOption } from ".";
 
 
-
-function ChatNavUser() {
-	const { me, discussion, index_active } = useContext(ChatSocketContext).ChatSocketState;
-
-	function othUser() {
-		const user1: IUser = discussion[index_active].user1;
-		const user2: IUser = discussion[index_active].user2;
-		return ( me.id != user1.id ? user1 : user2 );
-	}
-
-	const oth_User = othUser();
-
+export interface ChatUserProps { user: IUser, msg: string | undefined }
+export const ChatUser: React.FunctionComponent<ChatUserProps> = ({ user, msg }) => {
 	return (
 		<div className="chat-user">	
 			<div className="chat-user-avatar">
-				<img src={oth_User.avatarUrl} className="chat-user-icon" />
+				<img src={user.avatarUrl} className="chat-user-icon" />
 			</div>
 			<div>
-				<p id="chat-username">{oth_User.username}</p>
-				<p id="chat-user-origin">{oth_User.login + " #EUW"}</p>
+				<p id="chat-username">{user.username}</p>
+				<p id="chat-user-origin">{msg}</p>
 			</div>
 		</div>
 	)
 }
 
 export function ChatNav() {
-	const chat = useContext(ChatSocketContext).ChatSocketDispatch;
+	const { me, discussion, index_active } = useContext(ChatSocketContext).ChatSocketState;
 
-	function reduceChat() {
-		chat({ type: EChatSocketActionType.DISPLAY, payload: false })
-	}
+	const oth_User = () => {
+		const user1: IUser = discussion[index_active].user1;
+		const user2: IUser = discussion[index_active].user2;
+		return ( me.id != user1.id ? user1 : user2 );
+	};
+
+	const user = oth_User();
 
 	return (
 		<div className='messages-nav'>
-			<ChatNavUser />
-			<div className='messages-options'>
-				<button id='btn-messages-reduction' onClick={() => reduceChat()}></button>
-				<button id='btn-messages-panel'></button>
-			</div>
+			<ChatUser user={user} msg={user.login + " #EUW"}/>
+			<ChatOption />
 		</div>
 	)
 }
