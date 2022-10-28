@@ -1,6 +1,5 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { AxiosJwt } from "../../hooks";
 import { DflUser, IDiscussion, IMessage, IUser } from "../../types";
 
 export interface IChatSocketContextState {
@@ -55,16 +54,24 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_UID:
 			return { ...state, me: action.payload as IUser };
 		case EChatSocketActionType.UP_DISC:
-			return { ...state, discussion: [...state.discussion, action.payload as IDiscussion] };
+			return { ...state, discussion: [ ...state.discussion ] };
 		case EChatSocketActionType.RM_DISC:
 			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_CURR:
-			return { ...state, index_active: action.payload as number };
+			const newIndex = action.payload as number;
+			if (newIndex != -1) {
+				// state.discussion[newIndex].notif = 0;
+				// console.log("reset notif: ", state.discussion[newIndex].notif);
+			}
+			return { ...state, index_active: newIndex };
 		case EChatSocketActionType.DISPLAY:
 			return { ...state, chat_display: action.payload as boolean };
 		case EChatSocketActionType.NEW_MSG:
 			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
-			state.discussion[index].messages.push(action.payload as IMessage);
+			if (index != -1) {
+				state.discussion[index].messages.push(action.payload as IMessage);
+				// state.discussion[index].notif += 1;
+			}
 			return { ...state };
 		default:
 			return { ...state };

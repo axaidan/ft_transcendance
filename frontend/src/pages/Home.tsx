@@ -31,9 +31,11 @@ export function Home() {
 	if (error !== '') return navigate('/');
 	if (!user) return navigate('/');
 
+	console.log("USER: ", user)
+
 	return (
 		<SocketContextComponent user={user}>
-			<ChatSocketContextComponent user={user}>
+			<ChatSocketContextComponent>
 				<Navbar />
 				<div className='container-body'>
 					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
