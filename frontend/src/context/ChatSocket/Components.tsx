@@ -1,18 +1,18 @@
 // Extern:
-import { PropsWithChildren, useEffect, useReducer, useState } from "react";
+import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "react";
 
 // Intern:
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
-import { IMessage, IUser } from "../../types";
+import { IDiscussion, IMessage, IUser } from "../../types";
+import { SocketContext } from "../UserSocket";
 
-export interface IChatSocketContextComponentProps extends PropsWithChildren {
-	user: IUser;
-}
-
-export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children, user }) => {
+export interface IChatSocketContextComponentProps extends PropsWithChildren {}
+export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
 	const [loadingSocket, setLoading] = useState(true);
+
+	const { me } = useContext(SocketContext).SocketState
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -21,35 +21,31 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 	})
 
 	useEffect(() => {
-		if (user.id != 0) {
-			console.log("UserId: ", user.id);
-
-			chatSocket.connect();
-			// Save the socket in context //
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: user });
-			// Start the envent listeners // 
-			StartListeners();
-			StartHandshake();
-		}
-	}, [user])
+		console.log("UserId: ", me.id);
+		chatSocket.connect();
+		// Save the socket in context //
+		ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
+		ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: me });
+		// Start the envent listeners // 
+		StartListeners();
+		StartHandshake();
+	}, [])
 
 	const StartListeners = () => {
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
 			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
-		})
-		// chatSocket.on('newDiscToClient', (message: IMessage) => {
-		//     console.info('J\'ai recu un nouveau message.');
-		// 	ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
+		});
+
+		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
+		//     console.info('J\'ai recu une nouvelle discussion.');
+		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
 		// })
-
-
 	};
 
 	const StartHandshake = () => {
 		console.info('Sending handshake to server ...');
-		chatSocket.emit('loginToServer', user.id);
+		chatSocket.emit('loginToServer', me.id);
 		setLoading(false);
 	};
 

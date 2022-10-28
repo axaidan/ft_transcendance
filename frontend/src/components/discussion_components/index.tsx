@@ -1,3 +1,5 @@
 export * from './DiscussionNav'
+export * from './ChatOption'
+export * from './ChatUtils'
 export * from './ChatNav'
 export * from './Chat'

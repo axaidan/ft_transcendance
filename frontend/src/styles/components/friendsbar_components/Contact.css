@@ -21,31 +21,11 @@
     position: absolute;
     display: flex;
     top:  30px;
-    left: -13px;
-    font-size: 0.9em;
+    left: -10px;
 }
 
 .contact-status div {
-    margin-right: 9px;
-}
-/* width */
-::-webkit-scrollbar {
-	width: 7px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-	background: #020912;
-}
-  
-/* Handle */
-::-webkit-scrollbar-thumb {
-	background: rgb(196, 150, 26);
-	border-radius: 10px;
-}
-  /* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-	background: rgb(221, 198, 135);
+    margin-right: 7px;
 }
 
 #contact-list {
