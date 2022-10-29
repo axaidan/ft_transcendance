@@ -1,9 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ChannelUser } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { isInstance } from 'class-validator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChanelUserDto } from './dto/create-channel-user.dto';
+import { CreateChannelUserDto } from './dto/create-channel-user.dto';
 import { EChannelStatus } from './types';
 
 @Injectable()
@@ -12,7 +11,7 @@ export class ChannelUserService {
         private prisma: PrismaService,
     ) {}
 
-    async create(dto: CreateChanelUserDto) :
+    async create(dto: CreateChannelUserDto) :
     Promise<ChannelUser>
     {
         try {

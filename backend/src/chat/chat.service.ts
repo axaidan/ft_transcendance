@@ -15,6 +15,10 @@ export class ChatService {
         private channelService: ChannelService,
     ) {}
 
+    //////////////////////////
+    //  DISCUSSION METHODS  //
+    //////////////////////////
+
     //  GET /discussion
     //  RETURNS ALL DISCUSSIONS OF GIVEN USER
     async getDiscussions(currentUserId: number) :
@@ -59,6 +63,10 @@ export class ChatService {
         this.chatGateway.newDisc(newDiscDto);
         return discussion;
     }
+
+    //////////////////////
+    //  CHANNEL METHODS //
+    //////////////////////
 
     //  GET /channel/all
     async getAllPublicChannels(currentUserId: number) : 

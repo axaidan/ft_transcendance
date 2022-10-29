@@ -1,13 +1,12 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Channel, ChannelUser, Prisma } from '@prisma/client';
-import { channel } from 'diagnostics_channel';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
-import { CreateChanelUserDto } from './channel-user/dto/create-channel-user.dto';
+import { CreateChannelUserDto } from './channel-user/dto/create-channel-user.dto';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
 import { ChannelDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { ChanWusersWmsgs, ChanWusersWmsgsWstatus } from './types';
+import * as argon from 'argon2';
 
 @Injectable()
 export class ChannelService {
@@ -103,9 +102,10 @@ export class ChannelService {
         if (channel === null) {
             throw new NotFoundException(`channel ${channelDto.id} NOT FOUND`);
         }
-        let channelUser: ChannelUser = await this.channelUserService.findOne(currentUserId, channelDto.id);
+        let channelUser: ChannelUser =
+            await this.channelUserService.findOne(currentUserId, channelDto.id);
         if (channelUser === null) {
-            const createChannelUserDto: CreateChanelUserDto = {
+            const createChannelUserDto: CreateChannelUserDto = {
                 userId: currentUserId,
                 channelId: channelDto.id,
                 status: EChannelStatus.NORMAL,
@@ -125,9 +125,8 @@ export class ChannelService {
             },
             include : {
                 channelUsers: true,
-                // messages: true,
             }
-        })
+        });
         return channel;
     }
 

@@ -12,6 +12,7 @@ import { CreateDiscussionDto, DiscussionDto } from 'src/chat/discussion/dto';
 import { CreateChannelDto } from 'src/chat/channel/dto';
 import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
 import { normalize } from 'path';
+import { ChannelService } from 'src/chat/channel/channel.service';
 
 const N = 20;
 
@@ -20,6 +21,7 @@ describe('App e2e', () => {
 	let prisma: PrismaService;
 	let authService: AuthService;
 	let discService: DiscussionService;
+	let chanService: ChannelService;
 	
 	let dummyJwt: {access_token: string};
 	let dummyUser: User
@@ -56,76 +58,39 @@ describe('App e2e', () => {
 		const channelArr: Channel[] = [];
 		let i = 0;
 		for ( ; i < N/4 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: false,
-					protected: false,
-					channelUsers: {
-						create: [{
-							userId: userArr[0].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					}
-				},
+			const channel = await chanService.create(userArr[0].id, {
+				name: `channel${i}`,
+				private: false,
+				protected: false,
 			});
 			channelArr.push(channel);
 		}
 		for ( ; i < N/2 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: true,
-					protected: false,
-					channelUsers: {
-						create: [{
-							userId: userArr[1].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
+			const channel = await chanService.create(userArr[2].id, {
+				name: `channel${i}`,
+				private: false,
+				protected: true,
+				hash: `password${i}`,
+
 			});
 			channelArr.push(channel);
 		}
 		for ( ; i < N/2 + N/4 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: false,
-					protected: true,
-					hash: `password${i}`,
-					channelUsers: {
-						create: [{
-							userId: userArr[2].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
+
+			const channel = await chanService.create(userArr[1].id, {
+				name: `channel${i}`,
+				private: true,
+				protected: false,
 			});
+
 			channelArr.push(channel);
 		}
 		for ( ; i < N ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: true,
-					protected: true,
-					hash: `password${i}`,
-					channelUsers: {
-						create: [{
-							userId: userArr[3].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
+			const channel = await chanService.create(userArr[3].id, {
+				name: `channel${i}`,
+				private: true,
+				protected: true,
+				hash: `password${i}`,
 			});
 			channelArr.push(channel);
 		}
@@ -384,6 +349,7 @@ describe('App e2e', () => {
 		
 		prisma = app.get(PrismaService);
 		authService = app.get(AuthService);
+		chanService = app.get(ChannelService);
 		await prisma.cleanDb();
 
 		// DUMMY USER AND JWT INIT
@@ -1253,7 +1219,7 @@ describe('App e2e', () => {
 				.expectStatus(200)
 				.expectBodyContains(userArr[0].id)
 				.expectBodyContains(userArr[1].id)
-				.inspect();
+				// .inspect();
 			});
 		});
 
@@ -1412,10 +1378,10 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-		});	// DESCRIBE(RELATION CREATE POST/channel)
+		});	// DESCRIBE(CREATE POST/channel)
 
 
-		describe('Create GET /channel/all', () => {
+		describe('GET /channel/all', () => {
 
 			it('VALID - should 200', () => {
 				return pactum
@@ -1426,15 +1392,33 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				// .expectJsonLength(13)
+				.expectJsonLength(13)
 				// .expectBodyContains(chanArr[0].name)
 				// .expectBodyContains(chanArr[4].name)
 				// .inspect();
 			});
 
-		}); //	DESCRIBE (RELATION GET/all)
+		}); //	DESCRIBE (GET/channel/all)
 
-		describe('Create GET /channel', () => {
+		describe('POST /channel/join', () => {
+
+			it('VALID JOIN PUBLIC - should 201', () => {
+				return pactum
+				.spec()
+				.post('/channel/join')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody({
+					id: chanArr[0].id,
+				})
+				.expectStatus(201)
+				.inspect();
+			});
+
+		}); //	DESCRIBE (POST /channel/join)
+
+		describe('GET /channel', () => {
 
 			it('VALID - should 200', () => {
 				return pactum
@@ -1447,7 +1431,7 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-		}); //	DESCRIBE (RELATION GET/all)
+		}); //	DESCRIBE (GET/channel/)
 
 	});
 
