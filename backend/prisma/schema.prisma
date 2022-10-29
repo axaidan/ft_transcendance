@@ -126,6 +126,7 @@ model ChannelUser {
 	role			Int
 	userId			Int
 	channelId		Int
+	statusTime		DateTime?
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
 	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
@@ -11,18 +11,17 @@ import { DiscussionWithUsers } from './discussion/types';
 @Controller()
 export class ChatController {
 
-    constructor (
+    constructor(
         private chatService: ChatService,
-    ) {}
+    ) { }
 
     //////////////////////////
     //  DISCUSSION REQUESTS //
     //////////////////////////
 
     @Get('discussion')
-    async getDiscussions(@GetUser('id') currentUserId: number) :
-    Promise<Discussion[]>
-    {
+    async getDiscussions(@GetUser('id') currentUserId: number):
+        Promise<Discussion[]> {
         return await this.chatService.getDiscussions(currentUserId);
     }
 
@@ -30,22 +29,20 @@ export class ChatController {
     async getDiscussionById(
         @GetUser('id') currentUserId: number,
         @Param('id', ParseIntPipe) discId: number,
-    ) :
-    Promise<Discussion>
-    {
+    ):
+        Promise<Discussion> {
         const discussion = await this.chatService.getDiscussionById(currentUserId, discId);
         return discussion;
     }
-    
 
-    //  POST /discussion/:user2Id
+
+    //  POST /discussion
     @Post('discussion')
     async createDiscussion(
         @GetUser('id') currentUserId: number,
-        @Body() body: CreateDiscussionBodyDto, 
-    ) :
-    Promise<DiscussionWithUsers>
-    {
+        @Body() body: CreateDiscussionBodyDto,
+    ):
+        Promise<DiscussionWithUsers> {
         return this.chatService.createDiscussion(currentUserId, body.user2Id);
     }
 
@@ -54,19 +51,15 @@ export class ChatController {
     //////////////////////////
 
     @Get('channel/all')
-    async getAllPublicChannels(@GetUser('id') currentUserId: number) :
-    Promise<Channel[]>
-    {
+    async getAllPublicChannels(@GetUser('id') currentUserId: number)
+        : Promise<Channel[]> {
         const channels: Channel[] = await this.chatService.getAllPublicChannels(currentUserId);
         return channels;
     }
 
     @Get('channel')
-    async getAllChannelsForUser(
-        @GetUser('id') currentUserId: number,
-    )
-    : Promise<Channel[]>
-    {
+    async getAllChannelsForUser(@GetUser('id') currentUserId: number)
+        : Promise<Channel[]> {
         const channels: Channel[] = await this.chatService.getAllChannelsForUser(currentUserId);
         return channels;
     }
@@ -75,9 +68,7 @@ export class ChatController {
     async createChannel(
         @GetUser('id') currentUserId: number,
         @Body() createChanDto: CreateChannelDto,
-    ) :
-    Promise<Channel>
-    {
+    ): Promise<Channel> {
         const channel: Channel = await this.chatService.createChannel(currentUserId, createChanDto);
         return channel;
     }
@@ -86,15 +77,20 @@ export class ChatController {
     async joinChannel(
         @GetUser('id') currentUserId: number,
         @Body() channelDto: ChannelDto,
-        ) : Promise<Channel> {
-            const channel: Channel = await this.chatService.joinChannel(currentUserId, channelDto);
-            return channel;
+    ): Promise<Channel> {
+        const channel: Channel = await this.chatService.joinChannel(currentUserId, channelDto);
+        return channel;
     }
 
-    // @Post('channel/leave')
-    // async leaveChannel() {
-
-    // }
+    @HttpCode(200)
+    @Post('channel/leave')
+    async leaveChannel(
+        @GetUser('id') currentUserId: number,
+        @Body() channelDto: ChannelDto,
+    ): Promise<Channel> {
+        const channel: Channel = await this.chatService.leaveChannel(currentUserId, channelDto);
+        return channel;
+    }
 
     // @Patch('channel')
     // async editChannel() {
@@ -114,13 +110,13 @@ export class ChatController {
     // @Patch('channel/:chanId')
     // async updateChan() {
     // } 
-    
+
     // @Get('channel')
     // async getChannels(@GetUser('id') currentUserId: number)
     // Promise<Channel[]>
     // {
-        // const channels: Channel[] = await this.channelService.getChannelsByUserId(currentUserId);
-        // return channels;
+    // const channels: Channel[] = await this.channelService.getChannelsByUserId(currentUserId);
+    // return channels;
     // }
 
 }

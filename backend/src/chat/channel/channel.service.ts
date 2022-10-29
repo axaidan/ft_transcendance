@@ -17,14 +17,13 @@ export class ChannelService {
     ) { }
 
     //  POST /channel
-    //  CREATES A CHANNEL WITH name, private AND OPTIONAL hash
     async create(
         currentUserId: number,
         dto: CreateChannelDto
     ): Promise<Channel> {
-        if (dto.protected === true && dto.private === true) {
-            throw new BadRequestException('cannot be private and protected');
-        }
+        // if (dto.protected === true && dto.private === true) {
+        //     throw new BadRequestException('cannot be private and protected');
+        // }
         let hash: string;
         if (dto.protected === true) {
             if (('hash' in dto) === false) {
@@ -79,6 +78,11 @@ export class ChannelService {
                 channel['userRole'] = channelUser.role;
                 channel['userJoined'] = true;
             }
+            else {
+                channel['userStatus'] = EChannelStatus.NORMAL;
+                channel['userRole'] = EChannelRoles.NORMAL;
+                channel['userJoined'] = true;
+            }
             delete channel.hash;
         }
         return channels;
@@ -105,16 +109,18 @@ export class ChannelService {
     }
 
     //  POST /channel/join + ChannelDto
-    //  reject if channel is private
-    //  check hash if channel protected
-    //  check status expiration if channel already joined
+    //  reject if channel is private (??? YES OR NO ?)
     async join(currentUserId: number, channelDto: ChannelDto):
         Promise<Channel> {
         const channel: Channel = await this.findOne(channelDto.id);
         if (channel === null) {
             throw new NotFoundException(`channel ${channelDto.id} NOT FOUND`);
         }
+        //  check hash if channel protected
         if (channel.protected === true) {
+            if (('hash' in channelDto) === false) {
+                throw new BadRequestException('need password');
+            }
             const passwordMatches = await argon.verify(channel.hash, channelDto.hash);
             if (passwordMatches === false) {
                 throw new ForbiddenException('incorrect password');
@@ -123,17 +129,39 @@ export class ChannelService {
         let channelUser: ChannelUser =
             await this.channelUserService.findOne(currentUserId, channelDto.id);
         if (channelUser === null) {
-            const createChannelUserDto: CreateChannelUserDto = {
+            channelUser = await this.channelUserService.create({
                 userId: currentUserId,
                 channelId: channelDto.id,
                 status: EChannelStatus.NORMAL,
                 role: EChannelRoles.NORMAL,
-            }
-            channelUser = await this.channelUserService.create(createChannelUserDto);
+            });
+        }
+        else {
         }
         channel['userStatus'] = channelUser.status;
         channel['userRole'] = channelUser.role;
         channel['userJoined'] = true;
+        delete channel.hash;
+        return channel;
+    }
+
+    // if (user is owner find another owner)
+    // if (status is not noral, keep ChannelUser record in db)
+    async leave(userId: number, dto: ChannelDto):
+        Promise<Channel> {
+        const channelUser: ChannelUser = await this.channelUserService.findOne(userId, dto.id);
+        if (channelUser === null) {
+            throw new ForbiddenException('channel not joined');
+        }
+        // DO NOT DELETE IF STATUS IS NOT NORMAL
+        if (channelUser.status === EChannelStatus.NORMAL) {
+            this.channelUserService.delete(channelUser);
+        }
+        // socket leaves the room;
+        const channel: Channel = await this.findOne(dto.id);
+        channel['userStatus'] = channelUser.status;
+        channel['userRole'] = channelUser.role;
+        channel['userJoined'] = false;
         delete channel.hash;
         return channel;
     }

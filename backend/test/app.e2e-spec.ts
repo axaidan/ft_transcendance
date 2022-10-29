@@ -1033,7 +1033,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(userId)
 				.expectBodyContains(dummyUser.id)
-				.inspect();
+				// .inspect();
 			});
 // 
 			it('NON VALID DTO- should 201', () => {
@@ -1427,7 +1427,7 @@ describe('App e2e', () => {
 					hash: `password${5}`,
 				})
 				.expectStatus(201)
-				.inspect();
+				// .inspect();
 			});
 
 			it('NON-VALID JOIN protected - should 403', () => {
@@ -1442,10 +1442,57 @@ describe('App e2e', () => {
 					hash: `incorrectPWD${5}`,
 				})
 				.expectStatus(403)
-				.inspect();
+				// .inspect();
+			});
+
+			it('NO-hash JOIN protected - should 400', () => {
+				return pactum
+				.spec()
+				.post('/channel/join')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody({
+					id: chanArr[5].id,
+					// hash: `incorrectPWD${5}`,
+				})
+				.expectStatus(400)
+				// .inspect();
 			});
 
 		}); //	DESCRIBE (POST /channel/join)
+
+		describe('POST /channel/leave', () => {
+
+			it('VALID leave - should 200', () => {
+				return pactum
+				.spec()
+				.post('/channel/leave')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`
+				})
+				.withBody({
+					id: chanArr[0].id,
+				})
+				.expectStatus(200)
+				// .inspect();
+			});
+
+			it('NOT MEMBER - should 403', () => {
+				return pactum
+				.spec()
+				.post('/channel/leave')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`
+				})
+				.withBody({
+					id: chanArr[0].id,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+		});
 
 		describe('GET /channel', () => {
 

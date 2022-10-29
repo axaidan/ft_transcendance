@@ -33,6 +33,17 @@ export class ChannelUserService {
         }
     }
 
+    async delete(channelUser: ChannelUser): Promise<void> {
+        await this.prisma.channelUser.delete({
+            where: {
+                channelId_userId: {
+                    channelId: channelUser.channelId,
+                    userId: channelUser.userId
+                },
+            },
+        });
+    }
+
     async getAllNonBannedChannelUsers(userId: number):
     Promise<ChannelUser[]>
     {

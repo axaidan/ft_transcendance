@@ -107,4 +107,15 @@ export class ChatService {
         return channel;
     }
 
+    //  POST /channel/join + ChannelDto
+    async leaveChannel(
+        currentUserId: number,
+        dto: ChannelDto,
+    ) : 
+    Promise<Channel>
+    {
+        const channel: Channel = await this.channelService.leave(currentUserId, dto);
+        return channel;
+    }
+
 }
