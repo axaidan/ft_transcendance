@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Channel, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
@@ -21,28 +21,39 @@ export class ChannelService {
     async create(
         currentUserId: number,
         dto: CreateChannelDto
-    ):
-        Promise<Channel> {
-        const hash = ((dto.protected === true && 'hash' in dto) ? dto.hash : null);
+    ): Promise<Channel> {
+        if (dto.protected === true && dto.private === true) {
+            throw new BadRequestException('cannot be private and protected');
+        }
+        let hash: string;
+        if (dto.protected === true) {
+            if (('hash' in dto) === false) {
+                throw new BadRequestException('need password to be protected');
+            }
+            hash = await argon.hash(dto.hash);
+        } else {
+            hash = null;
+        }
         try {
             const channel: Channel = await this.prisma.channel.create({
-                    data: {
-                        name: dto.name,
-                        private: dto.private,
-                        protected: dto.protected,
-                        hash: hash,
-                        channelUsers: {
-                            create: [{
-                                userId: currentUserId,
-                                status: EChannelStatus.NORMAL,
-                                role: EChannelRoles.OWNER,
-                            }],
-                        },
+                data: {
+                    name: dto.name,
+                    private: dto.private,
+                    protected: dto.protected,
+                    hash: hash,
+                    channelUsers: {
+                        create: [{
+                            userId: currentUserId,
+                            status: EChannelStatus.NORMAL,
+                            role: EChannelRoles.OWNER,
+                        }],
                     },
-                    include: {
-                        channelUsers: true,
-                    }
-                });
+                },
+            });
+            channel['userStatus'] = EChannelStatus.NORMAL;
+            channel['userRole'] = EChannelRoles.OWNER;
+            channel['userJoined'] = true;
+            delete channel.hash;
             return channel;
         } catch (e) {
             if (e instanceof Prisma.PrismaClientKnownRequestError) {
@@ -60,21 +71,22 @@ export class ChannelService {
             where: {
                 private: false,
             },
-            include: {
-                channelUsers: {
-                    where: {
-                        userId: userId,
-                    }
-                }
-            }
         });
+        for (const channel of channels) {
+            const channelUser = await this.channelUserService.findOne(userId, channel.id);
+            if (channelUser !== null) {
+                channel['userStatus'] = channelUser.status;
+                channel['userRole'] = channelUser.role;
+                channel['userJoined'] = true;
+            }
+            delete channel.hash;
+        }
         return channels;
     }
 
     // GET /channel
     async allForUser(userId: number):
-    Promise<Channel[]>
-    {
+        Promise<Channel[]> {
         const channelArr: Channel[] = await this.prisma.channel.findMany({
             where: {
                 channelUsers: {
@@ -87,6 +99,7 @@ export class ChannelService {
             channel['userStatus'] = channelUser.status;
             channel['userRole'] = channelUser.role;
             channel['userJoined'] = true;
+            delete channel.hash;
         }
         return channelArr;
     }
@@ -95,12 +108,17 @@ export class ChannelService {
     //  reject if channel is private
     //  check hash if channel protected
     //  check status expiration if channel already joined
-    async join(currentUserId: number, channelDto: ChannelDto) :
-    Promise<Channel>
-    {
-        const channel = await this.findOne(channelDto.id);
+    async join(currentUserId: number, channelDto: ChannelDto):
+        Promise<Channel> {
+        const channel: Channel = await this.findOne(channelDto.id);
         if (channel === null) {
             throw new NotFoundException(`channel ${channelDto.id} NOT FOUND`);
+        }
+        if (channel.protected === true) {
+            const passwordMatches = await argon.verify(channel.hash, channelDto.hash);
+            if (passwordMatches === false) {
+                throw new ForbiddenException('incorrect password');
+            }
         }
         let channelUser: ChannelUser =
             await this.channelUserService.findOne(currentUserId, channelDto.id);
@@ -113,19 +131,22 @@ export class ChannelService {
             }
             channelUser = await this.channelUserService.create(createChannelUserDto);
         }
+        channel['userStatus'] = channelUser.status;
+        channel['userRole'] = channelUser.role;
+        channel['userJoined'] = true;
+        delete channel.hash;
         return channel;
     }
 
-    async findOne(channelId: number) :
-    Promise<Channel>
-    {
+    async findOne(channelId: number):
+        Promise<Channel> {
         const channel: Channel = await this.prisma.channel.findUnique({
             where: {
                 id: channelId,
             },
-            include : {
-                channelUsers: true,
-            }
+            // include: {
+            //     channelUsers: true,
+            // }
         });
         return channel;
     }

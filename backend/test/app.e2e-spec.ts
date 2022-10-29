@@ -1235,7 +1235,7 @@ describe('App e2e', () => {
 		};
 
 		describe('Create POST /channel', () => {
-			it('VALID - should 201', () => {
+			it('VALID public, not protected - should 201', () => {
 				return pactum
 				.spec()
 				.post('/channel')
@@ -1246,7 +1246,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(dto.name)
 				.expectBodyContains(dto.protected)
-				.expectBodyContains(dummyUser.id)
+				// .expectBodyContains(dummyUser.id)
 				// .inspect();
 			});
 
@@ -1311,7 +1311,7 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('VALID - should 201', () => {
+			it('VALID - public protected should 201', () => {
 				const protectedDto = {
 					name: 'privCustomChannel',
 					private: false,
@@ -1328,7 +1328,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(protectedDto.name)
 				.expectBodyContains(protectedDto.protected)
-				.expectBodyContains(protectedDto.hash)
+				// .expectBodyContains(protectedDto.hash)
 				// .inspect();
 			});
 
@@ -1364,7 +1364,6 @@ describe('App e2e', () => {
 				})
 				.withBody(notProtWithHashDto)
 				.expectStatus(201)
-				.expectBodyContains(null)
 				.expectBodyContains(notProtWithHashDto.name)
 				.expectBodyContains(notProtWithHashDto.private)
 				.expectBodyContains(notProtWithHashDto.protected)
@@ -1413,6 +1412,36 @@ describe('App e2e', () => {
 					id: chanArr[0].id,
 				})
 				.expectStatus(201)
+				// .inspect();
+			});
+
+			it('VALID JOIN protected - should 201', () => {
+				return pactum
+				.spec()
+				.post('/channel/join')
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody({
+					id: chanArr[5].id,
+					hash: `password${5}`,
+				})
+				.expectStatus(201)
+				.inspect();
+			});
+
+			it('NON-VALID JOIN protected - should 403', () => {
+				return pactum
+				.spec()
+				.post('/channel/join')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody({
+					id: chanArr[5].id,
+					hash: `incorrectPWD${5}`,
+				})
+				.expectStatus(403)
 				.inspect();
 			});
 
