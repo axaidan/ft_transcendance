@@ -18,17 +18,16 @@ export function MyNavProfile() {
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
 
-	const [nick, setNick] = useState(false);
+	const [nick, setNick] = useState(true);
 
-	const ExistantUsername = (value: string) => {
-		axios.get('/user/is_user/' + value).then((res) => setNick(res.data));
-		return nick;
+	const ExistantUsername = async (value: string) => {
+		return (await axios.get('/user/is_user/' + value)).data;
 	}
 
 	const resolver: Resolver<FormValues> = async (values) => {
 		return {
 			values: values.username ? values : {},
-			errors: ExistantUsername(values.username) ?
+			errors: await ExistantUsername(values.username) ?
 				{} :
 				{
 					username: {
@@ -43,9 +42,11 @@ export function MyNavProfile() {
 
 	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
 
-	const onSubmit = handleSubmit((data) => {
+	const onSubmit = handleSubmit(async (data) => {
 		// if (ExistantUsername(data.username)) {
-		axios.get('/user/get_user_by_name/' + data.username).then((res) => navigate('/home/' + res.data));
+		// await axios.get('/user/get_user_by_name/' + data.username).then((res) => navigate('/home/' + res.data));
+		const userId: number = (await axios.get('/user/get_user_by_name/' + data.username)).data;
+		navigate('/home/' + userId);
 		// }
 	});
 
@@ -69,7 +70,7 @@ export function MyNavProfile() {
 				<div className="user_search">
 					<form onSubmit={onSubmit}>
 						<input {...register("username")} placeholder="Recherche d'invocateur" maxLength={20} className='input_search' />
-						{errors?.username && <p id='user-error-input'>{errors.username.message}</p>}
+						{errors.username && <p id='user-error-input'>{errors.username.message}</p>}
 					</form>
 				</div>
 			</ul >

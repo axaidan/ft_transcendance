@@ -1,14 +1,31 @@
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
 .friend-bloc {
 	display: flex;
+	width: 800px;
+	height: 80px;
+	border: 1px solid #16222a;
 	align-items: center;
 	background-color: #091720;
-	height: 80px;
-	border-bottom: 2px solid red;
 	background-image: url('../../../assets/images/avatar-border.png');
 	background-repeat: no-repeat;
 	background-position-y: center;
 	background-position-x: 27px;
 	background-size: 85px;
+	margin-left: 10vh;
+}
+
+.friend-bloc:hover {
+	transition: ease-in-out 0.2s;
+	box-shadow: inset 10px 0px 10px -10px white;
 }
 
 #friend-avatar {
@@ -31,16 +48,30 @@
 }
 
 #friend-chat {
-	margin-right: 10px;
-	height: 60px;
-	width: 60px;
-	background-color: yellowgreen;
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/chat-enabled.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	margin-right: 20px;
 }
 
 #friend-unfriend {
-	height: 60px;
-	width: 60px;
-	background-color: yellowgreen;
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	border-style: none;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/btn_highlights_delete.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 40px;
 }
 
 #friend-redirect {
@@ -54,4 +85,44 @@
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 30px;
+}
+
+.friend-friend-div {
+	margin-top: 50px;
+	margin-bottom: 25px;
+}
+
+.friend-friend-div h1 {
+	animation: fadeIn 1s;
+	margin-left: 15px;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	margin-bottom: 20px;
+}
+
+.friend-bloc button:active {
+	scale: 0.9;
+}
+
+#friend-unblock {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/red_x_mark.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	margin-right: 20px;
+}
+
+.friend-block-div h1 {
+	animation: fadeIn 1s;
+	margin-left: 15px;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	margin-top: 25px;
+	margin-bottom: 20px;
 }

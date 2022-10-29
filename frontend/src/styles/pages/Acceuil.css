@@ -4,13 +4,14 @@
 }
 
 #acc-title {
+	animation: fadeIn 3s;
 	font-family: 'Friz Quadrata Std Bold';
 	color: #785a28;
 	display: flex;
 	justify-content: center;
 	margin: 50px;
 	font-size: 80px;
-	text-shadow: 3px 1px #c8aa6d, 8px 1px #444;
+	text-shadow: 3px 1px #c8aa6d, 7px 2px #444;
 }
 
 .acc-video-div {
@@ -51,7 +52,12 @@
 	/* height: 100%; */
 }
 
-.acc-worlds a {
+.acc-notes {
+	display: flex;
+}
+
+.acc-worlds a,
+.acc-notes a {
 	text-decoration: none;
 }
 
@@ -63,10 +69,9 @@
 .acc-esport {
 	margin-top: 10px;
 	display: flex;
-	color: red;
+	color: turquoise;
 	font-size: small;
 	font-style: italic;
-	text-decoration: underline;
 }
 
 .acc-esport-title {

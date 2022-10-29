@@ -7,16 +7,26 @@ import '../../styles/components/profile_components/Friends.css'
 // Intern:
 import { IUser } from "../../types/interfaces/IUser"
 import { AxiosJwt } from "../../hooks";
-import { SocketContext } from '../../context/UserSocket/Socket';
+import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
 
 
 type FriendProps = {
 	friend: IUser;
 }
 
+
 function FriendList({ friend }: FriendProps) {
+	const axios = AxiosJwt();
+	const dispatch = useContext(SocketContext).SocketDispatch
+
+	const RemoveFriend = (cibleId: number) => {
+		axios.post('/relation/remove_friend/' + cibleId)
+		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+	}
+
 	return (
 		<div className="friend-bloc">
+
 			<img src={friend.avatarUrl} id='friend-avatar' />
 			<div className="friend-username">
 				{friend.username}
@@ -26,43 +36,55 @@ function FriendList({ friend }: FriendProps) {
 				</button>
 			</Link>
 			<div className="friend-right-button">
-				<button id='friend-chat'>Chat</button>
-				<button id='friend-unfriend'></button>
+				<button id='friend-chat'></button>
+				<button id='friend-unfriend' onClick={() => RemoveFriend(friend.id)}></button>
 			</div>
 		</div>
 	)
 }
 
+function BlockList({ friend }: FriendProps) {
+	const axios = AxiosJwt();
+	const dispatch = useContext(SocketContext).SocketDispatch
+
+	const RemoveBlock = (cibleId: number) => {
+		axios.post('/relation/unblock_user/' + cibleId)
+		dispatch({ type: ESocketActionType.RM_BLOCKS, payload: friend });
+	}
+
+	return (
+		<div className="friend-bloc">
+			<img src={friend.avatarUrl} id='friend-avatar' />
+			<div className="friend-username">
+				{friend.username}
+			</div>
+			<div className="friend-right-button">
+				<button id='friend-unblock' onClick={() => RemoveBlock(friend.id)} />
+			</div>
+		</div>
+	)
+}
+
+
+
 export function Friends() {
 	const axios = AxiosJwt();
-	const { me } = useContext(SocketContext).SocketState;
-	const [friends, setFriends] = useState<IUser[]>([]);
-	const [blocks, setBlocks] = useState<IUser[]>([]);
+	const { me, friends, blocks } = useContext(SocketContext).SocketState;
 
-	useEffect(() => {
-		// GET FRIENDS:
-		axios.get('/relation/list_friend')
-			.then((res: AxiosResponse<IUser[]>) => { setFriends(res.data) });
-		// GET BLOCKS:
-		axios.get('/relation/list_block')
-			.then((res: AxiosResponse<IUser[]>) => { setBlocks(res.data) });
-	}, [])
 
 	return (
 		<div className="friends-body">
-			<ul>
-				<h1>friend:</h1>
+			<ul className="friend-friend-div">
+				<h1>{me.username}'s friendlist :</h1>
 				{friends.map((friend: IUser, index: number) => (
 					<FriendList key={index} friend={friend} />
 				))}
 			</ul>
 
-			<ul>
-				<h1>Block:</h1>
-				{blocks.map((block: IUser, index) => (
-					<Link key={index} to={"/home/" + block.id}>
-						<li>{block.username}</li>
-					</Link>
+			<ul className="friend-block-div">
+				<h1>{me.username}'s blocklist :</h1>
+				{blocks.map((block: IUser, index: number) => (
+					<BlockList key={index} friend={block} />
 				))}
 			</ul>
 		</div>
