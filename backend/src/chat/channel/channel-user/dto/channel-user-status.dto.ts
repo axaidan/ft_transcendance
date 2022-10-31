@@ -6,11 +6,14 @@ export class ChannelUserStatusDto {
     userId: number;
 
     @IsInt()
+    chanId: number;
+
+    @IsInt()
     @Min(0)
     @Max(2)
     status: number;
 
-    @IsDate()
-    statusTime: Date;
+    // @IsDate()
+    // statusTime: Date;
 
 }

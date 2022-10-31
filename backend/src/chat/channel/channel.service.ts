@@ -7,7 +7,7 @@ import { EChannelRoles, EChannelStatus } from './channel-user/types';
 import { ChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
-import { ChannelUserRoleDto } from './channel-user/dto';
+import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel-user/dto';
 import { channel } from 'diagnostics_channel';
 
 @Injectable()
@@ -161,14 +161,13 @@ export class ChannelService {
     async leave(userId: number, dto: ChannelDto):
         Promise<Channel> {
         const channelUser: ChannelUser = await this.channelUserService.findOne(userId, dto.id);
-        if (channelUser === null) {
+        if (channelUser === null)
             throw new ForbiddenException('channel not joined');
-        }
-        // DO NOT DELETE IF STATUS IS NOT NORMAL
-        if (channelUser.status === EChannelStatus.NORMAL) {
+        if (channelUser.status === EChannelStatus.NORMAL)
             await this.channelUserService.delete(channelUser);
+        else {
+            // DO NOT DELETE IF STATUS IS NOT NORMAL
         }
-        // socket leaves the room;
         const channel: Channel = await this.findOne(dto.id);
         this.setUserProperties(channel, {
             status: channelUser.status,
@@ -202,9 +201,22 @@ export class ChannelService {
         if (currentChannelUser.role !== EChannelRoles.OWNER)
             throw new ForbiddenException('you must be OWNER');
         if (dto.role === EChannelRoles.OWNER)
-            currentChannelUser =  await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
+            currentChannelUser = await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
         else
             channelUser = await this.channelUserService.editRole(channelUser, dto.role);
+        return channelUser;
+    }
+
+    async editChannelUserStatus(currentUserId: number, dto: ChannelUserStatusDto)
+    : Promise<ChannelUser>
+    {
+        const currentChannelUser = await this.channelUserService.findOne(currentUserId, dto.chanId);
+        let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
+        if (currentChannelUser === null || channelUser === null)
+            throw new NotFoundException('user not found in channel');
+        if (currentChannelUser.role !== EChannelRoles.ADMIN && currentChannelUser.role !== EChannelRoles.OWNER)
+            throw new ForbiddenException('you must be ADMIN or OWNER');
+        channelUser = await this.channelUserService.editStatus(channelUser, dto.status, new Date());
         return channelUser;
     }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser } from '@prisma/client';
-import { ChannelUserRoleDto } from './channel/channel-user/dto';
+import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelService } from './channel/channel.service';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
@@ -105,6 +105,7 @@ export class ChatService {
     Promise<Channel>
     {
         const channel: Channel = await this.channelService.join(currentUserId, dto);
+        // event userJoined
         return channel;
     }
 
@@ -116,6 +117,8 @@ export class ChatService {
     Promise<Channel>
     {
         const channel: Channel = await this.channelService.leave(currentUserId, dto);
+        // event userLeft
+        // ?event newRole
         return channel;
     }
 
@@ -128,8 +131,19 @@ export class ChatService {
     : Promise<ChannelUser>
     {
         const channelUser = await this.channelService.editChannelUserRole(currentUserId, dto);
-        // new role event
+        // event newRole
+        // ?event newRole
         return channelUser;
     }
+
+    async editChannelUserStatus(currentUserId: number, dto: ChannelUserStatusDto)
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.channelService.editChannelUserStatus(currentUserId, dto);
+        // event newRole
+        // ?event newRole
+        return channelUser;
+    }
+
 
 }

@@ -68,6 +68,19 @@ export class ChannelUserService {
         return channelUser;
     }
 
+    async editStatus(channelUser: ChannelUser, status: number, statusTime: Date)
+    : Promise<ChannelUser>
+    {
+        channelUser = await this.prisma.channelUser.update({
+            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
+            data: {
+                status: status,
+                // statusTime: statusTime
+            },
+        });
+        return channelUser;
+    }
+
     async findOne(userId: number, chanId: number) {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
             where: { channelId_userId: { channelId: chanId, userId: userId } },

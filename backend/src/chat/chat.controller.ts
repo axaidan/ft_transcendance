@@ -3,7 +3,7 @@ import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { domainToASCII } from 'url';
-import { ChannelUserRoleDto } from './channel/channel-user/dto';
+import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
@@ -135,9 +135,14 @@ export class ChatController {
 
     @Patch('channelUser/status')
     //@Roles(['admin', 'owner'])
-    async editChannelUserstatus(@GetUser('id') currentUserId: number)
-    // : Promise<ChannelUser>
+    async editChannelUserstatus(
+        @GetUser('id') currentUserId: number,
+        @Body() dto: ChannelUserStatusDto
+    )
+    : Promise<ChannelUser>
     {
+        const channelUser = await this.chatService.editChannelUserStatus(currentUserId, dto);
+        return channelUser;
 
     }
 

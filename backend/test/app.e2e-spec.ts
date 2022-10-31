@@ -13,7 +13,7 @@ import { CreateChannelDto } from 'src/chat/channel/dto';
 import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
 import { normalize } from 'path';
 import { ChannelService } from 'src/chat/channel/channel.service';
-import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
+import { ChannelUserRoleDto, ChannelUserStatusDto } from 'src/chat/channel/channel-user/dto';
 
 const N = 20;
 
@@ -1480,9 +1480,9 @@ describe('App e2e', () => {
 
 	describe('ChannelUser', () => {
 
-		describe('PATCH /channelUser/role + ChannelUserDto', () => {
+		describe('PATCH /channelUser/role + ChannelUserRoleDto', () => {
 			
-			it('VALID change role - should 200', () => {
+			it('VALID role TO ADMIN - should 200', () => {
 				const dto: ChannelUserRoleDto = {
 					chanId: chanArr[0].id,
 					userId: chanUserArr[0].userId,
@@ -1501,7 +1501,7 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NONVALID change role - should 403', () => {
+			it('NONVALID role TO ADMIN - should 403', () => {
 				const dto: ChannelUserRoleDto = {
 					chanId: chanArr[0].id,
 					userId: chanUserArr[0].userId,
@@ -1519,7 +1519,53 @@ describe('App e2e', () => {
 			});
 
 			
-		}); // DESCRIBE (PATCH /channelUser)
+		}); // DESCRIBE (PATCH /channelUser/role)
+
+		
+		describe('PATCH /channelUser/status + ChannelUserStatusDto', () => {
+			
+			it('VALID status TO MUTED - should 200', () => {
+				const dto: ChannelUserStatusDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					status: EChannelStatus.MUTED,
+					// statusTime: new Date().setMinutes(5),
+				};
+				return pactum
+				.spec()
+				.patch('/channelUser/status')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(200)
+				.expectBodyContains(EChannelStatus.MUTED)
+				.expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID status TO MUTED - should 403', () => {
+
+				const dto: ChannelUserStatusDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[1].userId,
+					status: EChannelStatus.MUTED,
+					// statusTime: new Date().setMinutes(5),
+				};
+				return pactum
+				.spec()
+				.patch('/channelUser/status')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				.inspect();
+			});
+
+
+
+		}); // DESCRIBE (PATCH /channelUser/status)
 
 	}); // DESCRIBE (CHANNELUSER)
 
