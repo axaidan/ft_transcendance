@@ -4,9 +4,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
 import { CreateChannelUserDto } from './channel-user/dto/create-channel-user.dto';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
-import { ChannelDto } from './dto';
+import { ChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
+import { ChannelUserRoleDto } from './channel-user/dto';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class ChannelService {
@@ -74,14 +76,17 @@ export class ChannelService {
         for (const channel of channels) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             if (channelUser !== null) {
-                channel['userStatus'] = channelUser.status;
-                channel['userRole'] = channelUser.role;
-                channel['userJoined'] = true;
-            }
-            else {
-                channel['userStatus'] = EChannelStatus.NORMAL;
-                channel['userRole'] = EChannelRoles.NORMAL;
-                channel['userJoined'] = true;
+                this.setUserProperties(channel, {
+                    status: channelUser.status,
+                    role: channelUser.role,
+                    joined: true, // false if BANNED, (true || false) if MUTED
+                });
+            } else {
+                this.setUserProperties(channel, {
+                    status: EChannelStatus.NORMAL,
+                    role: EChannelRoles.NORMAL,
+                    joined: false,
+                });
             }
             delete channel.hash;
         }
@@ -100,9 +105,11 @@ export class ChannelService {
         });
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
-            channel['userStatus'] = channelUser.status;
-            channel['userRole'] = channelUser.role;
-            channel['userJoined'] = true;
+            this.setUserProperties(channel, {
+                status: channelUser.status,
+                role: channelUser.role,
+                joined: true,
+            });
             delete channel.hash;
         }
         return channelArr;
@@ -137,10 +144,14 @@ export class ChannelService {
             });
         }
         else {
+            // CHECK statu AND status_time
+            // CHECK ROLE, if Owner FIND NEW Owner
         }
-        channel['userStatus'] = channelUser.status;
-        channel['userRole'] = channelUser.role;
-        channel['userJoined'] = true;
+        this.setUserProperties(channel, {
+            status: channelUser.status,
+            role: channelUser.role,
+            joined: true
+        });
         delete channel.hash;
         return channel;
     }
@@ -155,13 +166,15 @@ export class ChannelService {
         }
         // DO NOT DELETE IF STATUS IS NOT NORMAL
         if (channelUser.status === EChannelStatus.NORMAL) {
-            this.channelUserService.delete(channelUser);
+            await this.channelUserService.delete(channelUser);
         }
         // socket leaves the room;
         const channel: Channel = await this.findOne(dto.id);
-        channel['userStatus'] = channelUser.status;
-        channel['userRole'] = channelUser.role;
-        channel['userJoined'] = false;
+        this.setUserProperties(channel, {
+            status: channelUser.status,
+            role: channelUser.role,
+            joined: false,
+        });
         delete channel.hash;
         return channel;
     }
@@ -176,6 +189,29 @@ export class ChannelService {
             //     channelUsers: true,
             // }
         });
+        return channel;
+    }
+
+    async editChannelUserRole(currentUserId: number, dto: ChannelUserRoleDto)
+    : Promise<ChannelUser>
+    {
+        let currentChannelUser = await this.channelUserService.findOne(currentUserId, dto.chanId);
+        let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
+        if (currentChannelUser === null || channelUser === null)
+            throw new NotFoundException('user not found in channel');
+        if (currentChannelUser.role !== EChannelRoles.OWNER)
+            throw new ForbiddenException('you must be OWNER');
+        if (dto.role === EChannelRoles.OWNER)
+            currentChannelUser =  await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
+        else
+            channelUser = await this.channelUserService.editRole(channelUser, dto.role);
+        return channelUser;
+    }
+
+    setUserProperties(channel: Channel, dto: UserPropetiesDto) {
+        channel['userStatus'] = dto.status;
+        channel['userRole'] = dto.role;
+        channel['userJoined'] = dto.joined;
         return channel;
     }
 

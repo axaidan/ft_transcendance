@@ -1,9 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ChannelUser } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { find, NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ChannelUserRoleDto } from './dto';
 import { CreateChannelUserDto } from './dto/create-channel-user.dto';
-import { EChannelStatus } from './types';
+import { EChannelRoles, EChannelStatus } from './types';
 
 @Injectable()
 export class ChannelUserService {
@@ -56,11 +58,19 @@ export class ChannelUserService {
         return channelUsers;
     }
 
+    async editRole(channelUser: ChannelUser, role: number)
+    : Promise<ChannelUser>
+    {
+        channelUser = await this.prisma.channelUser.update({
+            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
+            data: { role: role },
+        });
+        return channelUser;
+    }
+
     async findOne(userId: number, chanId: number) {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
-            where: {
-                channelId_userId: { channelId: chanId, userId: userId },
-            },
+            where: { channelId_userId: { channelId: chanId, userId: userId } },
         });
         return channelUser;
     }

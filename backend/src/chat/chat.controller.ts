@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { Discussion, Channel, ChannelUser } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
+import { domainToASCII } from 'url';
+import { ChannelUserRoleDto } from './channel/channel-user/dto';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
@@ -92,7 +94,13 @@ export class ChatController {
         return channel;
     }
 
+    //////////////////////////////
+    //  CHANNELUSER REQUESTS    //
+    //////////////////////////////
+
+    // EDIT A Channel
     // @Patch('channel')
+    // @Roles('owner')
     // async editChannel() {
 
     // }
@@ -102,6 +110,36 @@ export class ChatController {
     // @Delete('channel/:chanId')
     // async deleteChan() {
     // } 
+
+    // INVITE USER
+    @Post('channelUser')
+    //@Roles(['admin', 'owner'])
+    async addChannelUser()
+    // : Promise<ChannelUser>
+    {
+
+    }
+    
+    // EDIT ChannelUser'S status OR role
+    @Patch('channelUser/role')
+    //@Roles(['admin', 'owner'])
+    async editChannelUserRole(
+        @GetUser('id') currentUserId: number,
+        @Body() dto: ChannelUserRoleDto,
+        )
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.chatService.editChannelUserRole(currentUserId, dto);
+        return channelUser;
+    }
+
+    @Patch('channelUser/status')
+    //@Roles(['admin', 'owner'])
+    async editChannelUserstatus(@GetUser('id') currentUserId: number)
+    // : Promise<ChannelUser>
+    {
+
+    }
 
     // //   UPDATE Channel/:id (name)
     // //   ONLY IF USER IS OWNER

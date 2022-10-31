@@ -13,6 +13,7 @@ import { CreateChannelDto } from 'src/chat/channel/dto';
 import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
 import { normalize } from 'path';
 import { ChannelService } from 'src/chat/channel/channel.service';
+import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
 
 const N = 20;
 
@@ -111,14 +112,15 @@ describe('App e2e', () => {
 			});
 			channelUserArr.push(channelUser);
 		}
-		await prisma.channelUser.create({
+		const dummyChanUser = await prisma.channelUser.create({
 			data: {
 				userId: dummyUser.id,
 				channelId: chanArr[1].id,
 				status: 0,
 				role: 0,
 			}
-		})
+		});
+		channelUserArr.push(dummyChanUser);
 		return channelUserArr;
 	}
 
@@ -1166,43 +1168,6 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		// describe('Retrieve Msgs GET /discussion/user/:id', () => {
-		// 	it('VALID - NO MSGS', () => {
-		// 		return pactum
-		// 		.spec()
-		// 		.get(`/discussion/user/${dummyUser.id}`)
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${jwtArr[0].access_token}`,
-		// 		})
-		// 		.expectStatus(200)
-		// 		// .inspect()
-		// 	});
-
-		// 	it('VALID - HAS MSGS', () => 
-// import { GetUser } from 'src/auth/decorator';{
-		// 		return pactum
-		// 		.spec()
-		// 		.get(`/discussion/user/${dummyUser.id}`)
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${jwtArr[1].access_token}`,
-		// 		})
-		// 		.expectStatus(200)
-		// 		// .inspect()
-		// 	});
-
-			// NO WEBSOCKET ON TEST, TEST NOT POSSIBLE FOR NOW
-			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
-			// 	return pactum
-			// 	.spec()
-			// 	.get(`/discussion/user/${dummyUser.id}`)
-			// 	.withHeaders({
-			// 		Authorization: `Bearer ${jwtArr[10].access_token}`,
-			// 	})
-			// 	.expectStatus(200)
-			// 	// .inspect()
-			// });
-		// }); // DESCRIBE (DISCUSSION/:ID)
-
 		describe('GET  /discussion/:id', () => {
 			it('VALID - should 201', () => {
 				const userId = userArr[6].id;
@@ -1494,6 +1459,7 @@ describe('App e2e', () => {
 
 		});
 
+
 		describe('GET /channel', () => {
 
 			it('VALID - should 200', () => {
@@ -1509,7 +1475,53 @@ describe('App e2e', () => {
 
 		}); //	DESCRIBE (GET/channel/)
 
-	});
+	}); // DESCRIBE (CHANNEL)
+
+
+	describe('ChannelUser', () => {
+
+		describe('PATCH /channelUser/role + ChannelUserDto', () => {
+			
+			it('VALID change role - should 200', () => {
+				const dto: ChannelUserRoleDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					role: EChannelRoles.ADMIN,
+				};
+				return pactum
+				.spec()
+				.patch('/channelUser/role')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectBodyContains(EChannelRoles.ADMIN)
+				.expectBodyContains(chanUserArr[0].userId)
+				.expectStatus(200)
+				// .inspect();
+			});
+
+			it('NONVALID change role - should 403', () => {
+				const dto: ChannelUserRoleDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					role: EChannelRoles.NORMAL,
+				};
+				return pactum
+				.spec()
+				.patch('/channelUser/role')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			
+		}); // DESCRIBE (PATCH /channelUser)
+
+	}); // DESCRIBE (CHANNELUSER)
 
 	
 
