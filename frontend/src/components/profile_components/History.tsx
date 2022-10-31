@@ -15,18 +15,41 @@ type GameProps = {
 	game: IGame;
 }
 
+
+
 function Game({ game }: GameProps) {
+
+	const didWin = (p1score: number, p2score: number): string => {
+		if (p1score === p2score)
+			return 'Draw';
+		else
+			return p1score > p2score ? 'Victory' : 'Defeat';
+	}
+
 	return (
-		<li className="hist-unique-game">
-			<Link to={"/home/" + game.player1.id}>
-				<p>{game.player1.username}</p>
-			</Link>
-			<p>{game.score1}</p>
-			<p>{game.score2}</p>
-			<Link to={"/home/" + game.player2.id}>
-				<p>{game.player2.username}</p>
-			</Link>
-		</li>
+		<div className="hist-unique-game" id={'pone-' + didWin(game.score1, game.score2)}>
+			<div className="history-playerone" >
+				<img src={game.player1.avatarUrl} id='history-user-avatar' />
+				<div className={didWin(game.score1, game.score2)}>
+					{didWin(game.score1, game.score2)}
+					<Link to={"/home/" + game.player1.id}>
+						<p id='history-username'>{game.player1.username}</p>
+					</Link>
+				</div>
+				<p id='history-pone-score'>{game.score1}</p>
+			</div>
+			<div className="history-separation"> - </div>
+			<div className="history-playertwo">
+				<p id='history-ptwo-score'>{game.score2}</p>
+				<div className={didWin(game.score2, game.score1)}>
+					{didWin(game.score2, game.score1)}
+					<Link to={"/home/" + game.player2.id}>
+						<p id='history-username'>{game.player2.username}</p>
+					</Link>
+				</div>
+				<img src={game.player2.avatarUrl} id='history-user-avatar' />
+			</div>
+		</div >
 	)
 }
 
@@ -35,22 +58,22 @@ export function History() {
 	const axios = AxiosJwt();
 	const user: IUser = useOutletContext();
 	const [games, setGames] = useState<IGame[]>([]);
-	const [users, setUsers] = useState<IUser[]>([]);
 
 	useEffect(() => {
 		axios.get('/game/historique/' + user.id)
 			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
-		axios.get('user/all').then((res: AxiosResponse<IUser[]>) => { setUsers(res.data) });
 	}, []);
 
 	return (
 		<div className='container-history'>
-			<h1>{user.username} 'S RECENT GAMES (LAST 20 PLAYED)</h1>
-			<ul>
+			<div className="history-title">
+				{user.username} 'S RECENT GAMES (LAST 20 PLAYED)
+			</div>
+			<ul id='history-list'>
 				{games.map((game: IGame, index: number) => (
 					<Game key={index} game={game} />
 				))}
 			</ul>
-		</div>
+		</div >
 	)
 }

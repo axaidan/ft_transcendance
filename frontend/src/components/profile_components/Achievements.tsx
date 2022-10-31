@@ -24,7 +24,6 @@ export function Achievement() {
 			.then((res) => setLocked(res.data));
 	}, [])
 
-	//let test: IconProp = 
 	return (
 		<div>
 			<ul className='all_achiev'>

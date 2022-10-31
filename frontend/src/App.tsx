@@ -21,7 +21,7 @@ export default function App() {
 					<Route path=':id' element={<OthNavProfile />}>
 						<Route index element={<Profile />} />
 						<Route path="history" element={<History />} />
-						<Route path="achievement" element={<Collection />} />
+						<Route path="achievement" element={<Achievement />} />
 					</Route>
 					<Route path='channel' element={<Channel />} />
 					<Route path='store' element={<Store />} />

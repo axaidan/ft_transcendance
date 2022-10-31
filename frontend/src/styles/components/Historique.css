@@ -1,32 +1,115 @@
 .container-history {
-	border: 1px solid black;
-	background-color: red;
+	margin-top: 50px;
+}
+
+.history-title {
+	animation: fadeIn 2s;
+	font-size: xx-large;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+#history-list {
+	border-top: 2px solid #16222a;
+	margin-top: 50px;
+
 }
 
 .hist-unique-game {
-	background-color: gray;
-}
-
-.li-game {
-	margin: 15px;
-	display: grid;
-	justify-content: space-between;
-	grid-template-columns: repeat(3, 1fr);
-	grid-gap: 10px;
-}
-
-.container-score {
+	background: linear-gradient(to left, rgba(2, 9, 18, 0.5) 0, rgba(9, 23, 32, 0.5) 50%, rgba(2, 9, 18, 0.5));
+	background-repeat: repeat-x;
 	display: flex;
-	justify-content: space-around;
+	width: 100%;
+	height: 80px;
+	font-family: 'Friz Quadrata Std Bold';
+	border-bottom: 2px solid #16222a;
 }
 
-.center_box {
-	display: flex;
-	justify-content: center;
+#pone-Victory:hover {
+	background: linear-gradient(to left, rgba(133, 11, 11, 0.5) 0, rgba(9, 23, 32, 0.5) 50%, rgba(22, 102, 14, 0.5) 100%);
+}
+
+#pone-Defeat:hover {
+	transition: ease-in-out 0.2s;
+	background: linear-gradient(to right, rgba(133, 11, 11, 0.5) 0, rgba(9, 23, 32, 0.5) 50%, rgba(22, 102, 14, 0.5) 100%);
+}
+
+#pone-Draw:hover {
+	transition: ease-in-out 0.2s;
+	background: linear-gradient(to right, rgba(10, 36, 151, 0.5) 0, rgba(9, 23, 32, 0.5) 50%, rgba(10, 36, 151, 0.5) 100%);
+}
+
+.hist-unique-game a {
+	color: aliceblue;
 	text-decoration: none;
 }
 
-.center_box:hover,
-.center_box:visited {
-	color: currentColor;
+.history-separation {
+	display: flex;
+	align-self: center;
+	width: 80px;
+	justify-content: center;
+}
+
+.history-playerone {
+	display: flex;
+	align-items: center;
+	margin-left: 50px;
+	width: 100%;
+	background-image: url('../../assets/images/avatar-border.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-position-x: 10px;
+	background-size: 70px;
+}
+
+.history-playertwo {
+	display: flex;
+	margin-left: auto;
+	align-items: center;
+	margin-right: 50px;
+	width: 100%;
+	justify-content: end;
+	background-image: url('../../assets/images/avatar-border.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-position-x: calc(100% - 10px);
+	background-size: 70px;
+	text-align: end;
+}
+
+
+#history-ptwo-score {
+	display: flex;
+	margin-right: auto;
+	font-size: xx-large;
+}
+
+.Victory {
+	color: green;
+}
+
+.Defeat {
+	color: red;
+}
+
+.Draw {
+	color: gray;
+}
+
+#history-pone-score {
+	display: flex;
+	margin-left: auto;
+	font-size: xx-large;
+}
+
+#history-user-avatar {
+	border-radius: 50%;
+	margin-left: 20px;
+	margin-right: 20px;
+	width: 50px;
+	height: 50px;
+}
+
+#history-username:hover {
+	scale: 1.1;
 }

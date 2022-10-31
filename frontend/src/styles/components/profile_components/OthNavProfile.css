@@ -1,0 +1,279 @@
+/*****************************
+******************************
+			BODY
+******************************
+******************************/
+
+.other-body {
+	width: 100%;
+	height: 95%;
+}
+
+#othNavProfile-title {
+	display: flex;
+	margin-left: 100px;
+}
+
+.other-navlinks {
+	margin-right: 20px;
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	text-decoration: none;
+}
+
+.other-navlinks:hover {
+	scale: 0.9;
+}
+
+.othNavProfile-container {
+	display: flex;
+	width: 100%;
+	height: 50px;
+	align-items: center;
+	background-image: url('../../../assets/images/othNavProfile/profile_active_bg.png');
+	background-position-y: -10px;
+	background-repeat: no-repeat;
+	background-size: 440px;
+}
+
+.othNavLinks {
+	margin-right: 20px;
+	margin-left: auto;
+}
+
+.otherProfileBody {
+	display: grid;
+	height: 96%;
+	grid-template: 100% / 40% 60%;
+}
+
+/*****************************
+******************************
+			LEFT
+******************************
+******************************/
+
+.other-left-side {
+	display: grid;
+	height: 100%;
+	width: 100%;
+	grid-template-rows: 80% 20%;
+	background-image: url('../../../assets/images/profile_component/solidbanner_still.png');
+	background-size: 350px;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	background-position-y: -270px;
+}
+
+.other-banner {
+	display: grid;
+	grid-template-rows: 2fr 2fr 1fr 2fr 8fr 4fr;
+	font-family: Friz Quadrata Std Bold;
+}
+
+/*****************************
+******************************
+			NICKNAME
+******************************
+******************************/
+
+.other-options {
+	display: flex;
+	grid-row-start: 2;
+	justify-content: center;
+	height: 50px;
+}
+
+/*****************************
+******************************
+			XP BAR
+******************************
+******************************/
+
+.other-xp-bar {
+	display: grid;
+	grid-row-start: 4;
+	background-image: url('../../../assets/images/profile_component/level-bar-bottom.png');
+	background-size: 200px;
+	background-repeat: no-repeat;
+	background-position-x: center;
+	background-position-y: center;
+	grid-column-start: 1;
+}
+
+.other-xp-fill {
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	justify-content: center;
+	align-items: center;
+	background-image: url('../../../assets/images/profile_component/level-bar-fill.png');
+	background-position-y: center;
+	background-position-x: calc(50% - 20px);
+	background-size: 180px;
+	background-repeat: no-repeat;
+}
+
+
+
+.other-xp-nbr {
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	background-image: url('../../../assets/images/profile_component/level-bar-top.png');
+	background-position-x: calc(50% - 100px);
+	background-position-y: 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+}
+
+.other-xp-value {
+	color: white;
+	display: grid;
+	grid-row-start: 4;
+	grid-column-start: 1;
+	font-size: smaller;
+	margin-left: calc(50% - 105px);
+	align-items: center;
+	margin-top: 5px;
+}
+
+.other-clan {
+	display: grid;
+	grid-row-start: 3;
+	justify-content: center;
+	color: #938f75;
+}
+
+.other-profile-icon-div {
+	display: grid;
+	grid-row-start: 5;
+	justify-content: center;
+	align-items: center;
+	background-image: url('../../../assets/images/avatar-border.png');
+	background-position: center;
+	background-size: 250px;
+	background-repeat: no-repeat;
+}
+
+#other-profile-icon {
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+}
+
+.other-end-of-banner {
+	display: grid;
+	grid-row-start: 6;
+	background-image: url('../../../assets/images/profile_component/banner-bottom.png');
+	background-position-x: center;
+	background-repeat: no-repeat;
+	background-position-y: -50%;
+	background-size: 350px;
+}
+
+.other-loot {
+	display: grid;
+	grid-template-columns: 2fr 2fr 2fr 2fr 2fr;
+	height: 100%;
+	justify-content: center;
+}
+
+.other-coffer {
+	background-image: url('../../../assets/images/profile_component/perks_chest.png');
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+	background-size: 80px;
+	display: grid;
+	justify-content: center;
+	grid-column-start: 2;
+}
+
+.other-boost {
+	display: grid;
+	justify-content: center;
+	background-image: url('../../../assets/images/profile_component/perks_boost.png');
+	background-size: 80px;
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+}
+
+.other-reroll {
+	display: grid;
+	justify-content: center;
+	background-image: url('../../../assets/images/profile_component/perks_reroll.png');
+	background-size: 80px;
+	align-items: center;
+	background-position: 50% 0;
+	background-repeat: no-repeat;
+}
+
+.other-stats {
+	display: grid;
+	grid-template-rows: repeat(2, 1fr);
+}
+
+.other-setting {
+	display: grid;
+	height: 100%;
+	align-items: center;
+}
+
+.other-lol-stats {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	width: 100%;
+	height: 100%;
+}
+
+.other-stats h3 {
+	display: grid;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	color: #938f75;
+	width: 100%;
+	justify-content: center;
+}
+
+
+.other-rank {
+	background-image: url('../../../assets/images/profile_component/profile_unranked.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.other-honor {
+	background-image: url('../../../assets/images/profile_component/honor_empty.png');
+	background-size: 250px;
+	background-position: 50% 35px;
+	background-repeat: no-repeat;
+}
+
+.other-champion {
+	background-image: url('../../../assets/images/profile_component/master.png');
+	background-size: 250px;
+	background-position: 50% -150px;
+	background-repeat: no-repeat;
+}
+
+.other-trophee {
+	background-image: url('../../../assets/images/profile_component/trophy_empty.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.other-clash {
+	background-image: url('../../../assets/images/profile_component/banner_empty.png');
+	background-size: 250px;
+	background-position: 50% 50px;
+	background-repeat: no-repeat;
+}
+
+.other-txt {
+	display: flex;
+	justify-content: center;
+}

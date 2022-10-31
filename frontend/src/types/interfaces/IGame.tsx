@@ -4,11 +4,13 @@ export type IGame = {
 	player1: {
 		id: number;
 		username: string;
+		avatarUrl: string;
 	};
 	score2: number;
 	player2: {
 		id: number;
 		username: string;
+		avatarUrl: string;
 	};
 };
 
@@ -17,10 +19,12 @@ export const DflGame = {
 	player1: {
 		id: 0,
 		username: "username",
+		avatarUrl: '',
 	},
 	score2: 0,
 	player2: {
 		id: 0,
-		username: "username"
-	},	
+		username: "username",
+		avatarUrl: '',
+	},
 }
