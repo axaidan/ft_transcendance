@@ -33,7 +33,9 @@ model User {
 	discussion2 Discussion[] @relation("discussion2")
 	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
-	channelUsers ChannelUser[]
+	channelUsers	ChannelUser[]
+	channelBans		ChannelBan[]
+	channelMutes	ChannelMute[]
 
 	avatar Avatar? @relation(fields: [avatarId], references: [id])
 	avatarId Int?
@@ -111,6 +113,8 @@ model Channel {
 	hash			String?
  
 	channelUsers	ChannelUser[]
+	channelBans		ChannelBan[]
+	channelMutes	ChannelMute[]
 
 	@@map("channel")
 	@@unique([name, private])
@@ -122,16 +126,47 @@ model ChannelUser {
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
-	status			Int
+	// status			Int
 	role			Int
 	userId			Int
 	channelId		Int
-	statusTime		DateTime?
+	// statusTime		DateTime?
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
 	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
 
 	@@map("channelUser")
+}
+
+model ChannelBan {
+	@@id([channelId, userId])
+
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+
+	userId			Int
+	channelId		Int
+
+	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	@@map("channelBan")
+}
+
+model ChannelMute {
+	@@id([channelId, userId])
+
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+
+	userId			Int
+	channelId		Int
+	muteExpires		DateTime
+
+	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	@@map("channelMute")
 }
 
 

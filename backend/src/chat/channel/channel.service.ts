@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Channel, ChannelUser, Prisma } from '@prisma/client';
+import { Channel, ChannelBan, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
 import { CreateChannelUserDto } from './channel-user/dto/create-channel-user.dto';
@@ -9,6 +9,8 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel-user/dto';
 import { channel } from 'diagnostics_channel';
+import { ChannelBanService } from './channel-ban/channel-ban.service';
+import { ChannelMuteService } from './channel-mute/channel-mute.service';
 
 @Injectable()
 export class ChannelService {
@@ -16,6 +18,8 @@ export class ChannelService {
     constructor(
         private prisma: PrismaService,
         private channelUserService: ChannelUserService,
+        private channelBanService: ChannelBanService,
+        private channelMuteService: ChannelMuteService,
     ) { }
 
     //  POST /channel
@@ -45,15 +49,17 @@ export class ChannelService {
                     channelUsers: {
                         create: [{
                             userId: currentUserId,
-                            status: EChannelStatus.NORMAL,
+                            // status: EChannelStatus.NORMAL,
                             role: EChannelRoles.OWNER,
                         }],
                     },
                 },
             });
-            channel['userStatus'] = EChannelStatus.NORMAL;
-            channel['userRole'] = EChannelRoles.OWNER;
-            channel['userJoined'] = true;
+            this.setUserProperties(channel, {
+                // status: EChannelStatus.NORMAL,
+                role: EChannelRoles.NORMAL,
+                joined: true,
+            });
             delete channel.hash;
             return channel;
         } catch (e) {
@@ -77,13 +83,13 @@ export class ChannelService {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             if (channelUser !== null) {
                 this.setUserProperties(channel, {
-                    status: channelUser.status,
+                    // status: channelUser.status,
                     role: channelUser.role,
                     joined: true, // false if BANNED, (true || false) if MUTED
                 });
             } else {
                 this.setUserProperties(channel, {
-                    status: EChannelStatus.NORMAL,
+                    // status: EChannelStatus.NORMAL,
                     role: EChannelRoles.NORMAL,
                     joined: false,
                 });
@@ -106,7 +112,7 @@ export class ChannelService {
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             this.setUserProperties(channel, {
-                status: channelUser.status,
+                // status: channelUser.status,
                 role: channelUser.role,
                 joined: true,   // false if banned
             });
@@ -148,7 +154,7 @@ export class ChannelService {
             // CHECK ROLE, if Owner FIND NEW Owner
         }
         this.setUserProperties(channel, {
-            status: channelUser.status,
+            // status: channelUser.status,
             role: channelUser.role,
             joined: true
         });
@@ -163,14 +169,11 @@ export class ChannelService {
         const channelUser: ChannelUser = await this.channelUserService.findOne(userId, dto.id);
         if (channelUser === null)
             throw new ForbiddenException('channel not joined');
-        if (channelUser.status === EChannelStatus.NORMAL)
-            await this.channelUserService.delete(channelUser);
-        else {
-            // DO NOT DELETE IF STATUS IS NOT NORMAL
-        }
+        await this.channelUserService.delete(channelUser);
+        // DO NOT DELETE IF STATUS IS NOT NORMAL
         const channel: Channel = await this.findOne(dto.id);
         this.setUserProperties(channel, {
-            status: channelUser.status,
+            // status: channelUser.status,
             role: channelUser.role,
             joined: false,
         });
@@ -217,7 +220,7 @@ export class ChannelService {
     }
 
     setUserProperties(channel: Channel, dto: UserPropetiesDto) {
-        channel['userStatus'] = dto.status;
+        // channel['userStatus'] = dto.status;
         channel['userRole'] = dto.role;
         channel['userJoined'] = dto.joined;
         return channel;

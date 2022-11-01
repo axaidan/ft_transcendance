@@ -21,7 +21,7 @@ export class ChannelUserService {
                 data: {
                     userId: dto.userId,
                     channelId: dto.channelId,
-                    status: dto.status,
+                    // status: dto.status,
                     role: dto.role,
                 },
             });
@@ -52,7 +52,7 @@ export class ChannelUserService {
         const channelUsers : ChannelUser[] = await this.prisma.channelUser.findMany({
             where: {
                 userId: userId,
-                status: { not: EChannelStatus.BANNED },
+                // status: { not: EChannelStatus.BANNED },
             },
         });
         return channelUsers;
@@ -74,7 +74,7 @@ export class ChannelUserService {
         channelUser = await this.prisma.channelUser.update({
             where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
             data: {
-                status: status,
+                // status: status,
                 // statusTime: statusTime
             },
         });
