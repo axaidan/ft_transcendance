@@ -4,12 +4,14 @@ import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { domainToASCII } from 'url';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
+import { Roles } from './channel/decorators/roles.decorator';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
+import { RolesGuard } from './channel/guards/roles.guard';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsers } from './discussion/types';
 
-@UseGuards(JwtGuard)
+@UseGuards(JwtGuard, RolesGuard)
 @Controller()
 export class ChatController {
 
@@ -94,58 +96,6 @@ export class ChatController {
         return channel;
     }
 
-    //////////////////////////////
-    //  CHANNELUSER REQUESTS    //
-    //////////////////////////////
-
-    // EDIT A Channel
-    // @Patch('channel')
-    // @Roles('owner')
-    // async editChannel() {
-
-    // }
-
-    // //   DELETE Channel/:id
-    // //   ONLY IF USER IS OWNER
-    // @Delete('channel/:chanId')
-    // async deleteChan() {
-    // } 
-
-    // INVITE USER
-    @Post('channelUser')
-    //@Roles(['admin', 'owner'])
-    async addChannelUser()
-    // : Promise<ChannelUser>
-    {
-
-    }
-    
-    // EDIT ChannelUser'S status OR role
-    @Patch('channelUser/role')
-    //@Roles(['admin', 'owner'])
-    async editChannelUserRole(
-        @GetUser('id') currentUserId: number,
-        @Body() dto: ChannelUserRoleDto,
-        )
-    : Promise<ChannelUser>
-    {
-        const channelUser = await this.chatService.editChannelUserRole(currentUserId, dto);
-        return channelUser;
-    }
-
-    @Patch('channelUser/status')
-    //@Roles(['admin', 'owner'])
-    async editChannelUserstatus(
-        @GetUser('id') currentUserId: number,
-        @Body() dto: ChannelUserStatusDto
-    )
-    : Promise<ChannelUser>
-    {
-        const channelUser = await this.chatService.editChannelUserStatus(currentUserId, dto);
-        return channelUser;
-
-    }
-
     // //   UPDATE Channel/:id (name)
     // //   ONLY IF USER IS OWNER
     // //   INVITE OTHER User
@@ -161,5 +111,61 @@ export class ChatController {
     // const channels: Channel[] = await this.channelService.getChannelsByUserId(currentUserId);
     // return channels;
     // }
+
+    // EDIT A Channel
+    // @Patch('channel')
+    // @Roles('owner')
+    // async editChannel() {
+
+    // }
+
+    // //   DELETE Channel/:id
+    // //   ONLY IF USER IS OWNER
+    // @Delete('channel/:chanId')
+    // async deleteChan() {
+    // } 
+
+
+    //////////////////////////////
+    //  CHANNELUSER REQUESTS    //
+    //////////////////////////////
+
+
+    // INVITE USER
+    @Post('channelUser')
+    //@Roles(['admin', 'owner'])
+    async addChannelUser()
+    // : Promise<ChannelUser>
+    {
+
+    }
+    
+    // EDIT ChannelUser'S status OR role
+    @Patch('channelUser/role')
+    @Roles('owner')
+    async editChannelUserRole(
+        @GetUser('id') currentUserId: number,
+        @Body() dto: ChannelUserRoleDto,
+        )
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.chatService.editChannelUserRole(currentUserId, dto);
+        return channelUser;
+    }
+
+    @Patch('channelUser/status')
+    @Roles('admin')
+    async editChannelUserstatus(
+        @GetUser('id') currentUserId: number,
+        @Body() dto: ChannelUserStatusDto
+    )
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.chatService.editChannelUserStatus(currentUserId, dto);
+        return channelUser;
+
+    }
+
+
 
 }

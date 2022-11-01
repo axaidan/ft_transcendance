@@ -108,7 +108,7 @@ export class ChannelService {
             this.setUserProperties(channel, {
                 status: channelUser.status,
                 role: channelUser.role,
-                joined: true,
+                joined: true,   // false if banned
             });
             delete channel.hash;
         }
@@ -198,8 +198,6 @@ export class ChannelService {
         let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         if (currentChannelUser === null || channelUser === null)
             throw new NotFoundException('user not found in channel');
-        if (currentChannelUser.role !== EChannelRoles.OWNER)
-            throw new ForbiddenException('you must be OWNER');
         if (dto.role === EChannelRoles.OWNER)
             currentChannelUser = await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
         else
@@ -214,8 +212,6 @@ export class ChannelService {
         let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         if (currentChannelUser === null || channelUser === null)
             throw new NotFoundException('user not found in channel');
-        if (currentChannelUser.role !== EChannelRoles.ADMIN && currentChannelUser.role !== EChannelRoles.OWNER)
-            throw new ForbiddenException('you must be ADMIN or OWNER');
         channelUser = await this.channelUserService.editStatus(channelUser, dto.status, new Date());
         return channelUser;
     }
