@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser } from '@prisma/client';
+import { Discussion, Channel, ChannelUser, ChannelBan, ChannelMute } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { domainToASCII } from 'url';
+import { ChannelBanDto } from './channel/channel-ban/dto';
+import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { Roles } from './channel/decorators/roles.decorator';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
@@ -153,19 +155,47 @@ export class ChatController {
         return channelUser;
     }
 
-    @Patch('channelUser/status')
-    @Roles('admin')
-    async editChannelUserstatus(
-        @GetUser('id') currentUserId: number,
-        @Body() dto: ChannelUserStatusDto
-    )
-    : Promise<ChannelUser>
-    {
-        const channelUser = await this.chatService.editChannelUserStatus(currentUserId, dto);
-        return channelUser;
 
+    ///////////////////
+    //  BAN REQUESTS //
+    ///////////////////
+
+    @Post('channelUser/ban')
+    @Roles('admin')
+    async ban(@Body() dto: ChannelBanDto)
+    : Promise<ChannelBan>
+    {
+        const channelBan = await this.chatService.banChannelUser(dto);
+        return channelBan;
     }
 
+    @Delete('channelUser/ban')
+    @Roles('admin')
+    async unban(dto: ChannelBanDto) 
+    {
+        await this.chatService.unbanChannelUser(dto);
+    }
 
+    ////////////////////
+    //  MUTE REQUESTS //
+    ////////////////////
+
+    @Post('channelUser/mute')
+    @Roles('admin')
+    async mute(
+        @Body() dto: CreateChannelMuteDto,
+    )
+    : Promise<ChannelMute>
+    {
+        const channelMute = await this.chatService.muteChannelUser(dto);
+        return channelMute;
+    }
+
+    @Delete('channelUser/mute')
+    @Roles('admin')
+    async unmute(dto: ChannelMuteDto) 
+    {
+        await this.chatService.unmuteChannelUser(dto);
+    }
 
 }

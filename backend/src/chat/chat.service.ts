@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser } from '@prisma/client';
+import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan } from '@prisma/client';
+import { ChannelBanDto } from './channel/channel-ban/dto';
+import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelService } from './channel/channel.service';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
@@ -94,6 +96,7 @@ export class ChatService {
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        // event newChan
         return channel;
     }
 
@@ -136,14 +139,40 @@ export class ChatService {
         return channelUser;
     }
 
-    async editChannelUserStatus(currentUserId: number, dto: ChannelUserStatusDto)
-    : Promise<ChannelUser>
+    ///////////////////
+    //  BAN METHODS  //
+    ///////////////////
+
+    async banChannelUser(dto: ChannelBanDto)
+    : Promise<ChannelBan>
     {
-        const channelUser = await this.channelService.editChannelUserStatus(currentUserId, dto);
-        // event newRole
-        // ?event newRole
-        return channelUser;
+        const channelBan = await this.channelService.banChannelUser(dto);
+        // event newBan
+        return channelBan;
     }
 
+    async unbanChannelUser(dto: ChannelBanDto) 
+    {
+        await this.channelService.unbanChannelUser(dto);
+        // event newUnmute
+    }
+
+    ////////////////////
+    //  MUTE METHODS  //
+    ////////////////////
+
+    async muteChannelUser(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelMute = await this.channelService.muteChannelUser(dto);
+        // event newMute
+        return channelMute;
+    }
+
+    async unmuteChannelUser(dto: ChannelMuteDto) 
+    {
+        await this.channelService.unmuteChannelUser(dto);
+        // event newUnmute
+    }
 
 }
