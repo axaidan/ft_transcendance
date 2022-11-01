@@ -84,13 +84,13 @@ export class ChannelService {
         for (const channel of channels) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             if (channelUser !== null) {
-                this.setUserProperties(userId, channel, {
+                await this.setUserProperties(userId, channel, {
                     // status: channelUser.status,
                     role: channelUser.role,
                     joined: true, // false if BANNED, (true || false) if MUTED
                 });
             } else {
-                this.setUserProperties(userId, channel, {
+                await this.setUserProperties(userId, channel, {
                     // status: EChannelStatus.NORMAL,
                     role: EChannelRoles.NORMAL,
                     joined: false,
@@ -141,6 +141,11 @@ export class ChannelService {
                 throw new ForbiddenException('incorrect password');
             }
         }
+        // CHECK IF USER IS NOT BANNED
+        const channelBan = await this.channelBanService.findOne(currentUserId, channelDto.id);
+        if (channelBan !== null)
+            throw new ForbiddenException('you are banned from this channel');
+        // CHECK IF USER DOESN'T ALREADY EXIST
         let channelUser: ChannelUser =
             await this.channelUserService.findOne(currentUserId, channelDto.id);
         if (channelUser === null) {
@@ -150,10 +155,8 @@ export class ChannelService {
                 status: EChannelStatus.NORMAL,
                 role: EChannelRoles.NORMAL,
             });
-        }
-        else {
+        } else {
             // CHECK statu AND status_time
-            // CHECK ROLE, if Owner FIND NEW Owner
         }
         this.setUserProperties(currentUserId, channel, {
             // status: channelUser.status,
@@ -207,26 +210,63 @@ export class ChannelService {
         return channelUser;
     }
 
-    async banChannelUser(dto: ChannelBanDto) : Promise<ChannelBan>
+    //////////////////
+    //  BAN METHODS //
+    //////////////////
+
+    async banChannelUser(dto: ChannelBanDto)
+    : Promise<ChannelBan>
     {
+        const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
+        // CHECK IF BANNED USER EXISTS IN CHANNEL
+        if (channelUser === null)
+            throw new NotFoundException('user not found in channel');
+        // CHECK IF BANNED USER THE OWNER OR ANOTHER ADMIN
+        if (channelUser.role !== EChannelRoles.NORMAL)
+            throw new ForbiddenException('cannot ban an admin or owner');
         const channelMute = await this.channelBanService.create(dto);
+        await this.leave(dto.userId, { id: dto.chanId });
         return channelMute;
     }
 
-    async muteChannelUser(dto: CreateChannelMuteDto) : Promise<ChannelMute>
+    async unbanChannelUser(dto: ChannelBanDto) 
+    : Promise<ChannelBan>
     {
+        const channelBan = await this.channelBanService.delete(dto);
+        return channelBan;
+    }
+
+    ///////////////////
+    //  MUTE METHODS //
+    ///////////////////
+
+    async muteChannelUser(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
+        // CHECK IF MUTED USER EXISTS IN CHANNEL
+        if (channelUser === null)
+            throw new NotFoundException('user not found in channel');
+        // CHECK IF MUTED USER THE OWNER OR ANOTHER ADMIN
+        if (channelUser.role !== EChannelRoles.NORMAL)
+            throw new ForbiddenException('cannot mute an admin or owner');
         const channelMute = await this.channelMuteService.create(dto);
+        
         return channelMute;
     }
 
     async unmuteChannelUser(dto: ChannelMuteDto) 
+    : Promise<ChannelMute>
     {
-        await this.channelMuteService.delete(dto);
+        const channelMute = await this.channelMuteService.delete(dto);
+        return channelMute;
     }
 
-    async unbanChannelUser(dto: ChannelBanDto) 
+    async editMute(dto: CreateChannelMuteDto) 
+    : Promise<ChannelMute>
     {
-        await this.channelBanService.delete(dto);
+        const channelMute = await this.channelMuteService.edit(dto);
+        return channelMute;
     }
 
     async setUserProperties(userId: number, channel: Channel, dto: UserPropetiesDto) {

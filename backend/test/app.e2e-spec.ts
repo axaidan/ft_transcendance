@@ -14,6 +14,9 @@ import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/typ
 import { normalize } from 'path';
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from 'src/chat/channel/channel-user/dto';
+import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
+import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
+import { firstValueFrom } from 'rxjs';
 
 const N = 20;
 
@@ -1357,7 +1360,7 @@ describe('App e2e', () => {
 				.expectJsonLength(13)
 				// .expectBodyContains(chanArr[0].name)
 				// .expectBodyContains(chanArr[4].name)
-				// .inspect();
+				.inspect();
 			});
 
 		}); //	DESCRIBE (GET/channel/all)
@@ -1455,7 +1458,7 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-		});
+		}); //	DESCRIBE(POST CHANNEL/LEAVE)
 
 
 		describe('GET /channel', () => {
@@ -1519,40 +1522,107 @@ describe('App e2e', () => {
 			
 		}); // DESCRIBE (PATCH /channelUser/role)
 
+	}); // DESCRIBE (CHANNELUSER)
+
+	describe('ChannelMute', () => {
 		
-		describe('POST /channelUser/ban + ChannelUserStatusDto', () => {
-			
-			it('VALID status TO MUTED - should 200', () => {
-				const dto: ChannelUserStatusDto = {
+		describe('POST /channelUser/mute + CreateChannelMuteDto', () => {
+
+			it('VALID mute - should 200', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
 					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					status: EChannelStatus.MUTED,
-					// statusTime: new Date().setMinutes(5),
+					userId: chanUserArr[1].userId,
+					expires: inFiveMins,
 				};
 				return pactum
 				.spec()
-				.patch('/channelUser/status')
+				.post('/channelUser/mute')
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.withBody(dto)
-				.expectStatus(200)
-				.expectBodyContains(EChannelStatus.MUTED)
-				.expectBodyContains(chanUserArr[0].userId)
+				.expectStatus(201)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
 				// .inspect();
 			});
 
-			it('NONVALID status TO MUTED - should 403', () => {
-
-				const dto: ChannelUserStatusDto = {
+			it('NONVALID mute (mute admin) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
 					chanId: chanArr[0].id,
-					userId: chanUserArr[1].userId,
-					status: EChannelStatus.MUTED,
-					// statusTime: new Date().setMinutes(5),
+					userId: chanUserArr[0].userId,
+					expires: inFiveMins,
 				};
 				return pactum
 				.spec()
-				.patch('/channelUser/status')
+				.post('/channelUser/mute')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+			 
+			it('NONVALID mute (mute owner) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: userArr[0].id,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/mute')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (dupl) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/mute')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (not admin) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[1].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/mute')
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[2].access_token}`,
 				})
@@ -1561,11 +1631,168 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
+			it('NONVALID mute (past) - should 403', () => {
+				const now = new Date();
+				const FiveBefore = new Date(now.setMinutes(now.getMinutes() - 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[2].userId,
+					expires: FiveBefore,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/mute')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (!exists) - should 404', () => {
+				const now = new Date();
+				const FiveBefore = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: userArr[9].id,
+					expires: FiveBefore,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/mute')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(404)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
 
 
-		}); // DESCRIBE (PATCH /channelUser/status)
+		}); // DESCRIBE (POST /channelUser/mute)
+		
+	}); // DESCRIBE (ChannelMute)
 
-	}); // DESCRIBE (CHANNELUSER)
+
+	describe('ChannelBan', () => {
+		
+		describe('POST /channelUser/ban + ChannelBanDto', () => {
+			
+			it('VALID ban - should 200', () => {
+				const dto: ChannelBanDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[1].userId,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/ban')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(201)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+			   
+			it('NONVALID ban (ban admin) - should 403', () => {
+				const dto: ChannelBanDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/ban')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID ban (ban owner) - should 403', () => {
+				const dto: ChannelBanDto = {
+					chanId: chanArr[0].id,
+					userId: userArr[0].id,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/ban')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID ban (dupl) - should 403', () => {
+				const dto: ChannelBanDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/ban')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID ban (not admin) - should 403', () => {
+
+				const dto: ChannelBanDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[2].userId,
+				};
+				return pactum
+				.spec()
+				.post('/channelUser/ban')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[3].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('CHECK banned user should have left', () => {
+			});
+
+			it('CHECK banned user cannot join - should 403', () => {
+				return pactum
+				.spec()
+				.post('/channel/join')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				.withBody({ id: chanArr[0].id })
+				.expectStatus(403)
+				// .inspect()
+
+			});
+
+		}); // DESCRIBE (POST /channelUser/ban)
+		
+	}); // DESCRIBE (ChannelBan)
+
+	
 
 	
 

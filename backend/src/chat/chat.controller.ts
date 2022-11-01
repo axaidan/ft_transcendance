@@ -7,8 +7,10 @@ import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { Roles } from './channel/decorators/roles.decorator';
+import { ForbiddenStatus } from './channel/decorators/status.decorator';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { RolesGuard } from './channel/guards/roles.guard';
+import { ForbiddenStatusGuard } from './channel/guards/status.guard';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsers } from './discussion/types';
@@ -79,7 +81,9 @@ export class ChatController {
         return channel;
     }
 
+    // @UseGuards(ForbiddenStatusGuard)
     @Post('channel/join')
+    // @ForbiddenStatus('ban')
     async joinChannel(
         @GetUser('id') currentUserId: number,
         @Body() channelDto: ChannelDto,
@@ -100,26 +104,9 @@ export class ChatController {
 
     // //   UPDATE Channel/:id (name)
     // //   ONLY IF USER IS OWNER
-    // //   INVITE OTHER User
-    // //   IF CurrentUser ID ADMIN
     // @Patch('channel/:chanId')
     // async updateChan() {
     // } 
-
-    // @Get('channel')
-    // async getChannels(@GetUser('id') currentUserId: number)
-    // Promise<Channel[]>
-    // {
-    // const channels: Channel[] = await this.channelService.getChannelsByUserId(currentUserId);
-    // return channels;
-    // }
-
-    // EDIT A Channel
-    // @Patch('channel')
-    // @Roles('owner')
-    // async editChannel() {
-
-    // }
 
     // //   DELETE Channel/:id
     // //   ONLY IF USER IS OWNER
@@ -135,7 +122,7 @@ export class ChatController {
 
     // INVITE USER
     @Post('channelUser')
-    //@Roles(['admin', 'owner'])
+    @Roles('admin')
     async addChannelUser()
     // : Promise<ChannelUser>
     {
@@ -155,7 +142,6 @@ export class ChatController {
         return channelUser;
     }
 
-
     ///////////////////
     //  BAN REQUESTS //
     ///////////////////
@@ -172,8 +158,10 @@ export class ChatController {
     @Delete('channelUser/ban')
     @Roles('admin')
     async unban(dto: ChannelBanDto) 
+    : Promise<ChannelBan>
     {
-        await this.chatService.unbanChannelUser(dto);
+        const channelBan = await this.chatService.unbanChannelUser(dto);
+        return channelBan;
     }
 
     ////////////////////
@@ -194,8 +182,19 @@ export class ChatController {
     @Delete('channelUser/mute')
     @Roles('admin')
     async unmute(dto: ChannelMuteDto) 
+    : Promise<ChannelMute>
     {
-        await this.chatService.unmuteChannelUser(dto);
+        const channelMute =  await this.chatService.unmuteChannelUser(dto);
+        return channelMute;
+    }
+
+    @Patch('channelUser/mute')
+    @Roles('admin')
+    async editMute(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelMute = await this.chatService.editMute(dto);
+        return channelMute;
     }
 
 }

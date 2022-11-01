@@ -1,4 +1,4 @@
-import { IsDate, IsInt } from "class-validator";
+import { IsDate, IsDateString, IsInt } from "class-validator";
 
 export class CreateChannelMuteDto {
 
@@ -8,7 +8,7 @@ export class CreateChannelMuteDto {
     @IsInt()
     chanId: number;
 
-    @IsDate()
+    @IsDateString()
     expires: Date;
 
 }

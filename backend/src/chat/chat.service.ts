@@ -125,7 +125,6 @@ export class ChatService {
         return channel;
     }
 
-
     //////////////////////////
     //  CHANNELUSER METHODS //
     //////////////////////////
@@ -152,9 +151,11 @@ export class ChatService {
     }
 
     async unbanChannelUser(dto: ChannelBanDto) 
+    : Promise<ChannelBan>
     {
-        await this.channelService.unbanChannelUser(dto);
-        // event newUnmute
+        const channelBan = await this.channelService.unbanChannelUser(dto);
+        // event newUnban
+        return channelBan;
     }
 
     ////////////////////
@@ -170,9 +171,19 @@ export class ChatService {
     }
 
     async unmuteChannelUser(dto: ChannelMuteDto) 
+    : Promise<ChannelMute>
     {
-        await this.channelService.unmuteChannelUser(dto);
+        const channelMute = await this.channelService.unmuteChannelUser(dto);
         // event newUnmute
+        return channelMute;
+    }
+
+    async editMute(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelMute = this.channelService.editMute(dto);
+        // event newEditMute
+        return channelMute;
     }
 
 }
