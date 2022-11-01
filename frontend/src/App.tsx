@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 
-import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest } from "./pages";
+import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest, OtherProfile } from "./pages";
 import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./components";
 
 export default function App() {
@@ -19,7 +19,7 @@ export default function App() {
 						<Route path="achievement" element={<Achievement />} />
 					</Route>
 					<Route path=':id' element={<OthNavProfile />}>
-						<Route index element={<Profile />} />
+						<Route index element={<OtherProfile />} />
 						<Route path="history" element={<History />} />
 						<Route path="achievement" element={<Achievement />} />
 					</Route>

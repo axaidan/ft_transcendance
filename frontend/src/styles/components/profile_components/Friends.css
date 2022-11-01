@@ -62,8 +62,8 @@
 }
 
 #friend-unfriend {
-	height: 40px;
-	width: 40px;
+	height: 45px;
+	width: 45px;
 	border-radius: 50%;
 	border-style: none;
 	border-color: #785a28;
@@ -71,7 +71,22 @@
 	background-image: url('../../../assets/images/profile_component/friends/btn_highlights_delete.png');
 	background-position: center;
 	background-repeat: no-repeat;
-	background-size: 40px;
+	background-size: 45px;
+	margin-right: 20px;
+}
+
+#friend-blockit {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/othNavProfile/block_mask.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 35px;
+	margin-right: 20px;
 }
 
 #friend-redirect {

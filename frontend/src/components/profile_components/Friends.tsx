@@ -5,7 +5,7 @@ import { AxiosResponse } from "axios";
 import '../../styles/components/profile_components/Friends.css'
 
 // Intern:
-import { IUser } from "../../types/interfaces/IUser"
+import { IUser } from '../../types/interfaces/IUser';
 import { AxiosJwt } from "../../hooks";
 import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
 
@@ -20,7 +20,13 @@ function FriendList({ friend }: FriendProps) {
 	const dispatch = useContext(SocketContext).SocketDispatch
 
 	const RemoveFriend = (cibleId: number) => {
-		axios.post('/relation/remove_friend/' + cibleId)
+		axios.post('/relation/remove_friend/' + cibleId);
+		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+	}
+
+	const BlockFriend = (cibleId: number) => {
+		axios.post('/relation/block_user/' + cibleId);
+		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: friend });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
 	}
 
@@ -38,6 +44,7 @@ function FriendList({ friend }: FriendProps) {
 			<div className="friend-right-button">
 				<button id='friend-chat'></button>
 				<button id='friend-unfriend' onClick={() => RemoveFriend(friend.id)}></button>
+				<button id='friend-blockit' onClick={() => BlockFriend(friend.id)}></button>
 			</div>
 		</div>
 	)
@@ -47,9 +54,15 @@ function BlockList({ friend }: FriendProps) {
 	const axios = AxiosJwt();
 	const dispatch = useContext(SocketContext).SocketDispatch
 
-	const RemoveBlock = (cibleId: number) => {
+	const IsFriend = async (cibleId: number): Promise<boolean> => {
+		return (await axios.get('/relation/is_friend/' + cibleId)).data;
+	}
+
+	const RemoveBlock = async (cibleId: number) => {
 		axios.post('/relation/unblock_user/' + cibleId)
 		dispatch({ type: ESocketActionType.RM_BLOCKS, payload: friend });
+		if (await IsFriend(cibleId) === true)
+			dispatch({ type: ESocketActionType.ADD_FRIENDS, payload: friend });
 	}
 
 	return (
@@ -68,7 +81,6 @@ function BlockList({ friend }: FriendProps) {
 
 
 export function Friends() {
-	const axios = AxiosJwt();
 	const { me, friends, blocks } = useContext(SocketContext).SocketState;
 
 

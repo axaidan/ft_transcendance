@@ -29,7 +29,8 @@ export function Home() {
 
 	if (loading) return <LoadingHome />
 	if (error !== '') return navigate('/');
-	if (!user) return navigate('/');
+	if (!user)
+		return navigate('/');
 
 	console.log("USER: ", user)
 

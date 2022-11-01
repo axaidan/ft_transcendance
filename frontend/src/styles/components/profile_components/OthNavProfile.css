@@ -12,6 +12,8 @@
 #othNavProfile-title {
 	display: flex;
 	margin-left: 100px;
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: xx-large;
 }
 
 .other-navlinks {
