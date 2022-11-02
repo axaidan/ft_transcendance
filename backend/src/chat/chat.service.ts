@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser } from '@prisma/client';
+import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan } from '@prisma/client';
+import { ChannelBanDto } from './channel/channel-ban/dto';
+import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
+import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelService } from './channel/channel.service';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
@@ -14,6 +17,10 @@ export class ChatService {
         private discService: DiscussionService,
         private channelService: ChannelService,
     ) {}
+
+    //////////////////////////
+    //  DISCUSSION METHODS  //
+    //////////////////////////
 
     //  GET /discussion
     //  RETURNS ALL DISCUSSIONS OF GIVEN USER
@@ -40,8 +47,8 @@ export class ChatService {
     {
         const discussion = await this.discService.findOneByUserIds(currentUserId, user2Id);
         return discussion;
+        
     }
-
     //  POST /discussion
     async createDiscussion(
         currentUserId: number,
@@ -69,6 +76,10 @@ export class ChatService {
         return discussion;
     }
 
+    //////////////////////
+    //  CHANNEL METHODS //
+    //////////////////////
+
     //  GET /channel/all
     async getAllPublicChannels(currentUserId: number) : 
     Promise<Channel[]>
@@ -94,6 +105,7 @@ export class ChatService {
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        // event newChan
         return channel;
     }
 
@@ -105,7 +117,82 @@ export class ChatService {
     Promise<Channel>
     {
         const channel: Channel = await this.channelService.join(currentUserId, dto);
+        // event userJoined
         return channel;
+    }
+
+    //  POST /channel/join + ChannelDto
+    async leaveChannel(
+        currentUserId: number,
+        dto: ChannelDto,
+    ) : 
+    Promise<Channel>
+    {
+        const channel: Channel = await this.channelService.leave(currentUserId, dto);
+        // event userLeft
+        // ?event newRole
+        return channel;
+    }
+
+    //////////////////////////
+    //  CHANNELUSER METHODS //
+    //////////////////////////
+
+    async editChannelUserRole(currentUserId: number, dto: ChannelUserRoleDto)
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.channelService.editChannelUserRole(currentUserId, dto);
+        // event newRole
+        // ?event newRole
+        return channelUser;
+    }
+
+    ///////////////////
+    //  BAN METHODS  //
+    ///////////////////
+
+    async banChannelUser(dto: ChannelBanDto)
+    : Promise<ChannelBan>
+    {
+        const channelBan = await this.channelService.banChannelUser(dto);
+        // event newBan
+        return channelBan;
+    }
+
+    async unbanChannelUser(dto: ChannelBanDto) 
+    : Promise<ChannelBan>
+    {
+        const channelBan = await this.channelService.unbanChannelUser(dto);
+        // event newUnban
+        return channelBan;
+    }
+
+    ////////////////////
+    //  MUTE METHODS  //
+    ////////////////////
+
+    async muteChannelUser(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelMute = await this.channelService.muteChannelUser(dto);
+        // event newMute
+        return channelMute;
+    }
+
+    async unmuteChannelUser(dto: ChannelMuteDto) 
+    : Promise<ChannelMute>
+    {
+        const channelMute = await this.channelService.unmuteChannelUser(dto);
+        // event newUnmute
+        return channelMute;
+    }
+
+    async editMute(dto: CreateChannelMuteDto)
+    : Promise<ChannelMute>
+    {
+        const channelMute = this.channelService.editMute(dto);
+        // event newEditMute
+        return channelMute;
     }
 
 }
