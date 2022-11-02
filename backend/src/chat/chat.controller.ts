@@ -2,15 +2,12 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { Discussion, Channel, ChannelUser, ChannelBan, ChannelMute } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { domainToASCII } from 'url';
 import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { Roles } from './channel/decorators/roles.decorator';
-import { ForbiddenStatus } from './channel/decorators/status.decorator';
 import { ChannelDto, CreateChannelDto } from './channel/dto';
 import { RolesGuard } from './channel/guards/roles.guard';
-import { ForbiddenStatusGuard } from './channel/guards/status.guard';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsers } from './discussion/types';
@@ -129,7 +126,6 @@ export class ChatController {
     //////////////////////////////
     //  CHANNELUSER REQUESTS    //
     //////////////////////////////
-
 
     // INVITE USER
     @Post('channelUser')

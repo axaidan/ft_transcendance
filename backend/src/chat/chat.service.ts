@@ -47,8 +47,8 @@ export class ChatService {
     {
         const discussion = await this.discService.findOneByUserIds(currentUserId, user2Id);
         return discussion;
-        
     }
+
     //  POST /discussion
     async createDiscussion(
         currentUserId: number,

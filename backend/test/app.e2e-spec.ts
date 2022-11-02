@@ -5,18 +5,14 @@ import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DiscussionService } from 'src/chat/discussion/discussion.service';
-import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
-import { CreateDiscussionDto, DiscussionDto } from 'src/chat/discussion/dto';
 import { CreateChannelDto } from 'src/chat/channel/dto';
 import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
-import { normalize } from 'path';
 import { ChannelService } from 'src/chat/channel/channel.service';
-import { ChannelUserRoleDto, ChannelUserStatusDto } from 'src/chat/channel/channel-user/dto';
+import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
 import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
 import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
-import { firstValueFrom } from 'rxjs';
 
 const N = 20;
 

@@ -1,11 +1,9 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ChannelUser } from '@prisma/client';
+import { Channel, ChannelUser } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { find, NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChannelUserRoleDto } from './dto';
 import { CreateChannelUserDto } from './dto/create-channel-user.dto';
-import { EChannelRoles, EChannelStatus } from './types';
+import { EChannelRoles } from './types';
 
 @Injectable()
 export class ChannelUserService {
@@ -68,24 +66,40 @@ export class ChannelUserService {
         return channelUser;
     }
 
-    async editStatus(channelUser: ChannelUser, status: number, statusTime: Date)
-    : Promise<ChannelUser>
-    {
-        channelUser = await this.prisma.channelUser.update({
-            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
-            data: {
-                // status: status,
-                // statusTime: statusTime
-            },
-        });
-        return channelUser;
-    }
+    // async editStatus(channelUser: ChannelUser, status: number, statusTime: Date)
+    // : Promise<ChannelUser>
+    // {
+    //     channelUser = await this.prisma.channelUser.update({
+    //         where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
+    //         data: {
+    //             // status: status,
+    //             // statusTime: statusTime
+    //         },
+    //     });
+    //     return channelUser;
+    // }
 
     async findOne(userId: number, chanId: number) {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
             where: { channelId_userId: { channelId: chanId, userId: userId } },
         });
         return channelUser;
+    }
+
+    async findNextOwner(channel: Channel)
+    : Promise<ChannelUser>
+    {
+        let nextOwner = await this.prisma.channelUser.findFirst({
+            where: { channelId: channel.id, role: EChannelRoles.ADMIN },
+            orderBy: { updatedAt: 'asc' },
+        });
+        if (nextOwner !== null)
+            return nextOwner;
+        nextOwner = await this.prisma.channelUser.findFirst({
+            where: { channelId: channel.id },
+            orderBy: { createdAt: 'asc' },
+        });
+        return nextOwner;
     }
 
 }

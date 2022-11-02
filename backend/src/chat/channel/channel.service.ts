@@ -2,13 +2,11 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { Channel, ChannelBan, ChannelMute, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
-import { CreateChannelUserDto } from './channel-user/dto/create-channel-user.dto';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
 import { ChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
-import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel-user/dto';
-import { channel } from 'diagnostics_channel';
+import { ChannelUserRoleDto } from './channel-user/dto';
 import { ChannelBanService } from './channel-ban/channel-ban.service';
 import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
@@ -51,14 +49,12 @@ export class ChannelService {
                     channelUsers: {
                         create: [{
                             userId: currentUserId,
-                            // status: EChannelStatus.NORMAL,
                             role: EChannelRoles.OWNER,
                         }],
                     },
                 },
             });
             this.setUserProperties(currentUserId, channel, {
-                // status: EChannelStatus.NORMAL,
                 role: EChannelRoles.NORMAL,
                 joined: true,
             });
@@ -85,13 +81,11 @@ export class ChannelService {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             if (channelUser !== null) {
                 await this.setUserProperties(userId, channel, {
-                    // status: channelUser.status,
                     role: channelUser.role,
-                    joined: true, // false if BANNED, (true || false) if MUTED
+                    joined: true,
                 });
             } else {
                 await this.setUserProperties(userId, channel, {
-                    // status: EChannelStatus.NORMAL,
                     role: EChannelRoles.NORMAL,
                     joined: false,
                 });
@@ -114,9 +108,8 @@ export class ChannelService {
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
             this.setUserProperties(userId, channel, {
-                // status: channelUser.status,
                 role: channelUser.role,
-                joined: true,   // false if banned
+                joined: true,
             });
             delete channel.hash;
         }
@@ -159,7 +152,6 @@ export class ChannelService {
             // CHECK statu AND status_time
         }
         this.setUserProperties(currentUserId, channel, {
-            // status: channelUser.status,
             role: channelUser.role,
             joined: true
         });
@@ -175,10 +167,8 @@ export class ChannelService {
         if (channelUser === null)
             throw new ForbiddenException('channel not joined');
         await this.channelUserService.delete(channelUser);
-        // DO NOT DELETE IF STATUS IS NOT NORMAL
         const channel: Channel = await this.findOne(dto.id);
         this.setUserProperties(userId, channel, {
-            // status: channelUser.status,
             role: channelUser.role,
             joined: false,
         });
@@ -209,6 +199,26 @@ export class ChannelService {
             channelUser = await this.channelUserService.editRole(channelUser, dto.role);
         return channelUser;
     }
+
+    async passOwnership(currentOwner: ChannelUser, channel: Channel)
+    : Promise<ChannelUser>
+    {
+        let nextOwner = await this.channelUserService.findNextOwner(channel);
+        if (nextOwner === null)
+            return null;
+        currentOwner = await this.channelUserService.editRole(currentOwner, EChannelRoles.ADMIN);
+        nextOwner = await this.channelUserService.editRole(nextOwner, EChannelRoles.OWNER);
+        return nextOwner;
+    }
+
+    async getAdmins() 
+    {}
+
+    async getMembers()
+    {}
+
+    async getOwner()
+    {}
 
     //////////////////
     //  BAN METHODS //
