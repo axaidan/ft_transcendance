@@ -8,6 +8,7 @@ import '../../styles/components/profile_components/Friends.css'
 import { IUser } from '../../types/interfaces/IUser';
 import { AxiosJwt } from "../../hooks";
 import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
+import { UserCreateChat } from '../discussion_components/ChatUtils';
 
 
 type FriendProps = {
@@ -42,7 +43,9 @@ function FriendList({ friend }: FriendProps) {
 				</button>
 			</Link>
 			<div className="friend-right-button">
-				<button id='friend-chat'></button>
+				<UserCreateChat user={friend}>
+					<button id='friend-chat'></button>
+				</UserCreateChat>
 				<button id='friend-unfriend' onClick={() => RemoveFriend(friend.id)}></button>
 				<button id='friend-blockit' onClick={() => BlockFriend(friend.id)}></button>
 			</div>

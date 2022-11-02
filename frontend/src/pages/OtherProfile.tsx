@@ -1,6 +1,6 @@
 // Extern:
 import { AxiosResponse } from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 
@@ -12,6 +12,7 @@ import { AxiosJwt } from '../hooks/AxiosJwt';
 import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
 import { DflRelationship, IRelationship } from '../types';
+import { IGame } from '../types/interfaces/IGame';
 
 
 export function OtherProfile() {
@@ -22,6 +23,10 @@ export function OtherProfile() {
 	const dispatch = useContext(SocketContext).SocketDispatch
 	const [isFriend, setisFriend] = useState(false);
 	const [isBlocked, setisBlocked] = useState(false);
+	const [games, setGames] = useState<IGame[]>([]);
+	const [defeat, setDefeat] = useState(0);
+	const [draw, setDraw] = useState(0);
+	const [victories, setVictories] = useState(0);
 
 	useEffect(() => {
 		axios.get("/user/" + id)
@@ -33,9 +38,6 @@ export function OtherProfile() {
 	useEffect(() => {
 		axios.get('/relation/is_friend/' + id)
 			.then((res: AxiosResponse<boolean>) => { setisFriend(res.data) })
-	})
-
-	useEffect(() => {
 		axios.get('/relation/is_block/' + id)
 			.then((res: AxiosResponse<boolean>) => { setisBlocked(res.data) })
 	})
@@ -53,8 +55,11 @@ export function OtherProfile() {
 	}
 
 	const RemoveFriend = async (user: IUser) => {
+
 		await axios.post('/relation/remove_friend/' + user.id);
-		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: user });
+		const friend = friends.filter(friend => friend.id == user.id);
+		console.log("User: ", user, "\nfriend: ", friend, '\nfriends: ', friends);
+		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend[0] });
 	}
 
 	const RemoveBlock = async (user: IUser) => {
@@ -68,6 +73,62 @@ export function OtherProfile() {
 		return (await axios.get('/relation/is_friend/' + cibleId)).data;
 	}
 
+	useEffect(() => {
+		axios.get('/game/historique/' + othUser.id)
+			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
+	}, [games]);
+
+	const getVictories = (userId: number): void => {
+		let victories: number = 0;
+		games.map((game: IGame) => {
+			if (game.player1.id === userId) {
+				if (game.score1 > game.score2) {
+					victories++;
+				}
+			}
+			if (game.player2.id === userId) {
+				if (game.score2 > game.score1) {
+					victories++;
+				}
+			}
+		});
+		setVictories(victories);
+	};
+
+	const getDefeat = (userId: number): void => {
+		let defeat: number = 0;
+		games.map((game: IGame) => {
+			if (game.player1.id === userId) {
+				if (game.score1 < game.score2) {
+					defeat++;
+				}
+			}
+			if (game.player2.id === userId) {
+				if (game.score2 < game.score1) {
+					defeat++;
+				}
+			}
+		});
+		setDefeat(defeat);
+	};
+
+	const getDraw = (userId: number): void => {
+		let draws: number = 0;
+		games.map((game: IGame) => {
+			if (game.player1.id === userId || game.player2.id === userId) {
+				if (game.score1 === game.score2) {
+					draws++;
+				}
+			}
+		});
+		setDraw(draws);
+	};
+
+	useEffect(() => {
+		getVictories(othUser.id);
+		getDefeat(othUser.id);
+		getDraw(othUser.id);
+	});
 
 	return (
 		<div className="otherProfileBody">
@@ -120,7 +181,13 @@ export function OtherProfile() {
 					<div className="other-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							No game yet
+							Victories : {victories}
+						</div>
+						<div className="other-txt">
+							Defeats : {defeat}
+						</div>
+						<div className="other-txt">
+							Draw : {draw}
 						</div>
 					</div>
 					<div className="other-trophee">
