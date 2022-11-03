@@ -7,7 +7,8 @@ export default class Lobby {
     PlayersId: Array<number>;
     ViewersId: Array<number>;
     
-    
+    PalettePlayer1: number;
+    PalettePlayer2: number;
     /**
      *  mettre un match aussi
      *  
@@ -15,6 +16,7 @@ export default class Lobby {
 
     constructor() {this.LobbyId= idValue++;
         this.PlayersId = new Array<number>();
+        this.ViewersId = new Array<number>();
         console.log(this.LobbyId);
     }
 

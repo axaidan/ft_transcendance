@@ -61,8 +61,13 @@ export class LobbyService {
         await this.socket.joinGameRoom(u2, lobbyId);
 
         var lobby = this.lobbies.get(lobbyId);
-        this.socket.wss.to('game'+ lobbyId).emit("startGame", lobby);
+//        this.socket.wss.to('game'+ lobbyId).emit("startGame", lobby);
+     //   await this.socket.exitGameRoom(u1, lobbyId)
+     //   await this.socket.exitGameRoom(u2, lobbyId)
+    //        await this.socket.closeRoom(lobbyId);
         //start la game
+        console.log('watch user in room')
+        await this.socket.watchUsersInRoom(lobbyId)
 
     };
 
@@ -75,6 +80,9 @@ export class LobbyService {
         const lobby = new Lobby();
     lobby.PlayersId.push(userId1);
     lobby.PlayersId.push(userId2);
+    lobby.PalettePlayer1 = userId1;
+    lobby.PalettePlayer2 = userId2;
+
     this.lobbies.set(lobby.LobbyId, lobby);
     console.log('id du lobby creer :', lobby.LobbyId);
     console.log(lobby.LobbyId);
@@ -93,15 +101,53 @@ export class LobbyService {
         return undefined;
     }
 
-    async specLobby(lobbyId: number, userId: number) {
+    async specLobby(lobbyId: number, meId: number) {
+        console.log(`user ${meId} want to spec lobby ${lobbyId}`);
         const lobby = this.lobbies.get(lobbyId);
         if (!lobby) {
+            console.log('no lobby')
             return ; // no lobby here
         }
-        if (lobby.ViewersId.find(user => user === userId)) {
+        if (lobby.ViewersId.find(user => user === meId)) {
+            console.log('already watch lobby')
             return ; // already a viewer
         }
-        lobby.ViewersId.push(userId);
+        lobby.ViewersId.push(meId);
+        this.socket.specLobby(meId, lobbyId);
+
+    }
+
+
+    async specUser(meId: number, targetId:number) {
+        console.log(`user ${meId} want to spec user${targetId}`);
+
+//        let roomId :string = await this.socket.lobbyUserInGame(targetId);
+        let roomId = await this.findUserInLobbies(targetId);
+
+        if (roomId !== undefined) {
+            let looby = this.lobbies.get(roomId);
+            if (looby !== undefined) {
+            console.log(`${looby.LobbyId}`)
+            looby.ViewersId.push(meId);
+            this.socket.specLobby(meId, roomId);
+            this.lstViewer(looby.LobbyId)
+            }
+        }
+        else {
+            console.log('user not in game');
+        }
+
+
+        
+    }
+
+    async lstViewer(lobbieId: number) {
+        const lobby = this.lobbies.get(lobbieId);
+        if (lobby) {
+            lobby.ViewersId.forEach((value) => {
+                console.log(value);
+            })
+        }
     }
 
     async quitSpecLobby(lobbyId: number, userId: number) {

@@ -5,7 +5,7 @@
     watch()
 */
 
-import { Controller, Delete, Get, Logger, Post, UseGuards } from "@nestjs/common";
+import { Controller, Delete, Get, Logger, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { GetUser } from "src/auth/decorator";
 import { JwtGuard } from "src/auth/guard";
 import { LobbyService } from "./lobby.service";
@@ -50,6 +50,13 @@ export class lobbyController {
      */
     @Post('leave')
     async leaveLobby() {
+    }
+
+    @Get('spec/:id')
+    @UseGuards(JwtGuard)
+    async specUser(@GetUser('id') meId: number, @Param('id', ParseIntPipe) targetId:number){
+        return this.lobbyService.specUser(meId, targetId);
+
     }
 
     /*

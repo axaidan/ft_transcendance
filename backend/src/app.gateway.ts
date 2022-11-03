@@ -14,7 +14,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	@WebSocketServer() wss: Server;
 
 	private logger: Logger = new Logger('AppGateway');
-	private clientsMap = new Map<number, Socket>();
+	private clientsMap = new Map<number, Socket>(); // userid socket
+	private clientsMapRooms = new Map<string, Set<number> >();  // map de RoomName ArrayUserId
+
 
 	////////////////////////////////////
 	//  INIT, CONNECTION, DISCONNECT  //
@@ -35,6 +37,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				 this.logger.log(`USER ${id} LOGGED OUT app.gateway`);
 				this.wss.emit('logoutToClient', id);
 				this.clientsMap.delete(id);
+				this.exitRoom(id, client);
 				break;
 			}
 		}
@@ -105,6 +108,16 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		client.emit('getOnlineUsersToClient', userIdArr);
 	}
 
+	/** 
+	 * room pour le jeu commance
+	 * */ 
+
+	/**
+	 * 
+	 * @param userId user
+	 * @param lobbieId room to join
+	 */
+
 	joinGameRoom(userId: number, lobbieId: number) {
 		this.logger.log('joinGameRoom');
 		this.logger.log(`id du joins : ${userId}`)
@@ -115,11 +128,118 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			if ((roomName in client.rooms) === false) {
 				this.logger.log(`User ${userId} Joining ${roomName} room`);
 				client.join(roomName);
+				
+
+				var listEle:Set<number>  = this.clientsMapRooms.get(roomName);
+
+				if (listEle) {	
+
+					var indexEle = listEle.has(userId)
+					if (indexEle){
+					}
+					else  {
+							listEle.add(userId);
+					}
+				}
+				else {
+					let lst:Set<number> = new Set<number>()
+					lst.add(userId)
+					this.clientsMapRooms.set(roomName, lst)
+
+				}
 			}
 		}
 		else {
-			this.logger.log('client edxist pas')
+			this.logger.log('client exist pas')
 		}
+	}
+
+	specLobby(meId:number, lobbyId: number) {
+		let roomName: string = 'game' + lobbyId;
+		if (this.clientsMapRooms.has(roomName)) {
+			this.clientsMapRooms.get(roomName).add(meId);
+		}
+	}
+
+	async closeRoom(lobbieId: number) {
+		let roomName: string = 'game' + lobbieId;
+
+		console.log(`go close room: ${roomName}`)
+		this.clientsMapRooms.forEach((object, roomName) => {
+			object.forEach((inc) => {
+				console.log(`test :${inc}`);
+				this.clientsMapRooms.get(roomName).delete(inc)
+			})
+		})
+
+		
+	}
+
+	//------------- exit la room mais pas le views lobby !!! //
+	exitGameRoom(userId: number, lobbieId: number) {
+		this.logger.log('exitGameRoom');
+		this.logger.log(`id du client : ${userId}`);
+
+		var roomName: string = 'game' + lobbieId;
+		if (this.clientsMap.has(userId)) {
+			let listEle: Set<number> = this.clientsMapRooms.get(roomName)
+
+			if (listEle !== undefined) {
+				//remove element oflist ele
+				let Ele = listEle.has(userId);
+				if (Ele) {
+					console.log(`element : ${userId} exit the game room`)
+					listEle.delete(userId);
+					this.clientsMap.get(userId).leave(roomName);
+				}
+				else {
+					console.log(`element : ${userId} exist pas`)
+				}
+			}
+			else {
+				console.log(`room doesnt exit: ${roomName} `);
+			}
+		}
+		else {
+			this.logger.log('client exist pas');
+		}
+
+	}
+
+	watchUsersInRoom(lobbieId: number) {
+		var roomName: string = 'game' + lobbieId;
+
+		let listEle: Set<number> = this.clientsMapRooms.get(roomName)
+
+
+		if (listEle) {
+			//remove element oflist ele
+			let Ele = listEle.forEach((object) =>{
+				console.log(`userId in rooms ${object}`);
+			})
+
+		}
+		else {
+			console.log('room doesnt exit');
+		}
+	}
+	
+	exitRoom(userId : number, client: Socket) {
+		this.clientsMapRooms.forEach((arr, roomName)=> {
+			if(arr.delete(userId) ) {
+				client.leave(roomName);
+				console.log(`user ${userId} exit the room`)
+			}
+
+		} )
+	}
+
+	async lobbyUserInGame(userId:number): Promise<string>{
+		this.clientsMapRooms.forEach((arr, roomName) => {
+			arr.has(userId);
+			return roomName;
+		})
+		return null 
 	}
 
 }
