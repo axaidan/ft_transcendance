@@ -1,10 +1,9 @@
 // Extern:
-import { useContext } from "react";
+import React from "react";
 
 // Intern:
 import { colorStatus, ContactStatus } from ".";
 import { IUser } from "../../../types";
-import { ChatSocketContext } from "../../../context";
 
 import '../../../styles/components/friendsbar_components/Contact.css'
 
@@ -17,19 +16,20 @@ export function Notification({ notif }:NotificationProps ) {
 
 type ContactProps = { user: IUser, status: number };
 export function Contact({ user, status }: ContactProps) {
-	const {discussion} = useContext(ChatSocketContext).ChatSocketState;
-	const notif: number = discussion[0]?.notif;
+	const notif: number = user.notif;
 
 	return (
 		<li className='contact-container'>
-			<img src={user.avatarUrl} className="contact_icon" />
+			<div className="chat-user-avatar">
+				<img src={user.avatarUrl} className="chat-user-icon" />
+			</div>
 			<div className='contact-info'>
 				<div id={colorStatus(status, 'username', notif ? true : false)} className="contact-name">
-					{user.username}
+					<p>{user.username}</p>
 				</div>
 				<ContactStatus mode={status} />
 			</div>
-			{/* <Notification notif={notif}/> */}
+			<Notification notif={notif}/>
 		</li>
 	)
 }

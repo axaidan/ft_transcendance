@@ -12,6 +12,7 @@ import bg_website from '../assets/videos/bg_website.webm'
 import { useAxios } from "../hooks/useAxios";
 import SocketContextComponent from "../context/UserSocket/Components";
 import { ChatSocketContextComponent } from "../context";
+import { ChannelSocketContextComponent } from "../context/ChannelSocket";
 
 function LoadingHome() {
 	return (
@@ -32,12 +33,14 @@ export function Home() {
 	return (
 		<SocketContextComponent user={user}>
 			<ChatSocketContextComponent>
-				<Navbar me={user} />
-				<div className='container-body'>
-					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
-					<Outlet />
-				</div>
-				<Friendsbar />
+				<ChannelSocketContextComponent>
+					<Navbar me={user} />
+					<div className='container-body'>
+						<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
+						<Outlet />
+					</div>
+					<Friendsbar />
+				</ChannelSocketContextComponent>
 			</ChatSocketContextComponent>
 		</SocketContextComponent>
 	)

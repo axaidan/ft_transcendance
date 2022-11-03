@@ -2,7 +2,7 @@
 import { PropsWithChildren, useContext, useEffect, useState } from "react";
 
 // Intern:
-import { ChatSocketContext, EChatSocketActionType } from "../../context";
+import { ChatSocketContext, EChatSocketActionType, SocketContext } from "../../context";
 import { AxiosJwt } from "../../hooks";
 import { IDiscussion, IUser } from "../../types";
 
@@ -10,8 +10,12 @@ export interface DiscLinkUserProps extends PropsWithChildren { index: number }
 export const DiscLinkUser: React.FunctionComponent<DiscLinkUserProps> = ({ children, index }) => {
 	const { index_active } = useContext(ChatSocketContext).ChatSocketState;
 	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
-	const UpDateActiveDiscusion = () => {if (index_active != index) dispatch({ type: EChatSocketActionType.UP_CURR, payload: index })};
-
+	const userDispatch = useContext(SocketContext).SocketDispatch;
+	const UpDateActiveDiscusion = () => {
+		if (index_active != index) {
+			dispatch({ type: EChatSocketActionType.UP_CURR, payload: index });
+		}
+	}
 	return (
 		<div onClick={() => { UpDateActiveDiscusion() }}>
 			{ children }
@@ -30,8 +34,11 @@ export const UserCreateChat: React.FunctionComponent<UserCreateChatProps> = ({ c
 	useEffect(() => {
 		if (!newDisc) { return; }
 		let new_current = discussion.findIndex((elem) => elem.id === newDisc.id);
-		if (new_current === -1) { discussion.push(newDisc); }
-		chat({ type: EChatSocketActionType.UP_CURR, payload: discussion.length - 1 })
+		if (new_current === -1)
+		{
+			discussion.push(newDisc); 
+			chat({ type: EChatSocketActionType.UP_CURR, payload: discussion.length - 1 })
+		}
 		chat({ type: EChatSocketActionType.DISPLAY, payload: true })
 	}, [newDisc])
 

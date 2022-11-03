@@ -4,8 +4,8 @@ import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "
 // Intern:
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
-import { IDiscussion, IMessage, IUser } from "../../types";
-import { SocketContext } from "../UserSocket";
+import { IMessage } from "../../types";
+import { SocketContext  } from "../UserSocket";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {}
 export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children }) => {

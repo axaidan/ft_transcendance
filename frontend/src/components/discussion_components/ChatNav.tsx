@@ -36,7 +36,7 @@ export function ChatNav() {
 	return (
 		<div className='messages-nav'>
 			<ChatUser user={user} msg={user.login + " #EUW"}/>
-			<ChatOption />
+			<ChatOption user={user} mod={true} />
 		</div>
 	)
 }

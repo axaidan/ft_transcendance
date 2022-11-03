@@ -1,10 +1,10 @@
 #btn-messages-reduction {
-	background: url(../../../assets/images/chat/control-hide.png) #020912be no-repeat center;
+	background: url(../../../assets/images/chat/control-hide.png) no-repeat center;
 	background-size: 25px;
 }
 
 #btn-messages-panel {
-	background: url(../../../assets/images/chat/control-settings.png) #020912be no-repeat center;
+	background: url(../../../assets/images/chat/control-settings.png) no-repeat center;
 	background-size: 25px;
 }
 
@@ -28,6 +28,8 @@
 .chat-user {
 	display: flex;
 	align-items: center;
+	background-color: #00000000;
+    transition: background-color 600ms linear;
 }
 
 .chat-user-avatar {
@@ -57,6 +59,8 @@
 	height: 60px;
 	display: flex;
 	align-items: center;
+	background-color: #00000000;
+    transition: background-color 600ms linear;
 }
 
 #disc-user {
@@ -240,12 +244,21 @@
 	border-bottom: 1px solid #785a28;
 }
 
+.messages-options {
+	position: relative;
+}
+
 .messages-options button {
 	height: 25px;
 	width: 25px;
 	margin-right: 10px;
 	margin-top: 15px;
 	border: none;
+}
+
+#btn-messages-panel-disable {
+	background: url(../../../assets/images/chat/control-settings-disabled.png) no-repeat center;
+	background-size: 25px;
 }
 
 .discussion-container {
@@ -263,4 +276,8 @@
 
 .messages-input:focus {
 	outline: none;
+}
+
+:hover {
+    transition: background-color 50ms linear;
 }

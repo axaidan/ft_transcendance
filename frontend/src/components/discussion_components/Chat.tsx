@@ -88,8 +88,8 @@ export function Chat() {
 function ChatSearchFriends() {
 	const { friends } = useContext(SocketContext).SocketState;
 	return (
-		<div id='chat-search-friends'>{friends.map(friend => { return (
-			<UserCreateChat user={friend}>
+		<div id='chat-search-friends'>{friends.map((friend, index) => { return (
+			<UserCreateChat key={index} user={friend}>
 				<div className="disc-user">
 					<ChatUser user={friend} msg={friend.login + " #EUW"} />
 				</div>
@@ -101,7 +101,7 @@ function ChatSearch() {
 	return (
 		<div className='messages-nav'>
 			<ChatUser user={DflUser} msg={undefined} />
-			<ChatOption />
+			<ChatOption user={DflUser} />
 		</div>
 	)
 }
