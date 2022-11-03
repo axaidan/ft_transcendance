@@ -46,6 +46,7 @@ export function OtherProfile() {
 		await axios.post('/relation/block_user/' + user.id);
 		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: user });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: user });
+		location.reload();
 	}
 
 
@@ -67,6 +68,7 @@ export function OtherProfile() {
 		dispatch({ type: ESocketActionType.RM_BLOCKS, payload: user });
 		if (await IsFriend(user.id) === true)
 			dispatch({ type: ESocketActionType.ADD_FRIENDS, payload: user });
+		location.reload();
 	}
 
 	const IsFriend = async (cibleId: number): Promise<boolean> => {
@@ -189,6 +191,12 @@ export function OtherProfile() {
 						<div className="other-txt">
 							Draw : {draw}
 						</div>
+						<div className="other-txt">
+							Winrate: {(victories + defeat + draw) ?
+								Math.round((victories / (victories + defeat + draw)) * 100) + '%' : '0%'
+							}
+						</div>
+
 					</div>
 					<div className="other-trophee">
 						<h3>Trophee</h3>

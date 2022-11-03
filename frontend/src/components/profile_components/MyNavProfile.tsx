@@ -69,7 +69,7 @@ export function MyNavProfile() {
 				</NavLink>
 				<div className="user_search">
 					<form onSubmit={onSubmit}>
-						<input {...register("username")} placeholder="Recherche d'invocateur" maxLength={20} className='input_search' />
+						<input {...register("username")} placeholder="Recherche d'invocateur" maxLength={15} className='input_search' />
 						{errors.username && <p id='user-error-input'>{errors.username.message}</p>}
 					</form>
 				</div>

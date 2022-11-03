@@ -29,6 +29,7 @@ function FriendList({ friend }: FriendProps) {
 		axios.post('/relation/block_user/' + cibleId);
 		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: friend });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+		location.reload();
 	}
 
 	return (
@@ -66,6 +67,7 @@ function BlockList({ friend }: FriendProps) {
 		dispatch({ type: ESocketActionType.RM_BLOCKS, payload: friend });
 		if (await IsFriend(cibleId) === true)
 			dispatch({ type: ESocketActionType.ADD_FRIENDS, payload: friend });
+		location.reload();
 	}
 
 	return (

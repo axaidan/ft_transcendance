@@ -26,8 +26,8 @@ export function Profile() {
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
 
-
-	const [toggle2facheckbox, set2facheckbox] = useState(me.twoFactorAuth);
+	const DflChecked: boolean = me.twoFactorAuth;
+	const [toggle2facheckbox, set2facheckbox] = useState(DflChecked);
 	const [toggleEdit, setToggleEdit] = useState(false);
 	const [nick, setNick] = useState(false);
 
@@ -81,21 +81,6 @@ export function Profile() {
 		toggleUserEdit();
 		dispatch({ type: ESocketActionType.UP_USERNAME, payload: data.username });
 	});
-
-
-
-	const toggleTFA = () => {
-		set2facheckbox(!toggle2facheckbox);
-		axios.patch('/user',
-			{ twoFactorAuth: { toggle2facheckbox } },
-		).catch(function (error) {
-			if (error.response || error.request) {
-				console.log('this nickname is already taken');
-				return false;
-			}
-			return toggle2facheckbox;
-		})
-	}
 
 	const toggleUserEdit = () => {
 		setToggleEdit(!toggleEdit);
@@ -158,7 +143,10 @@ export function Profile() {
 			<div className="user-stats">
 				<div className="user-setting">
 					<div className="user-2auth">
-						<input type="checkbox" id='user-checkbox' onChange={toggleTFA} checked={nick} />
+						<input type="checkbox" id='user-checkbox' onClick={(e: React.FormEvent<HTMLInputElement>) => {
+							axios.patch('/user',
+								{ twoFactorAuth: !me.twoFactorAuth })
+						}} defaultChecked={me.twoFactorAuth} />
 						<label id='user-checkbox-label'>
 							2F-Auth
 						</label>

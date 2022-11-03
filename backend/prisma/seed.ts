@@ -76,6 +76,7 @@ async function main() {
 			login: 'mlormois',
 			username: 'Sergent',
 			avatarUrl: publicAvatarMlormois.url,
+
 		},
 	})
 
@@ -114,8 +115,8 @@ async function main() {
 		update: {},
 		create: {
 			login: 'wluong',
-			username: 'Migi',
 			avatarUrl: publicAvatarSmile.url,
+			email: 'wluong@student.42.fr',
 		},
 	})
 
