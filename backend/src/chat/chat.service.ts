@@ -134,6 +134,18 @@ export class ChatService {
         return channel;
     }
 
+    async editChannel()
+    // : Promise<Channel>
+    {}
+
+    async deleteChannel(chanId: number)
+    : Promise<Channel>
+    {
+        const channel = this.channelService.delete(chanId);
+        // event newChanDelete
+        return channel;
+    }
+
     //////////////////////////
     //  CHANNELUSER METHODS //
     //////////////////////////

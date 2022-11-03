@@ -3,7 +3,7 @@ import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "c
 export class ChannelDto {
 
     @IsInt()
-    id: number;
+    chanId: number;
 
     @IsOptional()
     @IsString()

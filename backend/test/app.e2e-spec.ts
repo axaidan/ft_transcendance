@@ -1357,6 +1357,37 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE(CREATE POST/channel)
 
+		describe('DELETE /channel/:id', () => {
+
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel`)
+				.withBody({ chanId : chanArr[4].id })
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('GET DELETED CHANNEL, should 404', () => {
+			});
+
+			it('NONVALID (not owner) - should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.delete(`/channel`)
+				.withBody({ chanId : chanArr[0].id })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+		}); // DESCRIBE (DELETE CHANNEL/:id)
 
 		describe('GET /channel/all', () => {
 
@@ -1369,10 +1400,10 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				.expectJsonLength(13)
+				.expectJsonLength(12)
 				// .expectBodyContains(chanArr[0].name)
 				// .expectBodyContains(chanArr[4].name)
-				.inspect();
+				// .inspect();
 			});
 
 		}); //	DESCRIBE (GET/channel/all)
@@ -1387,7 +1418,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
 				.withBody({
-					id: chanArr[0].id,
+					chanId: chanArr[0].id,
 				})
 				.expectStatus(201)
 				// .inspect();
@@ -1401,7 +1432,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
 				.withBody({
-					id: chanArr[5].id,
+					chanId: chanArr[5].id,
 					hash: `password${5}`,
 				})
 				.expectStatus(201)
@@ -1416,7 +1447,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.withBody({
-					id: chanArr[5].id,
+					chanId: chanArr[5].id,
 					hash: `incorrectPWD${5}`,
 				})
 				.expectStatus(403)
@@ -1431,7 +1462,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.withBody({
-					id: chanArr[5].id,
+					chanId: chanArr[5].id,
 					// hash: `incorrectPWD${5}`,
 				})
 				.expectStatus(400)
@@ -1450,7 +1481,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${dummyJwt.access_token}`
 				})
 				.withBody({
-					id: chanArr[0].id,
+					chanId: chanArr[0].id,
 				})
 				.expectStatus(200)
 				// .inspect();
@@ -1464,7 +1495,7 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${dummyJwt.access_token}`
 				})
 				.withBody({
-					id: chanArr[0].id,
+					chanId: chanArr[0].id,
 				})
 				.expectStatus(403)
 				// .inspect();
@@ -1794,7 +1825,7 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[2].access_token}`,
 				})
-				.withBody({ id: chanArr[0].id })
+				.withBody({ chanId: chanArr[0].id })
 				.expectStatus(403)
 				// .inspect()
 

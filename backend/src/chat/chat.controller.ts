@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseEnumPipe, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser, ChannelBan, ChannelMute } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
@@ -6,7 +6,7 @@ import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { Roles } from './channel/decorators/roles.decorator';
-import { ChannelDto, CreateChannelDto } from './channel/dto';
+import { ChannelDto, CreateChannelDto, EditChannelDto } from './channel/dto';
 import { RolesGuard } from './channel/guards/roles.guard';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
@@ -110,18 +110,31 @@ export class ChatController {
         return channel;
     }
 
-    // //   UPDATE Channel/:id (name)
-    // //   ONLY IF USER IS OWNER
-    // @Patch('channel/:chanId')
-    // async updateChan() {
-    // } 
+    // EDIT Channel/:id (name)
+    @Patch('channel/:chanId')
+    @Roles('owner')
+    async editChannel(
+        @Param('chanId') chanId : number,
+        @Body() dto : EditChannelDto,
+        )
+    // : Promise<Channel>
+    {
+        const channel = await this.chatService.editChannel();
+        return channel;
+    } 
 
-    // //   DELETE Channel/:id
-    // //   ONLY IF USER IS OWNER
-    // @Delete('channel/:chanId')
-    // async deleteChan() {
-    // } 
-
+    // DELETE Channel/:id
+    @Delete('channel')
+    @Roles('owner')
+    async deleteChannel(
+        // @Param('chanId', ParseIntPipe) chanId: number,
+        @Body() dto : ChannelDto
+    )
+    : Promise<Channel> 
+    {
+        const channel = await this.chatService.deleteChannel(dto.chanId);
+        return channel;
+    } 
 
     //////////////////////////////
     //  CHANNELUSER REQUESTS    //
