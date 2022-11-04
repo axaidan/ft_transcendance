@@ -1318,7 +1318,6 @@ describe('App e2e', () => {
 
 		describe('DELETE /channel/:id', () => {
 
-
 			it('VALID - should 200', () => {
 				return pactum
 				.spec()
@@ -1369,6 +1368,120 @@ describe('App e2e', () => {
 
 		}); // DESCRIBE (DELETE CHANNEL/:id)
 
+		describe('PATCH /channel/:chanId', () => {
+
+			it('VALID change name, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ name : 'newNameForChan3' })
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('NONVALID (!owner), should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.patch(`/channel/${chanArr[0].id}`)
+				.withBody({ name : 'newNameForChan3' })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID (name taken), should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ name : 'channel0' })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID type to prot NO hash, should 400', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ type: EChannelTypes.PROTECTED })
+				.expectStatus(400)
+				// .inspect()
+			});
+
+			it('VALID type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					type: EChannelTypes.PROTECTED,
+					hash: 'password'
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID type to private, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					type: EChannelTypes.PRIVATE,
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID name && type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					name: 'changeCHan3Name',
+					type: EChannelTypes.PROTECTED,
+					hash: 'password',
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID name && type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					name: 'changeCHan3Name',
+					type: EChannelTypes.PROTECTED,
+					hash: 'password',
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+
+		}); // DESCRIBE (PATCH CHANNEL/:id)
+
 		describe('GET /channel/all', () => {
 
 			it('VALID - should 200', () => {
@@ -1380,7 +1493,7 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				.expectJsonLength(16)
+				.expectJsonLength(12)
 				// .inspect();
 			});
 

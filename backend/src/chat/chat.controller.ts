@@ -114,12 +114,13 @@ export class ChatController {
     @Patch('channel/:chanId')
     @Roles('owner')
     async editChannel(
-        @Param('chanId') chanId : number,
+        @GetUser('id') currentUserId: number,
+        @Param('chanId', ParseIntPipe) chanId : number,
         @Body() dto : EditChannelDto,
         )
-    // : Promise<Channel>
+    : Promise<Channel>
     {
-        const channel = await this.chatService.editChannel();
+        const channel = await this.chatService.editChannel(currentUserId, chanId, dto);
         return channel;
     } 
 

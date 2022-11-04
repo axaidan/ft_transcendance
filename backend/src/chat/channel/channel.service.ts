@@ -1,9 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Channel, ChannelBan, ChannelMute, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
-import { ChannelDto, UserPropetiesDto } from './dto';
+import { ChannelDto, EditChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
 import { ChannelUserRoleDto } from './channel-user/dto';
@@ -13,6 +13,7 @@ import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
 import { ChannelBanDto } from './channel-ban/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { EChannelTypes } from './types/channel-types.enum';
+import { stringify } from 'querystring';
 
 @Injectable()
 export class ChannelService {
@@ -75,7 +76,7 @@ export class ChannelService {
         Promise<Channel[]> {
         const channels: Channel[] = await this.prisma.channel.findMany({
             where: {
-                NOT: { type: EChannelTypes.PROTECTED },
+                NOT: { type: EChannelTypes.PRIVATE },
             },
         });
         for (const channel of channels) {
@@ -130,6 +131,41 @@ export class ChannelService {
         catch(e) {
             if (e instanceof PrismaClientKnownRequestError) 
                 throw new NotFoundException('channel not found');
+        }
+    }
+
+    //  PATCH /channel/:chanId
+    async edit(currentUserId: number, chanId : number, dto: EditChannelDto)
+    : Promise<Channel>
+    {
+        let hash: string;
+
+        try {
+            if ('type' in dto && dto.type === EChannelTypes.PROTECTED) {
+                hash = await argon.hash(dto.hash);
+            }
+            const channel = await this.prisma.channel.update({
+                where: { id: chanId },
+                data: {
+                    name: (dto.name !== undefined ? dto.name : undefined),
+                    type: (dto.type !== undefined ? dto.type : undefined),
+                    hash: (dto.hash !== undefined ? hash : undefined),
+                },
+        });
+        this.setUserProperties(currentUserId, channel, {
+            role: EChannelRoles.OWNER,
+            joined: true,
+        });
+        delete channel.hash;
+        return channel;
+        } catch (e) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                if (e.code === 'P2002') 
+                    throw new ForbiddenException('channel name already taken');
+                else
+                    throw new ConflictException('sth wrong in db');
+
+            }
         }
     }
 

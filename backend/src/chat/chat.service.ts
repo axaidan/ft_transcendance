@@ -4,7 +4,7 @@ import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelService } from './channel/channel.service';
-import { ChannelDto, CreateChannelDto } from './channel/dto';
+import { ChannelDto, CreateChannelDto, EditChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
@@ -134,9 +134,14 @@ export class ChatService {
         return channel;
     }
 
-    async editChannel()
-    // : Promise<Channel>
-    {}
+    //  PATCH /channel/:chanId
+    async editChannel(currentUserId: number, chanId: number, dto: EditChannelDto)
+    : Promise<Channel>
+    {
+        const channel = await this.channelService.edit(currentUserId, chanId, dto);
+        // event channelEdited
+        return channel;
+    }
 
     async deleteChannel(chanId: number)
     : Promise<Channel>

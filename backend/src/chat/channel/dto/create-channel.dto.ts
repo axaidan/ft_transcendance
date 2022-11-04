@@ -7,17 +7,11 @@ export class CreateChannelDto {
     @IsNotEmpty()
     @MaxLength(20)
     @MinLength(3)
-    name: string;
-
-    // @IsBoolean()
-    // private: boolean;
-
-    // @IsBoolean()
-    // protected: boolean;
+    name?: string;
 
     @Min(0)
     @Max(2)
-    type: number;
+    type?: number;
 
     @ValidateIf(o => o.type === EChannelTypes.PROTECTED ) 
     @IsString()
