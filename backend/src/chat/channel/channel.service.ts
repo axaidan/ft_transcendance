@@ -202,7 +202,7 @@ export class ChannelService {
                 role: EChannelRoles.NORMAL,
             });
         } else {
-            // CHECK statu AND status_time
+            throw new ForbiddenException('channel already joined');
         }
         this.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
@@ -213,14 +213,18 @@ export class ChannelService {
     }
 
     // if (user is owner find another owner)
-    // if (status is not noral, keep ChannelUser record in db)
     async leave(userId: number, dto: ChannelDto):
         Promise<Channel> {
         const channelUser: ChannelUser = await this.channelUserService.findOne(userId, dto.chanId);
         if (channelUser === null)
             throw new ForbiddenException('channel not joined');
-        await this.channelUserService.delete(channelUser);
         const channel: Channel = await this.findOne(dto.chanId);
+        if (channelUser.role === EChannelRoles.OWNER) {
+            const nextOwner = await this.passOwnership(channelUser, channel);
+            if (nextOwner === null)
+                await this.delete(dto.chanId);
+        }
+        await this.channelUserService.delete(channelUser);
         this.setUserProperties(userId, channel, {
             role: channelUser.role,
             joined: false,
