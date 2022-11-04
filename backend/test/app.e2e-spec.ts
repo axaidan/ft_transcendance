@@ -13,6 +13,7 @@ import { ChannelService } from 'src/chat/channel/channel.service';
 import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
 import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
 import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
+import { EChannelTypes } from 'src/chat/channel/types/channel-types.enum';
 
 const N = 20;
 
@@ -60,41 +61,29 @@ describe('App e2e', () => {
 		for ( ; i < N/4 ; i++) {
 			const channel = await chanService.create(userArr[0].id, {
 				name: `channel${i}`,
-				private: false,
-				protected: false,
+				type: EChannelTypes.NORMAL,
 			});
 			channelArr.push(channel);
 		}
 		for ( ; i < N/2 ; i++) {
 			const channel = await chanService.create(userArr[2].id, {
 				name: `channel${i}`,
-				private: false,
-				protected: true,
+				type: EChannelTypes.PROTECTED,
 				hash: `password${i}`,
 
 			});
-			channelArr.push(channel);
-		}
-		for ( ; i < N/2 + N/4 ; i++) {
-
-			const channel = await chanService.create(userArr[1].id, {
-				name: `channel${i}`,
-				private: true,
-				protected: false,
-			});
-
 			channelArr.push(channel);
 		}
 		for ( ; i < N ; i++) {
-			const channel = await chanService.create(userArr[3].id, {
+
+			const channel = await chanService.create(userArr[1].id, {
 				name: `channel${i}`,
-				private: true,
-				protected: true,
-				hash: `password${i}`,
+				type: EChannelTypes.PRIVATE,
 			});
+
 			channelArr.push(channel);
 		}
-		return channelArr;
+			return channelArr;
 	}
 
 	const seedChannelUsers = async function() {
@@ -1208,8 +1197,7 @@ describe('App e2e', () => {
 
 		const dto : CreateChannelDto = {
 			name: 'customChannel1',
-			protected: false,
-			private: false,
+			type: EChannelTypes.NORMAL,
 		};
 
 		describe('Create POST /channel', () => {
@@ -1223,7 +1211,7 @@ describe('App e2e', () => {
 				.withBody(dto)
 				.expectStatus(201)
 				.expectBodyContains(dto.name)
-				.expectBodyContains(dto.protected)
+				.expectBodyContains(dto.type)
 				// .expectBodyContains(dummyUser.id)
 				// .inspect();
 			});
@@ -1242,8 +1230,7 @@ describe('App e2e', () => {
 
 			it('NON VALID DTO - NO name -  should 400', () => {
 				const noNameDto = {
-					protected: false,
-					private: false,
+					type: EChannelTypes.NORMAL,
 				};
 				return pactum
 				.spec()
@@ -1256,44 +1243,26 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NON VALID DTO - NO protected - should 400', () => {
-				const noProtectedDto = {
-					name: 'customChannel1',
-					private: true,
-				}
+			it('NON VALID DTO - NO type -  should 400', () => {
+				const noNameDto = {
+					name: 'lalala',
+				};
 				return pactum
 				.spec()
 				.post('/channel')
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
-				.withBody(noProtectedDto)
+				.withBody(noNameDto)
 				.expectStatus(400)
 				// .inspect();
 			});
 
-			it('NON VALID DTO - NO private - should 400', () => {
-				const noProtectedDto = {
-					name: 'customChannel1',
-					protected: false,
-					hash: 'password',
-				}
-				return pactum
-				.spec()
-				.post('/channel')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(noProtectedDto)
-				.expectStatus(400)
-				// .inspect();
-			});
 
 			it('VALID - public protected should 201', () => {
 				const protectedDto = {
 					name: 'privCustomChannel',
-					private: false,
-					protected: true, 
+					type: EChannelTypes.PROTECTED,
 					hash: 'password',
 				}
 				return pactum
@@ -1305,7 +1274,7 @@ describe('App e2e', () => {
 				.withBody(protectedDto)
 				.expectStatus(201)
 				.expectBodyContains(protectedDto.name)
-				.expectBodyContains(protectedDto.protected)
+				.expectBodyContains(protectedDto.type)
 				// .expectBodyContains(protectedDto.hash)
 				// .inspect();
 			});
@@ -1313,8 +1282,7 @@ describe('App e2e', () => {
 			it ('NON VALID - protected NO hash - should 400', () => {
 				const noHashDto = {
 					name: 'channel',
-					private: false,
-					protected: true, 
+					type: EChannelTypes.PROTECTED,
 				}
 				return pactum
 				.spec()
@@ -1330,8 +1298,7 @@ describe('App e2e', () => {
 			it ('MALFORMED - non-protected + hash - should 200 with null hash', () => {
 				const notProtWithHashDto  = {
 					name: 'notProtWithHashchan',
-					private: false,
-					protected: false, 
+					type: EChannelTypes.NORMAL,
 					hash: 'password',
 				}
 				return pactum
@@ -1343,16 +1310,8 @@ describe('App e2e', () => {
 				.withBody(notProtWithHashDto)
 				.expectStatus(201)
 				.expectBodyContains(notProtWithHashDto.name)
-				.expectBodyContains(notProtWithHashDto.private)
-				.expectBodyContains(notProtWithHashDto.protected)
-				//	CANNOT TEST LIKE THIS => NEED createdAt, updatedAt, id
-				// .expectBodyContains({
-				// 	name: notProtWithHashDto.name,
-				// 	hash: null,
-				// 	private: notProtWithHashDto.private,
-				// 	protected: notProtWithHashDto.protected,
-				// })
-				// .inspect();
+				.expectBodyContains(notProtWithHashDto.type)
+				//.inpect()
 			});
 
 		});	// DESCRIBE(CREATE POST/channel)
@@ -1421,9 +1380,7 @@ describe('App e2e', () => {
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				.expectJsonLength(12)
-				// .expectBodyContains(chanArr[0].name)
-				// .expectBodyContains(chanArr[4].name)
+				.expectJsonLength(16)
 				// .inspect();
 			});
 

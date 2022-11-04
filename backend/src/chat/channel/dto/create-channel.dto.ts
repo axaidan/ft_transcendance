@@ -1,5 +1,5 @@
-import { ValidationPipe } from "@nestjs/common";
-import { IsBoolean, IsNotEmpty, IsString, MaxLength, MinLength, ValidateIf } from "class-validator";
+import { IsNotEmpty, IsString, Max, MaxLength, Min, MinLength, ValidateIf } from "class-validator";
+import { EChannelTypes } from "../types/channel-types.enum";
 
 export class CreateChannelDto {
 
@@ -9,13 +9,17 @@ export class CreateChannelDto {
     @MinLength(3)
     name: string;
 
-    @IsBoolean()
-    private: boolean;
+    // @IsBoolean()
+    // private: boolean;
 
-    @IsBoolean()
-    protected: boolean;
+    // @IsBoolean()
+    // protected: boolean;
 
-    @ValidateIf(o => o.protected === true) 
+    @Min(0)
+    @Max(2)
+    type: number;
+
+    @ValidateIf(o => o.type === EChannelTypes.PROTECTED ) 
     @IsString()
     @IsNotEmpty()
     @MaxLength(20)

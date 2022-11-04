@@ -12,6 +12,7 @@ import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
 import { ChannelBanDto } from './channel-ban/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { EChannelTypes } from './types/channel-types.enum';
 
 @Injectable()
 export class ChannelService {
@@ -32,7 +33,7 @@ export class ChannelService {
         //     throw new BadRequestException('cannot be private and protected');
         // }
         let hash: string;
-        if (dto.protected === true) {
+        if (dto.type === EChannelTypes.PROTECTED) {
             if (('hash' in dto) === false) {
                 throw new BadRequestException('need password to be protected');
             }
@@ -44,8 +45,7 @@ export class ChannelService {
             const channel: Channel = await this.prisma.channel.create({
                 data: {
                     name: dto.name,
-                    private: dto.private,
-                    protected: dto.protected,
+                    type: dto.type,
                     hash: hash,
                     channelUsers: {
                         create: [{
@@ -75,7 +75,7 @@ export class ChannelService {
         Promise<Channel[]> {
         const channels: Channel[] = await this.prisma.channel.findMany({
             where: {
-                private: false,
+                NOT: { type: EChannelTypes.PROTECTED },
             },
         });
         for (const channel of channels) {
@@ -103,6 +103,7 @@ export class ChannelService {
             where: {
                 channelUsers: {
                     some: { userId: userId }
+        
                 },
             },
         });
@@ -141,7 +142,7 @@ export class ChannelService {
             throw new NotFoundException(`channel ${channelDto.chanId} NOT FOUND`);
         }
         //  check hash if channel protected
-        if (channel.protected === true) {
+        if (channel.type === EChannelTypes.PROTECTED) {
             if (('hash' in channelDto) === false) {
                 throw new BadRequestException('need password');
             }

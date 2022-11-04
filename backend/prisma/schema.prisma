@@ -107,9 +107,8 @@ model Channel {
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
-	name			String
-	private			Boolean
-	protected		Boolean
+	name			String	 @unique
+	type			Int
 	hash			String?
  
 	channelUsers	ChannelUser[]
@@ -117,7 +116,7 @@ model Channel {
 	channelMutes	ChannelMute[]
 
 	@@map("channel")
-	@@unique([name, private])
+	// @@unique([name, private])
 }
 
 model ChannelUser {
