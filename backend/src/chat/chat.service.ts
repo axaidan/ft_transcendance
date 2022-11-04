@@ -96,6 +96,14 @@ export class ChatService {
         return channels;
     }
 
+    //  GET /channel/:chanId
+    async getChannelWusersWmessages(currentUserId: number, chanId: number)
+    : Promise<Channel>
+    {
+        const channel = await this.channelService.getWusersWMessages(currentUserId, chanId);
+        return channel;
+    }
+
     //  POST /channel
     async createChannel(
         currentUserId: number,

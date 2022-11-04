@@ -2,18 +2,17 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { Channel, ChannelBan, ChannelMute, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
+import { ChannelBanService } from './channel-ban/channel-ban.service';
+import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
+import { EChannelTypes } from './types/channel-types.enum';
 import { ChannelDto, EditChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
 import { ChannelUserRoleDto } from './channel-user/dto';
-import { ChannelBanService } from './channel-ban/channel-ban.service';
-import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
 import { ChannelBanDto } from './channel-ban/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { EChannelTypes } from './types/channel-types.enum';
-import { stringify } from 'querystring';
 
 @Injectable()
 export class ChannelService {
@@ -110,13 +109,41 @@ export class ChannelService {
         });
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);
-            this.setUserProperties(userId, channel, {
+            await this.setUserProperties(userId, channel, {
                 role: channelUser.role,
                 joined: true,
             });
             delete channel.hash;
         }
         return channelArr;
+    }
+
+    // GET /channel/:chanId
+    async getWusersWMessages(currentUserId: number, chanId: number)
+    : Promise<Channel>
+    {
+        const channelUser = await this.channelUserService.findOne(currentUserId, chanId);
+        if (channelUser === null)
+            throw new NotFoundException('you must have joined the Channel');
+        const channelBan = await this.channelBanService.findOne(currentUserId, chanId);
+        if (channelBan !== null)
+            throw new ForbiddenException('you are banned from this channel');
+        const channel = await this.prisma.channel.findUnique({
+            where: { id: chanId },
+            include: {
+                channelUsers: true,
+                channelBans: true,
+                channelMutes: true,
+                // messages: true,
+            }
+        });
+        if (channel === null)
+            throw new NotFoundException('channel not found');
+        await this.setUserProperties(currentUserId, channel, {
+            role: channelUser.role,
+            joined: true,
+        });
+        return channel;
     }
 
     async delete(chanId: number)
@@ -152,7 +179,7 @@ export class ChannelService {
                     hash: (dto.hash !== undefined ? hash : undefined),
                 },
         });
-        this.setUserProperties(currentUserId, channel, {
+        await this.setUserProperties(currentUserId, channel, {
             role: EChannelRoles.OWNER,
             joined: true,
         });
@@ -174,11 +201,12 @@ export class ChannelService {
     async join(currentUserId: number, channelDto: ChannelDto):
         Promise<Channel> {
         const channel: Channel = await this.findOne(channelDto.chanId);
-        if (channel === null) {
+        if (channel === null)
             throw new NotFoundException(`channel ${channelDto.chanId} NOT FOUND`);
-        }
-        //  check hash if channel protected
+        if (channel.type === EChannelTypes.PRIVATE)
+            throw new ForbiddenException('cannot join a private channel');
         if (channel.type === EChannelTypes.PROTECTED) {
+            //  check hash if channel protected
             if (('hash' in channelDto) === false) {
                 throw new BadRequestException('need password');
             }
@@ -268,14 +296,6 @@ export class ChannelService {
         return nextOwner;
     }
 
-    async getAdmins() 
-    {}
-
-    async getMembers()
-    {}
-
-    async getOwner()
-    {}
 
     //////////////////
     //  BAN METHODS //

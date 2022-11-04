@@ -80,6 +80,17 @@ export class ChatController {
         return channels;
     }
 
+    @Get('channel/:chanId')
+    async getChannelWusersWmessages(
+        @GetUser('id') currentUserId: number,
+        @Param('chanId') chanId: number,
+    )
+    // : Promise<Channel>
+    {
+        const channel = await this.chatService.getChannelWusersWmessages(currentUserId, chanId);
+        return channel;
+    }
+
     @Post('channel')
     async createChannel(
         @GetUser('id') currentUserId: number,
