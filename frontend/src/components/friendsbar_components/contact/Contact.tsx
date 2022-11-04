@@ -14,22 +14,19 @@ export function Notification({ notif }:NotificationProps ) {
 	return (( notif ? (<div className='contact-notification'>{notif}</div>) : (<></>)))
 } 
 
-type ContactProps = { user: IUser, status: number };
-export function Contact({ user, status }: ContactProps) {
-	const notif: number = user.notif;
-
+type ContactProps = { user: IUser, mode: boolean };
+export function Contact({ user, mode }: ContactProps) {
 	return (
 		<li className='contact-container'>
 			<div className="chat-user-avatar">
 				<img src={user.avatarUrl} className="chat-user-icon" />
 			</div>
 			<div className='contact-info'>
-				<div id={colorStatus(status, 'username', notif ? true : false)} className="contact-name">
+				<div id={colorStatus(mode ? user.status : 4, 'username', false)} className="contact-name">
 					<p>{user.username}</p>
 				</div>
-				<ContactStatus mode={status} />
+				<ContactStatus mode={mode ? user.status : 4} />
 			</div>
-			<Notification notif={notif}/>
 		</li>
 	)
 }

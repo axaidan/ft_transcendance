@@ -19,7 +19,11 @@ model User {
     login String @unique
     username String? @unique
    	email String? @unique
-    twoFactorAuth Boolean @default(false)
+    
+	status Int @default(4)
+
+	twoFactorAuth Boolean @default(false)
+
 
 	whoIWatch Relation[] @relation("r1")
 	whoWatchesMe Relation[] @relation("r2")

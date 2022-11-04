@@ -2,6 +2,11 @@ import { createContext } from "react";
 import { Socket } from "socket.io-client";
 import { DflUser, IUser } from "../../types";
 
+export interface IStatus {
+	userId: number;
+	status: number;
+}
+
 export interface ISocketContextState {
     socket : Socket | undefined;
     me: IUser; 
@@ -30,6 +35,7 @@ export enum ESocketActionType {
     RM_FRIENDS= 'rm_new_friend' ,
     ADD_BLOCKS= 'add_new_block' ,
     RM_BLOCKS= 'rm_new_block' ,
+	UP_STATUS= 'update_user_status',
 }
 
 export type TSocketContextActions = ESocketActionType.UP_SOKET  |
@@ -41,10 +47,11 @@ export type TSocketContextActions = ESocketActionType.UP_SOKET  |
                                     ESocketActionType.GET_BLOCKS |
                                     ESocketActionType.ADD_FRIENDS |
                                     ESocketActionType.RM_FRIENDS |
-                                    ESocketActionType.ADD_BLOCKS | 
+                                    ESocketActionType.ADD_BLOCKS |
+									ESocketActionType.UP_STATUS	|
                                     ESocketActionType.RM_BLOCKS; 
 
-export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] ;
+export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | IStatus;
 
 export interface ISocketContextActions {
     type: TSocketContextActions;
@@ -52,7 +59,8 @@ export interface ISocketContextActions {
 }
 
 export const SocketReducer = ( state: ISocketContextState, action: ISocketContextActions ) => { 
-    // console.log( `Message Receive - Action: ${action.type} - Payload : `, action.payload );
+    console.log( `Message Receive - Action: ${action.type} - Payload : `, action.payload );
+	let user: IUser | undefined;
 
     switch(action.type) {
         case ESocketActionType.UP_SOKET:
@@ -77,7 +85,11 @@ export const SocketReducer = ( state: ISocketContextState, action: ISocketContex
             return { ...state, blocks: [ ...state.blocks, action.payload as IUser] };
         case ESocketActionType.RM_BLOCKS:
             return { ...state, blocks: state.blocks.filter((user) => user !== ( action.payload as IUser ))};
-        default:
+        case ESocketActionType.UP_STATUS:
+			user = state.friends.find((friend) => { return friend.id == (action.payload as IStatus).userId })
+			if (user) { user.status = (action.payload as IStatus).status; }
+			return { ...state }
+		default:
             return { ...state };
     }
 }

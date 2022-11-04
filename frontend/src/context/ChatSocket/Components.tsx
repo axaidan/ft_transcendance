@@ -5,14 +5,15 @@ import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
 import { IMessage } from "../../types";
-import { SocketContext  } from "../UserSocket";
+import { SocketContext, ESocketActionType  } from "../UserSocket";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {}
 export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
 	const [loadingSocket, setLoading] = useState(true);
 
-	const { me } = useContext(SocketContext).SocketState
+	const { me } = useContext(SocketContext).SocketState;
+	const UserDispatch = useContext(SocketContext).SocketDispatch;
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -35,6 +36,9 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
 			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
+			if (message.userId != me.id) {
+				UserDispatch({ type: ESocketActionType.UP_NOTIF, payload: message.userId })
+			}
 		});
 
 		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {

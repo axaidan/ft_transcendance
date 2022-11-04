@@ -60,8 +60,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			// this.logger.error(`USER ${userId} ALREADY LOGGED IN`);
 			throw new WsException(`double connection`);
 		}
+
 		this.clientsMap.set(userId, client.id);
-		// this.logger.log(`USER ${userId} LOGGED IN`);
+
+				
+		
 		client.broadcast.emit('loginToClient', userId);
 		// this.dispayClientsMap();
 	}

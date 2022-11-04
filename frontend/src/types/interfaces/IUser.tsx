@@ -7,7 +7,7 @@ export type IUser = {
 	updatedAt: string
 	twoFactorAuth: boolean,
 	avatarUrl: string,
-	notif: number,
+	status: number,
 }
 
 export const DflUser: IUser = {
@@ -19,6 +19,6 @@ export const DflUser: IUser = {
 	updatedAt: "string",
 	twoFactorAuth: false,
 	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
-	notif: 0,
+	status: 4,
 }
 

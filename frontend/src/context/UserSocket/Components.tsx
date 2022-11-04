@@ -7,6 +7,7 @@ import { useSocket } from "../../hooks/useSocket";
 import { IUser } from "../../types";
 import { AxiosJwt } from "../../hooks";
 import { AxiosResponse } from "axios";
+import { IStatus } from ".";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
     user: IUser;
@@ -48,14 +49,28 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
         /** User Connected Event */
         socket.on('loginToClient', (uid: number) => {
+			const status: IStatus = {
+				userId: uid,
+				status: 0
+			}
+
             console.info('User connected, new user list received.');
             SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
+			SocketDispatch({ type: ESocketActionType.UP_STATUS, payload: status })
+			
         })
 
         /** User Disconnect Event */
         socket.on('logoutToClient', (uid: number) => {
+
+			const status: IStatus = {
+				userId: uid,
+				status: 4
+			}
+
             console.info('User connected, new user list received.');
             SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
+			SocketDispatch({ type: ESocketActionType.UP_STATUS, payload: status })
         })
 
         socket.on('getOnlineUsersToClient', ( onlineUsers: number[]) => {

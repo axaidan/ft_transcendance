@@ -1,10 +1,10 @@
 // Extern:
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 // Intern:
 import { Contact } from ".";
 import { IUser } from "../../types";
-import { SocketContext } from "../../context";
+import { ESocketActionType, IStatus, SocketContext } from "../../context";
 import { UserCreateChat } from "../discussion_components";
 
 // Assets:
@@ -25,7 +25,7 @@ const UserListCategorie: React.FunctionComponent<UserListCategorieProps> = ({ us
 			</div>
 			{ active ? users.map((user, index) => { return (
 				<UserCreateChat key={index} user={user}> 
-					<Contact user={user} status={4}/>
+					<Contact user={user} mode={title == "ONLINE"}/>
 				</UserCreateChat>
 			)}) : <></> }
 		</div>
@@ -34,6 +34,7 @@ const UserListCategorie: React.FunctionComponent<UserListCategorieProps> = ({ us
 
 export function FriendsList() {
 	const { users, friends } = useContext(SocketContext).SocketState;
+
 	const userOnline = () => { return friends.filter((friend) => { return (users.includes(friend.id) == true)})}
 	const userOffline = () => { return friends.filter((friend) => { return (users.includes(friend.id) == false)})}
 
