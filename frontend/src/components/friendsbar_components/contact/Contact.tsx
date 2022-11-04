@@ -1,11 +1,12 @@
 // Extern:
-import React from "react";
+import React, { useContext, useEffect } from "react";
 
 // Intern:
 import { colorStatus, ContactStatus } from ".";
 import { IUser } from "../../../types";
 
 import '../../../styles/components/friendsbar_components/Contact.css'
+import { SocketContext } from "../../../context";
 
 
 
@@ -14,18 +15,29 @@ export function Notification({ notif }:NotificationProps ) {
 	return (( notif ? (<div className='contact-notification'>{notif}</div>) : (<></>)))
 } 
 
-type ContactProps = { user: IUser, mode: boolean };
-export function Contact({ user, mode }: ContactProps) {
+type ContactProps = { user: IUser};
+export function Contact({ user }: ContactProps) {
+
+	const { users, friends } = useContext(SocketContext).SocketState;
+
+	const getStatus = ( uid: number ) => {
+		return users.find((user) => { return uid == user.userId })?.status;
+	}
+
+	let status: number = 4;
+	if ( getStatus(user.id) != undefined ) 
+		status = getStatus(user.id)!;
+
 	return (
 		<li className='contact-container'>
 			<div className="chat-user-avatar">
 				<img src={user.avatarUrl} className="chat-user-icon" />
 			</div>
 			<div className='contact-info'>
-				<div id={colorStatus(mode ? user.status : 4, 'username', false)} className="contact-name">
+				<div id={colorStatus( status , 'username', false)} className="contact-name">
 					<p>{user.username}</p>
 				</div>
-				<ContactStatus mode={mode ? user.status : 4} />
+				<ContactStatus mode={status} />
 			</div>
 		</li>
 	)
