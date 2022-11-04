@@ -1,5 +1,6 @@
-import { Injectable, CanActivate, ExecutionContext, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, NotFoundException, Logger, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { IsNumber, isNumber } from 'class-validator';
 import { ChannelUserService } from '../channel-user/channel-user.service';
 import { EChannelRoles } from '../channel-user/types';
 
@@ -18,13 +19,16 @@ export class RolesGuard implements CanActivate {
             return true;
         }
 
-        // console.log(`roles = ${roles}`)
-        
         const request = context.switchToHttp().getRequest();
         const userId = request.user['id'];
-        const chanId = request.body['chanId'];
+        // A UN MOMENT FAUT SE DECIDER
+        let chanId = request.body['chanId'];
+        if (chanId === undefined)
+            chanId = Number(request.params.chanId);
+        if (Number.isInteger(chanId) === false)
+            throw new BadRequestException(':chanId must be an integer');
+
         const channelUser = await this.channelUserService.findOne(userId, chanId);
-        // console.log('channelUser = ', channelUser);
 
         if (channelUser === null)
             throw new NotFoundException('user not found in channel');

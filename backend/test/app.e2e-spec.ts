@@ -1196,7 +1196,7 @@ describe('App e2e', () => {
 				})
 				.expectStatus(200)
 				.expectBodyContains(userArr[0].id)
-				.inspect();
+				// .inspect();
 			});
 
 		});
@@ -1366,13 +1366,22 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.delete(`/channel`)
-				.withBody({ chanId : chanArr[4].id })
+				.delete(`/channel/${chanArr[4].id}`)
+				// .withBody({ chanId : chanArr[4].id })
 				.expectStatus(200)
 				// .inspect()
 			});
 
-			it('GET DELETED CHANNEL, should 404', () => {
+			it('NONVALID (!exists)- should 404', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel/${chanArr[4].id}`)
+				// .withBody({ chanId : chanArr[4].id })
+				.expectStatus(404)
+				// .inspect()
 			});
 
 			it('NONVALID (not owner) - should 403', () => {
@@ -1381,9 +1390,21 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[1].access_token}`,
 				})
-				.delete(`/channel`)
-				.withBody({ chanId : chanArr[0].id })
+				.delete(`/channel/${chanArr[0].id}`)
+				// .withBody({ chanId : chanArr[0].id })
 				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID (malformed)- should 400', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel/blablabla`)
+				// .withBody({ chanId : chanArr[4].id })
+				.expectStatus(400)
 				// .inspect()
 			});
 

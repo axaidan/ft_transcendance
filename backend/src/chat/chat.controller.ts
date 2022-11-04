@@ -124,15 +124,16 @@ export class ChatController {
     } 
 
     // DELETE Channel/:id
-    @Delete('channel')
+    @Delete('channel/:chanId')
     @Roles('owner')
     async deleteChannel(
-        // @Param('chanId', ParseIntPipe) chanId: number,
-        @Body() dto : ChannelDto
+        @Param('chanId', ParseIntPipe) chanId: number,
+        // @Body() dto : ChannelDto
     )
     : Promise<Channel> 
     {
-        const channel = await this.chatService.deleteChannel(dto.chanId);
+        // const channel = await this.chatService.deleteChannel(dto.chanId);
+        const channel = await this.chatService.deleteChannel(chanId);
         return channel;
     } 
 
