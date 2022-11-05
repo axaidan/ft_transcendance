@@ -45,9 +45,7 @@ export class ChannelUserService {
     : Promise<ChannelUser[]>
     {
         const channelUsers : ChannelUser[] = await this.prisma.channelUser.findMany({
-            where: {
-                userId: userId,
-            },
+            where: { userId: userId },
         });
         return channelUsers;
     }

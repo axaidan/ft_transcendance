@@ -32,9 +32,6 @@ export class ChannelService {
         currentUserId: number,
         dto: CreateChannelDto
     ): Promise<Channel> {
-        // if (dto.protected === true && dto.private === true) {
-        //     throw new BadRequestException('cannot be private and protected');
-        // }
         let hash: string;
         if (dto.type === EChannelTypes.PROTECTED) {
             if (('hash' in dto) === false) {
@@ -74,8 +71,8 @@ export class ChannelService {
     }
 
     //  GET /channel/all
-    async allPublic(userId: number):
-        Promise<Channel[]> {
+    async allPublic(userId: number)
+        : Promise<Channel[]> {
         const channels: Channel[] = await this.prisma.channel.findMany({
             where: {
                 NOT: { type: EChannelTypes.PRIVATE },
@@ -106,7 +103,7 @@ export class ChannelService {
             where: {
                 channelUsers: {
                     some: { userId: userId }
-        
+
                 },
             },
         });
@@ -123,8 +120,7 @@ export class ChannelService {
 
     // GET /channel/:chanId
     async getWusersWMessages(currentUserId: number, chanId: number)
-    : Promise<Channel>
-    {
+        : Promise<Channel> {
         const channelUser = await this.channelUserService.findOne(currentUserId, chanId);
         if (channelUser === null)
             throw new NotFoundException('you must have joined the Channel');
@@ -150,24 +146,22 @@ export class ChannelService {
     }
 
     async delete(chanId: number)
-    : Promise<Channel>
-    {
+        : Promise<Channel> {
         try {
             const channel = this.prisma.channel.delete({
                 where: { id: chanId },
             });
             return channel;
         }
-        catch(e) {
-            if (e instanceof PrismaClientKnownRequestError) 
+        catch (e) {
+            if (e instanceof PrismaClientKnownRequestError)
                 throw new NotFoundException('channel not found');
         }
     }
 
     //  PATCH /channel/:chanId
-    async edit(currentUserId: number, chanId : number, dto: EditChannelDto)
-    : Promise<Channel>
-    {
+    async edit(currentUserId: number, chanId: number, dto: EditChannelDto)
+        : Promise<Channel> {
         let hash: string;
 
         try {
@@ -181,20 +175,19 @@ export class ChannelService {
                     type: (dto.type !== undefined ? dto.type : undefined),
                     hash: (dto.hash !== undefined ? hash : undefined),
                 },
-        });
-        await this.setUserProperties(currentUserId, channel, {
-            role: EChannelRoles.OWNER,
-            joined: true,
-        });
-        delete channel.hash;
-        return channel;
+            });
+            await this.setUserProperties(currentUserId, channel, {
+                role: EChannelRoles.OWNER,
+                joined: true,
+            });
+            delete channel.hash;
+            return channel;
         } catch (e) {
             if (e instanceof PrismaClientKnownRequestError) {
-                if (e.code === 'P2002') 
+                if (e.code === 'P2002')
                     throw new ForbiddenException('channel name already taken');
                 else
                     throw new ConflictException('sth wrong in db');
-
             }
         }
     }
@@ -224,10 +217,10 @@ export class ChannelService {
             }
         }
         const channelUser = await this.channelUserService.create({
-                userId: currentUserId,
-                channelId: channelDto.chanId,
-                role: EChannelRoles.NORMAL,
-            });
+            userId: currentUserId,
+            channelId: channelDto.chanId,
+            role: EChannelRoles.NORMAL,
+        });
         this.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: true
@@ -258,8 +251,7 @@ export class ChannelService {
     }
 
     async findOne(channelId: number)
-    : Promise<Channel>
-    {
+        : Promise<Channel> {
         const channel: Channel = await this.prisma.channel.findUnique({
             where: {
                 id: channelId,
@@ -269,8 +261,7 @@ export class ChannelService {
     }
 
     async editChannelUserRole(currentUserId: number, dto: ChannelUserRoleDto)
-    : Promise<ChannelUser>
-    {
+        : Promise<ChannelUser> {
         let currentChannelUser = await this.channelUserService.findOne(currentUserId, dto.chanId);
         let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         if (currentChannelUser === null || channelUser === null)
@@ -283,8 +274,7 @@ export class ChannelService {
     }
 
     async passOwnership(currentOwner: ChannelUser, channel: Channel)
-    : Promise<ChannelUser>
-    {
+        : Promise<ChannelUser> {
         let nextOwner = await this.channelUserService.findNextOwner(channel);
         if (nextOwner === null)
             return null;
@@ -298,9 +288,8 @@ export class ChannelService {
         currentUserId: number,
         chanId: number,
         userId: number,
-        )
-    : Promise<ChannelUser>
-    {
+    )
+        : Promise<ChannelUser> {
         const currentUserIsBlocked = await this.relationService.is_block(currentUserId, userId);
         if (currentUserIsBlocked)
             throw new ForbiddenException('user blocked you');
@@ -320,8 +309,7 @@ export class ChannelService {
     //////////////////
 
     async banChannelUser(dto: ChannelBanDto)
-    : Promise<ChannelBan>
-    {
+        : Promise<ChannelBan> {
         const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         // CHECK IF BANNED USER EXISTS IN CHANNEL
         if (channelUser === null)
@@ -334,9 +322,8 @@ export class ChannelService {
         return channelBan;
     }
 
-    async unbanChannelUser(dto: ChannelBanDto) 
-    : Promise<ChannelBan>
-    {
+    async unbanChannelUser(dto: ChannelBanDto)
+        : Promise<ChannelBan> {
         const channelBan = await this.channelBanService.delete(dto);
         return channelBan;
     }
@@ -346,8 +333,7 @@ export class ChannelService {
     ///////////////////
 
     async muteChannelUser(dto: CreateChannelMuteDto)
-    : Promise<ChannelMute>
-    {
+        : Promise<ChannelMute> {
         const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         // CHECK IF MUTED USER EXISTS IN CHANNEL
         if (channelUser === null)
@@ -356,20 +342,18 @@ export class ChannelService {
         if (channelUser.role !== EChannelRoles.NORMAL)
             throw new ForbiddenException('cannot mute an admin or owner');
         const channelMute = await this.channelMuteService.create(dto);
-        
+
         return channelMute;
     }
 
-    async unmuteChannelUser(dto: ChannelMuteDto) 
-    : Promise<ChannelMute>
-    {
+    async unmuteChannelUser(dto: ChannelMuteDto)
+        : Promise<ChannelMute> {
         const channelMute = await this.channelMuteService.delete(dto);
         return channelMute;
     }
 
-    async editMute(dto: CreateChannelMuteDto) 
-    : Promise<ChannelMute>
-    {
+    async editMute(dto: CreateChannelMuteDto)
+        : Promise<ChannelMute> {
         const channelMute = await this.channelMuteService.edit(dto);
         return channelMute;
     }

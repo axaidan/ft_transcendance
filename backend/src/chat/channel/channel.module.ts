@@ -8,6 +8,7 @@ import { ChannelBanService } from './channel-ban/channel-ban.service';
 import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { RelationModule } from 'src/relations/relation.module';
 import { RelationService } from 'src/relations/relation.service';
+import { ChannelMessageModule } from './channel-message/channel-message/channel-message.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RelationService } from 'src/relations/relation.service';
     ChannelBanModule,
     ChannelMuteModule,
     RelationModule,
+    ChannelMessageModule,
   ],
   providers: [
     ChannelService,

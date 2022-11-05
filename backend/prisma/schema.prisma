@@ -36,7 +36,7 @@ model User {
 	channelUsers	ChannelUser[]
 	channelBans		ChannelBan[]
 	channelMutes	ChannelMute[]
-	channelMessages	ChannelMessages[]
+	channelMessages	ChannelMessage[]
 
 	avatar Avatar? @relation(fields: [avatarId], references: [id])
 	avatarId Int?
@@ -115,7 +115,7 @@ model Channel {
 	channelUsers	ChannelUser[]
 	channelBans		ChannelBan[]
 	channelMutes	ChannelMute[]
-	messages		ChannelMessages[]
+	messages		ChannelMessage[]
 
 	@@map("channel")
 	// @@unique([name, private])
@@ -170,7 +170,7 @@ model ChannelMute {
 	@@map("channelMute")
 }
 
-model ChannelMessages {
+model ChannelMessage {
 	
 	id			Int	@id	@default(autoincrement())
     createAt	DateTime @default(now())
@@ -182,6 +182,8 @@ model ChannelMessages {
 	channnel	Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
 
 	text		String
+
+	@@map("channelMessage")
 }
 
 

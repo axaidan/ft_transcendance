@@ -44,13 +44,11 @@ export class ChatController {
     async getDiscussionByUserId(
         @GetUser('id') currentUserId: number,
         @Param('id', ParseIntPipe) user2Id: number,
-    ) :
-    Promise<Discussion>
-    {
+    ):
+        Promise<Discussion> {
         const discussion = await this.chatService.getDiscussionByUserIds(currentUserId, user2Id);
         return discussion;
     }
-
 
     //  POST /discussion
     @Post('discussion')
@@ -66,6 +64,7 @@ export class ChatController {
     //  CHANNEL REQUESTS    //
     //////////////////////////
 
+    // @Get('channels/all')
     @Get('channel/all')
     async getAllPublicChannels(@GetUser('id') currentUserId: number)
         : Promise<Channel[]> {
@@ -73,6 +72,7 @@ export class ChatController {
         return channels;
     }
 
+    // @Get('channels')
     @Get('channel')
     async getAllChannelsForUser(@GetUser('id') currentUserId: number)
         : Promise<Channel[]> {
@@ -85,8 +85,7 @@ export class ChatController {
         @GetUser('id') currentUserId: number,
         @Param('chanId') chanId: number,
     )
-    : Promise<Channel>
-    {
+        : Promise<Channel> {
         const channel = await this.chatService.getChannelWusersWmessages(currentUserId, chanId);
         return channel;
     }
@@ -100,6 +99,7 @@ export class ChatController {
         return channel;
     }
 
+    // @Post('channel/:chanId/join')
     @Post('channel/join')
     async joinChannel(
         @GetUser('id') currentUserId: number,
@@ -110,6 +110,7 @@ export class ChatController {
     }
 
     @HttpCode(200)
+    // @Post('channel/:chanId/leave')
     @Post('channel/leave')
     async leaveChannel(
         @GetUser('id') currentUserId: number,
@@ -124,56 +125,53 @@ export class ChatController {
     @Roles('owner')
     async editChannel(
         @GetUser('id') currentUserId: number,
-        @Param('chanId', ParseIntPipe) chanId : number,
-        @Body() dto : EditChannelDto,
-        )
-    : Promise<Channel>
-    {
+        @Param('chanId', ParseIntPipe) chanId: number,
+        @Body() dto: EditChannelDto,
+    )
+        : Promise<Channel> {
         const channel = await this.chatService.editChannel(currentUserId, chanId, dto);
         return channel;
-    } 
+    }
 
     // DELETE Channel/:id
     @Delete('channel/:chanId')
     @Roles('owner')
     async deleteChannel(
         @Param('chanId', ParseIntPipe) chanId: number,
-        // @Body() dto : ChannelDto
     )
-    : Promise<Channel> 
-    {
+        : Promise<Channel> {
         // const channel = await this.chatService.deleteChannel(dto.chanId);
         const channel = await this.chatService.deleteChannel(chanId);
         return channel;
-    } 
+    }
 
     //////////////////////////////
     //  CHANNELUSER REQUESTS    //
     //////////////////////////////
 
     // INVITE USER
+    // @Post('channel/:chanId/user/:userId')
     @Post('channel/:chanId/user/:userId/add')
     @Roles('admin')
-    async addChannelUser(
+    async inviteUserToChannel(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
     )
-    : Promise<ChannelUser>
-    {
+        : Promise<ChannelUser> {
         const channelUser = await this.chatService.inviteUserToChannel(currentUserId, chanId, userId);
         return channelUser;
     }
-    
+
     // EDIT ChannelUser'S status OR role
+    // @Patch('channel/:chanId/user/:userId')
     @Patch('channelUser/role')
     @Roles('owner')
     async editChannelUserRole(
         @GetUser('id') currentUserId: number,
         @Body() dto: ChannelUserRoleDto,
-        )
-    : Promise<ChannelUser>
-    {
+    )
+        : Promise<ChannelUser> {
         const channelUser = await this.chatService.editChannelUserRole(currentUserId, dto);
         return channelUser;
     }
@@ -182,20 +180,20 @@ export class ChatController {
     //  BAN REQUESTS //
     ///////////////////
 
+    // @Post('channel/:chanId/user/:userId/ban')
     @Post('channelUser/ban')
     @Roles('admin')
     async ban(@Body() dto: ChannelBanDto)
-    : Promise<ChannelBan>
-    {
+        : Promise<ChannelBan> {
         const channelBan = await this.chatService.banChannelUser(dto);
         return channelBan;
     }
 
+    // @Delete('channel/:chanId/user/:userId/ban')
     @Delete('channelUser/ban')
     @Roles('admin')
-    async unban(dto: ChannelBanDto) 
-    : Promise<ChannelBan>
-    {
+    async unban(dto: ChannelBanDto)
+        : Promise<ChannelBan> {
         const channelBan = await this.chatService.unbanChannelUser(dto);
         return channelBan;
     }
@@ -204,31 +202,31 @@ export class ChatController {
     //  MUTE REQUESTS //
     ////////////////////
 
+    // @Post('channel/:chanId/user/:userId/mute')
     @Post('channelUser/mute')
     @Roles('admin')
     async mute(
         @Body() dto: CreateChannelMuteDto,
     )
-    : Promise<ChannelMute>
-    {
+        : Promise<ChannelMute> {
         const channelMute = await this.chatService.muteChannelUser(dto);
         return channelMute;
     }
 
+    // @Delete('channel/:chanId/user/:userId/mute')
     @Delete('channelUser/mute')
     @Roles('admin')
-    async unmute(dto: ChannelMuteDto) 
-    : Promise<ChannelMute>
-    {
-        const channelMute =  await this.chatService.unmuteChannelUser(dto);
+    async unmute(dto: ChannelMuteDto)
+        : Promise<ChannelMute> {
+        const channelMute = await this.chatService.unmuteChannelUser(dto);
         return channelMute;
     }
 
+    // @Patch('channel/:chanId/user/:userId/mute')
     @Patch('channelUser/mute')
     @Roles('admin')
     async editMute(dto: CreateChannelMuteDto)
-    : Promise<ChannelMute>
-    {
+        : Promise<ChannelMute> {
         const channelMute = await this.chatService.editMute(dto);
         return channelMute;
     }
