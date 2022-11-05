@@ -85,7 +85,7 @@ export class ChatController {
         @GetUser('id') currentUserId: number,
         @Param('chanId') chanId: number,
     )
-    // : Promise<Channel>
+    : Promise<Channel>
     {
         const channel = await this.chatService.getChannelWusersWmessages(currentUserId, chanId);
         return channel;
@@ -100,9 +100,7 @@ export class ChatController {
         return channel;
     }
 
-    // @UseGuards(ForbiddenStatusGuard)
     @Post('channel/join')
-    // @ForbiddenStatus('ban')
     async joinChannel(
         @GetUser('id') currentUserId: number,
         @Body() channelDto: ChannelDto,
@@ -154,12 +152,17 @@ export class ChatController {
     //////////////////////////////
 
     // INVITE USER
-    @Post('channelUser')
+    @Post('channel/:chanId/user/:userId/add')
     @Roles('admin')
-    async addChannelUser()
-    // : Promise<ChannelUser>
+    async addChannelUser(
+        @GetUser('id') currentUserId: number,
+        @Param('chanId', ParseIntPipe) chanId: number,
+        @Param('userId', ParseIntPipe) userId: number,
+    )
+    : Promise<ChannelUser>
     {
-
+        const channelUser = await this.chatService.inviteUserToChannel(currentUserId, chanId, userId);
+        return channelUser;
     }
     
     // EDIT ChannelUser'S status OR role

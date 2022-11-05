@@ -11,8 +11,8 @@ export class ChannelUserService {
         private prisma: PrismaService,
     ) {}
 
-    async create(dto: CreateChannelUserDto) :
-    Promise<ChannelUser>
+    async create(dto: CreateChannelUserDto)
+    : Promise<ChannelUser>
     {
         try {
             const channelUser: ChannelUser = await this.prisma.channelUser.create({
@@ -27,30 +27,26 @@ export class ChannelUserService {
         } catch (e) {
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code === 'P2002') {
-                    throw new ForbiddenException(`ChannelUser (userId: ${dto.userId}, channelId: ${dto.channelId}) already exists.`);
+                    throw new ForbiddenException(`channel already joined`);
                 }
             }
         }
     }
 
-    async delete(channelUser: ChannelUser): Promise<void> {
+    async delete(channelUser: ChannelUser)
+    : Promise<void>
+    {
         await this.prisma.channelUser.delete({
-            where: {
-                channelId_userId: {
-                    channelId: channelUser.channelId,
-                    userId: channelUser.userId
-                },
-            },
+            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
         });
     }
 
-    async getAllNonBannedChannelUsers(userId: number):
-    Promise<ChannelUser[]>
+    async getAllNonBannedChannelUsers(userId: number)
+    : Promise<ChannelUser[]>
     {
         const channelUsers : ChannelUser[] = await this.prisma.channelUser.findMany({
             where: {
                 userId: userId,
-                // status: { not: EChannelStatus.BANNED },
             },
         });
         return channelUsers;
@@ -66,20 +62,9 @@ export class ChannelUserService {
         return channelUser;
     }
 
-    // async editStatus(channelUser: ChannelUser, status: number, statusTime: Date)
-    // : Promise<ChannelUser>
-    // {
-    //     channelUser = await this.prisma.channelUser.update({
-    //         where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
-    //         data: {
-    //             // status: status,
-    //             // statusTime: statusTime
-    //         },
-    //     });
-    //     return channelUser;
-    // }
-
-    async findOne(userId: number, chanId: number) {
+    async findOne(userId: number, chanId: number)
+    : Promise<ChannelUser>
+    {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
             where: { channelId_userId: { channelId: chanId, userId: userId } },
         });

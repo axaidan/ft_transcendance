@@ -1652,9 +1652,90 @@ describe('App e2e', () => {
 				.expectStatus(403)
 				// .inspect();
 			});
-
 			
 		}); // DESCRIBE (PATCH /channelUser/role)
+
+		describe('POST /channelUser/:chanId/user/:userId/add', () => {
+			
+			it('VALID owner invites - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(201)
+				.expectBodyContains(chanArr[0].id)
+				.expectBodyContains(userArr[10].id)
+				.expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (exists) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(403)
+				// .expectBodyContains(chanArr[0].id)
+				// .expectBodyContains(userArr[10].id)
+				// .expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (!admin) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('VALID admin invites - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[11].id}/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectStatus(201)
+				.expectBodyContains(chanArr[0].id)
+				.expectBodyContains(userArr[11].id)
+				.expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (chan !exists) - should 404', () => {
+				return pactum
+				.spec()
+				.post(`/channel/1000000/user/${userArr[11].id}/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectStatus(404)
+				// .inspect();
+			});
+
+			it('NONVALID invite (user !exists) - should 404', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/1000000/add`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				// .expectStatus(404)
+				.expectStatus(403) // relationService.is_blocked throws 403
+				// .inspect();
+			});
+
+
+
+		});	// DESCRIBE (INVITE USER)
 
 	}); // DESCRIBE (CHANNELUSER)
 

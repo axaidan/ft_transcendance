@@ -9,8 +9,8 @@ export class CreateChannelUserDto {
     @IsInt()
     channelId: number;
 
-    @IsInt()
-    status: number;
+    // @IsInt()
+    // status: number;
 
     @IsInt()
     role: number;

@@ -172,6 +172,20 @@ export class ChatService {
         return channelUser;
     }
 
+    //  POST /channel/:chanId/user/:userId/invite
+    async inviteUserToChannel(
+        currentUserId: number,
+        chanId: number,
+        userId: number,
+    )
+    : Promise<ChannelUser>
+    {
+        const channelUser = await this.channelService.inviteUser(currentUserId, chanId, userId);
+        // event newUser to room
+        // event newChannel to user
+        return channelUser;
+    }
+
     ///////////////////
     //  BAN METHODS  //
     ///////////////////

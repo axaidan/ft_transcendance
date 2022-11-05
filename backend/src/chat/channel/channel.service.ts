@@ -13,6 +13,8 @@ import { ChannelUserRoleDto } from './channel-user/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
 import { ChannelBanDto } from './channel-ban/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PassThrough } from 'stream';
+import { RelationService } from 'src/relations/relation.service';
 
 @Injectable()
 export class ChannelService {
@@ -22,6 +24,7 @@ export class ChannelService {
         private channelUserService: ChannelUserService,
         private channelBanService: ChannelBanService,
         private channelMuteService: ChannelMuteService,
+        private relationService: RelationService,
     ) { }
 
     //  POST /channel
@@ -203,6 +206,11 @@ export class ChannelService {
         const channel: Channel = await this.findOne(channelDto.chanId);
         if (channel === null)
             throw new NotFoundException(`channel ${channelDto.chanId} NOT FOUND`);
+        // CHECK IF USER IS NOT BANNED
+        const channelBan = await this.channelBanService.findOne(currentUserId, channelDto.chanId);
+        if (channelBan !== null)
+            throw new ForbiddenException('you are banned from this channel');
+
         if (channel.type === EChannelTypes.PRIVATE)
             throw new ForbiddenException('cannot join a private channel');
         if (channel.type === EChannelTypes.PROTECTED) {
@@ -215,23 +223,11 @@ export class ChannelService {
                 throw new ForbiddenException('incorrect password');
             }
         }
-        // CHECK IF USER IS NOT BANNED
-        const channelBan = await this.channelBanService.findOne(currentUserId, channelDto.chanId);
-        if (channelBan !== null)
-            throw new ForbiddenException('you are banned from this channel');
-        // CHECK IF USER DOESN'T ALREADY EXIST
-        let channelUser: ChannelUser =
-            await this.channelUserService.findOne(currentUserId, channelDto.chanId);
-        if (channelUser === null) {
-            channelUser = await this.channelUserService.create({
+        const channelUser = await this.channelUserService.create({
                 userId: currentUserId,
                 channelId: channelDto.chanId,
-                status: EChannelStatus.NORMAL,
                 role: EChannelRoles.NORMAL,
             });
-        } else {
-            throw new ForbiddenException('channel already joined');
-        }
         this.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: true
@@ -261,8 +257,9 @@ export class ChannelService {
         return channel;
     }
 
-    async findOne(channelId: number):
-        Promise<Channel> {
+    async findOne(channelId: number)
+    : Promise<Channel>
+    {
         const channel: Channel = await this.prisma.channel.findUnique({
             where: {
                 id: channelId,
@@ -296,6 +293,27 @@ export class ChannelService {
         return nextOwner;
     }
 
+    //  POST /channel/:chanId/user/:userId/invite
+    async inviteUser(
+        currentUserId: number,
+        chanId: number,
+        userId: number,
+        )
+    : Promise<ChannelUser>
+    {
+        const currentUserIsBlocked = await this.relationService.is_block(currentUserId, userId);
+        if (currentUserIsBlocked)
+            throw new ForbiddenException('user blocked you');
+        const channelBan = await this.channelBanService.findOne(userId, chanId);
+        if (channelBan !== null)
+            throw new ForbiddenException('user is banned from channel');
+        const channelUser = await this.channelUserService.create({
+            channelId: chanId,
+            userId: userId,
+            role: EChannelRoles.NORMAL,
+        });
+        return channelUser;
+    }
 
     //////////////////
     //  BAN METHODS //
@@ -307,13 +325,13 @@ export class ChannelService {
         const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         // CHECK IF BANNED USER EXISTS IN CHANNEL
         if (channelUser === null)
-            throw new NotFoundException('user not found in channel');
-        // CHECK IF BANNED USER THE OWNER OR ANOTHER ADMIN
+            throw new NotFoundException('user not in channel');
+        // CHECK IF BANNED USER IS OWNER OR ADMIN
         if (channelUser.role !== EChannelRoles.NORMAL)
-            throw new ForbiddenException('cannot ban an admin or owner');
-        const channelMute = await this.channelBanService.create(dto);
-        await this.leave(dto.userId, { chanId: dto.chanId });
-        return channelMute;
+            throw new ForbiddenException('cannot ban admin or owner');
+        await this.channelUserService.delete(channelUser);
+        const channelBan = await this.channelBanService.create(dto);
+        return channelBan;
     }
 
     async unbanChannelUser(dto: ChannelBanDto) 
