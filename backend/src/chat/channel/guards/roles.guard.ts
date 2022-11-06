@@ -5,7 +5,7 @@ import { ChannelUserService } from '../channel-user/channel-user.service';
 import { EChannelRoles } from '../channel-user/types';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class ChannelRolesGuard implements CanActivate {
 
     constructor(
         private reflector: Reflector,
@@ -21,10 +21,7 @@ export class RolesGuard implements CanActivate {
 
         const request = context.switchToHttp().getRequest();
         const userId = request.user['id'];
-        // A UN MOMENT FAUT SE DECIDER
-        let chanId = request.body['chanId'];
-        if (chanId === undefined)
-            chanId = Number(request.params.chanId);
+        const chanId = Number(request.params.chanId);
         if (Number.isInteger(chanId) === false)
             throw new BadRequestException(':chanId must be an integer');
 

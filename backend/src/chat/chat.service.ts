@@ -4,7 +4,7 @@ import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
 import { ChannelService } from './channel/channel.service';
-import { ChannelDto, CreateChannelDto, EditChannelDto } from './channel/dto';
+import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
@@ -120,11 +120,12 @@ export class ChatService {
     //  POST /channel/join + ChannelDto
     async joinChannel(
         currentUserId: number,
-        dto: ChannelDto,
+        chanId: number,
+        dto: ChannelPasswordDto,
     ) : 
     Promise<Channel>
     {
-        const channel: Channel = await this.channelService.join(currentUserId, dto);
+        const channel: Channel = await this.channelService.join(currentUserId, chanId, dto);
         // event userJoined
         return channel;
     }
@@ -132,11 +133,11 @@ export class ChatService {
     //  POST /channel/join + ChannelDto
     async leaveChannel(
         currentUserId: number,
-        dto: ChannelDto,
+        chanId: number,
     ) : 
     Promise<Channel>
     {
-        const channel: Channel = await this.channelService.leave(currentUserId, dto);
+        const channel: Channel = await this.channelService.leave(currentUserId, chanId);
         // event userLeft
         // ?event newRole
         return channel;

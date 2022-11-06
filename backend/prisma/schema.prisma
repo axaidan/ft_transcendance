@@ -112,10 +112,10 @@ model Channel {
 	type			Int
 	hash			String?
  
-	channelUsers	ChannelUser[]
-	channelBans		ChannelBan[]
-	channelMutes	ChannelMute[]
-	messages		ChannelMessage[]
+	users		ChannelUser[]
+	bans		ChannelBan[]
+	mutes		ChannelMute[]
+	messages	ChannelMessage[]
 
 	@@map("channel")
 	// @@unique([name, private])

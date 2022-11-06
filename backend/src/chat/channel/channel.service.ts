@@ -6,7 +6,7 @@ import { ChannelBanService } from './channel-ban/channel-ban.service';
 import { ChannelMuteService } from './channel-mute/channel-mute.service';
 import { EChannelRoles, EChannelStatus } from './channel-user/types';
 import { EChannelTypes } from './types/channel-types.enum';
-import { ChannelDto, EditChannelDto, UserPropetiesDto } from './dto';
+import { ChannelPasswordDto, EditChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
 import { ChannelUserRoleDto } from './channel-user/dto';
@@ -47,7 +47,7 @@ export class ChannelService {
                     name: dto.name,
                     type: dto.type,
                     hash: hash,
-                    channelUsers: {
+                    users: {
                         create: [{
                             userId: currentUserId,
                             role: EChannelRoles.OWNER,
@@ -101,9 +101,8 @@ export class ChannelService {
         Promise<Channel[]> {
         const channelArr: Channel[] = await this.prisma.channel.findMany({
             where: {
-                channelUsers: {
+                users: {
                     some: { userId: userId }
-
                 },
             },
         });
@@ -124,24 +123,31 @@ export class ChannelService {
         const channelUser = await this.channelUserService.findOne(currentUserId, chanId);
         if (channelUser === null)
             throw new NotFoundException('you must have joined the Channel');
+        // console.log(`getWuserWmessages() - found channelUser ${channelUser.channelId} ${channelUser.userId}`);
         const channelBan = await this.channelBanService.findOne(currentUserId, chanId);
-        if (channelBan !== null)
+        if (channelBan !== null) {
+            console.log(`getWuserWmessages() - found channelBan`);
             throw new ForbiddenException('you are banned from this channel');
+        }
+        // console.log(`getWuserWmessages() - NO channelBan`);
         const channel = await this.prisma.channel.findUnique({
             where: { id: chanId },
             include: {
-                channelUsers: true,
-                channelBans: true,
-                channelMutes: true,
-                // messages: true,
-            }
+                users: { include: { user : { select: { username: true } } } },
+                bans: { include: { user : { select: { username: true } } } },
+                mutes: { include: { user : { select: { username: true } } } },
+                messages : { include: { user : { select: { username: true } } } },
+            },
         });
+        // console.log(`getWuserWmessages() - found channel ${channel.id}`);
         if (channel === null)
             throw new NotFoundException('channel not found');
         await this.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: true,
         });
+        delete channel.hash;
+        // console.log(`getWuserWmessages() - setUserProperties and deleted hash`);
         return channel;
     }
 
@@ -194,31 +200,30 @@ export class ChannelService {
 
     //  POST /channel/join + ChannelDto
     //  reject if channel is private (??? YES OR NO ?)
-    async join(currentUserId: number, channelDto: ChannelDto):
+    async join(currentUserId: number, chanId: number, dto: ChannelPasswordDto):
         Promise<Channel> {
-        const channel: Channel = await this.findOne(channelDto.chanId);
+        const channel: Channel = await this.findOne(chanId);
         if (channel === null)
-            throw new NotFoundException(`channel ${channelDto.chanId} NOT FOUND`);
+            throw new NotFoundException(`channel ${chanId} NOT FOUND`);
         // CHECK IF USER IS NOT BANNED
-        const channelBan = await this.channelBanService.findOne(currentUserId, channelDto.chanId);
+        const channelBan = await this.channelBanService.findOne(currentUserId, chanId);
         if (channelBan !== null)
             throw new ForbiddenException('you are banned from this channel');
-
         if (channel.type === EChannelTypes.PRIVATE)
             throw new ForbiddenException('cannot join a private channel');
         if (channel.type === EChannelTypes.PROTECTED) {
             //  check hash if channel protected
-            if (('hash' in channelDto) === false) {
+            if (dto === undefined || ('password' in dto) === false) {
                 throw new BadRequestException('need password');
             }
-            const passwordMatches = await argon.verify(channel.hash, channelDto.hash);
+            const passwordMatches = await argon.verify(channel.hash, dto.password);
             if (passwordMatches === false) {
                 throw new ForbiddenException('incorrect password');
             }
         }
         const channelUser = await this.channelUserService.create({
             userId: currentUserId,
-            channelId: channelDto.chanId,
+            channelId: chanId,
             role: EChannelRoles.NORMAL,
         });
         this.setUserProperties(currentUserId, channel, {
@@ -230,16 +235,16 @@ export class ChannelService {
     }
 
     // if (user is owner find another owner)
-    async leave(userId: number, dto: ChannelDto):
+    async leave(userId: number, chanId: number):
         Promise<Channel> {
-        const channelUser: ChannelUser = await this.channelUserService.findOne(userId, dto.chanId);
+        const channelUser: ChannelUser = await this.channelUserService.findOne(userId, chanId);
         if (channelUser === null)
             throw new ForbiddenException('channel not joined');
-        const channel: Channel = await this.findOne(dto.chanId);
+        const channel: Channel = await this.findOne(chanId);
         if (channelUser.role === EChannelRoles.OWNER) {
             const nextOwner = await this.passOwnership(channelUser, channel);
             if (nextOwner === null)
-                await this.delete(dto.chanId);
+                await this.delete(chanId);
         }
         await this.channelUserService.delete(channelUser);
         this.setUserProperties(userId, channel, {
@@ -362,13 +367,13 @@ export class ChannelService {
         const channelMute = await this.channelMuteService.findOne(userId, channel.id);
         const channelBan = await this.channelBanService.findOne(userId, channel.id);
         if (channelBan !== null)
-            channel['userStatus'] = EChannelStatus.BANNED;
+            channel['status'] = EChannelStatus.BANNED;
         else if (channelMute !== null)
-            channel['userStatus'] = EChannelStatus.MUTED;
+            channel['status'] = EChannelStatus.MUTED;
         else
-            channel['userStatus'] = EChannelStatus.NORMAL;
-        channel['userRole'] = dto.role;
-        channel['userJoined'] = dto.joined;
+            channel['status'] = EChannelStatus.NORMAL;
+        channel['role'] = dto.role;
+        channel['joined'] = dto.joined;
         channel['muteExpires'] = channelMute === null ? null : channelMute.muteExpires;
         return channel;
     }
