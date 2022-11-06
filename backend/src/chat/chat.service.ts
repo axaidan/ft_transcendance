@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan } from '@prisma/client';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan, User } from '@prisma/client';
+import { UserService } from 'src/users/users.service';
 import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
+import { ChannelUserService } from './channel/channel-user/channel-user.service';
 import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
+import { EChannelRoles } from './channel/channel-user/types';
 import { ChannelService } from './channel/channel.service';
 import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
 import { ChatGateway } from './chat.gateway';
@@ -16,6 +19,8 @@ export class ChatService {
         private chatGateway: ChatGateway,
         private discService: DiscussionService,
         private channelService: ChannelService,
+        private channelUserService: ChannelUserService,
+        private userService: UserService,
     ) {}
 
     //////////////////////////
@@ -108,39 +113,59 @@ export class ChatService {
     async createChannel(
         currentUserId: number,
         dto: CreateChannelDto
-    ) :
-    Promise<Channel>
+    )
+    : Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
-        // event newChan
         return channel;
     }
 
-    //  POST /channel/join + ChannelDto
     async joinChannel(
         currentUserId: number,
         chanId: number,
         dto: ChannelPasswordDto,
-    ) : 
-    Promise<Channel>
+    )
+    : Promise<Channel>
     {
         const channel: Channel = await this.channelService.join(currentUserId, chanId, dto);
-        // event userJoined
+        const user: User = await this.userService.getUser(currentUserId);
+        this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        this.chatGateway.userJoinedChannel(currentUserId, channel.id, user.username);
         return channel;
     }
 
-    //  POST /channel/join + ChannelDto
     async leaveChannel(
         currentUserId: number,
         chanId: number,
-    ) : 
-    Promise<Channel>
+    )
+    : Promise<Channel>
     {
-        const channel: Channel = await this.channelService.leave(currentUserId, chanId);
-        // event userLeft
-        // ?event newRole
+        const channel: Channel = await this.channelService.findOne(chanId);
+        if (channel === null)
+            throw new NotFoundException('channel not found');
+        const channelUser: ChannelUser = await this.channelUserService.findOne(currentUserId, chanId);
+        if (channelUser === null)
+            throw new NotFoundException('channel not joined');
+        if (channelUser.role === EChannelRoles.OWNER) {
+            const nextOwner = await this.channelService.passOwnership(channelUser, channel);
+            // if (nextOwner === null)
+            //     await this.channelService.delete(chanId);
+            // else
+            // ?newRole?
+        }
+        await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
+        this.channelService.setUserProperties(currentUserId, channel, {
+            role: channelUser.role,
+            joined: false,
+        });
+        delete channel.hash;
+        this.chatGateway.leaveChannelRoom(currentUserId, chanId);
+        this.chatGateway.userLeftChannel(currentUserId, chanId);
         return channel;
+
+        // const channel = await this.channelService.leave(currentUserId, chanId);
+        // return channel;
     }
 
     //  PATCH /channel/:chanId

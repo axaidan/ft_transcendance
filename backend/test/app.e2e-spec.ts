@@ -1090,7 +1090,6 @@ describe('App e2e', () => {
 			});
 		});	// DESCRIBE(DISCUSSION/CREATE)
 
-
 		describe('Retrieve GET /discussion/', () => {
 		
 			it('VALID - HAS DISCUSSIONS - should 200', () => {
@@ -1189,7 +1188,6 @@ describe('App e2e', () => {
 			});
 
 		});
-
 
 	});	// DESCRIBE(DISCUSSION)
 
@@ -1572,14 +1570,14 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NOT MEMBER - should 403', () => {
+			it('NOT MEMBER - should 404', () => {
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/leave`)
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`
 				})
-				.expectStatus(403)
+				.expectStatus(404)
 				// .inspect();
 			});
 

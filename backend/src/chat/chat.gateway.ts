@@ -49,9 +49,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.displayClientsMap();
     }
 
-    //////////////
-    //  METHODS //
-    //////////////
+    /////////////////////////
+    //  DISCUSSION METHODS //
+    /////////////////////////
     joinDiscRoom(userId: number, discId: number) {
         if (this.clientsMap.has(userId)) {
             const client: Socket = this.clientsMap.get(userId);
@@ -70,6 +70,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    newDisc(dto: DiscussionDto) {
+        const roomName: string = 'disc' + dto.id;
+        this.wss.to(roomName).emit('newDiscToClient', dto);
+    }
+
+    //////////////////////
+    //  CHANNEL METHODS //
+    //////////////////////
     joinChannelRoom(userId: number, chanId: number) {
         if (this.clientsMap.has(userId)) {
             const client: Socket = this.clientsMap.get(userId);
@@ -81,28 +89,46 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    async joinAllNonBannedChannel(userId: number) {
+    leaveChannelRoom(userId: number, chanId: number) {
+        if (this.clientsMap.has(userId)) {
+            const client: Socket = this.clientsMap.get(userId);
+            const roomName: string = `chan${chanId}`;
+            if ((roomName in client.rooms)) {
+                this.logger.log(`USER ${userId} LEAVING '${roomName}' ROOM`);
+                client.leave(roomName);
+            }
+        }
+    }
+
+    async joinAllJoinedChannelRooms(userId: number) {
         const channelUsers: ChannelUser[] =
-            await this.channelUserService.getAllNonBannedChannelUsers(userId);
+            await this.channelUserService.getAllJoinedChannelUsers(userId);
         for (const channelUser of channelUsers) {
             this.joinChannelRoom(userId, channelUser.channelId);
         }
     }
 
-    newDisc(dto: DiscussionDto) {
-        const roomName: string = 'disc' + dto.id;
-        this.wss.to(roomName).emit('newDiscToClient', dto);
+    userJoinedChannel(userId: number, chanId: number, username: string) {
+        this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
+            userId: userId,
+            chanId: chanId,
+            username: username,
+            // status: ,
+            // role: ,
+        });
     }
 
-    displayClientsMap() {
-        for (const [key, value] of this.clientsMap) {
-            this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
-        }
+    userLeftChannel(userId: number, chanId: number) {
+        this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
+            userId: userId,
+            chanId: chanId,
+        });
     }
 
-    //////////////
-    //  EVENTS  //
-    //////////////
+
+    ///////////////////////////
+    //  LOGIN/LOGOUT EVENTS  //
+    ///////////////////////////
     @SubscribeMessage('loginToServer')
     async handleLogin(client: Socket, userId: number) {
         if (this.clientsMap.has(userId)) {
@@ -114,7 +140,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.clientsMap.set(userId, client);
         this.displayClientsMap();
         await this.joinAllDiscRooms(userId);
-        await this.joinAllNonBannedChannel(userId);
+        await this.joinAllJoinedChannelRooms(userId);
     }
 
     @SubscribeMessage('logoutToServer')
@@ -128,6 +154,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.broadcast.emit('logoutToClient', userId);
     }
 
+    ////////////////////////////////
+    //  DISCUSSION SUBSCRIPTIONS  //
+    ////////////////////////////////
     @SubscribeMessage('discMsgToServer')
     async handleDiscMsg(
         client: Socket,
@@ -140,4 +169,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.wss.to(roomName).emit('discMsgToclient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
     }
+
+    //////////////
+    //  HELPERS //
+    //////////////
+    displayClientsMap() {
+        for (const [key, value] of this.clientsMap) {
+            this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
+        }
+    }
+
 }
