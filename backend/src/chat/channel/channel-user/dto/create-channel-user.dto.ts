@@ -1,7 +1,7 @@
 import { IsIn, IsInt } from "class-validator";
 import { EChannelStatus } from "../types";
 
-export class CreateChanelUserDto {
+export class CreateChannelUserDto {
 
     @IsInt()
     userId: number;
@@ -9,8 +9,8 @@ export class CreateChanelUserDto {
     @IsInt()
     channelId: number;
 
-    @IsInt()
-    status: number;
+    // @IsInt()
+    // status: number;
 
     @IsInt()
     role: number;

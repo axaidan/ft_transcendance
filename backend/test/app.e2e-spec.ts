@@ -5,13 +5,15 @@ import * as pactum from 'pactum';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DiscussionService } from 'src/chat/discussion/discussion.service';
-import { UserService } from '../src/users/users.service';
 import { AppModule } from '../src/app.module';
 import { EditUserDto } from 'src/users/dto/edit-user.dto';
-import { CreateDiscussionDto, DiscussionDto } from 'src/chat/discussion/dto';
 import { CreateChannelDto } from 'src/chat/channel/dto';
 import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/types';
-import { normalize } from 'path';
+import { ChannelService } from 'src/chat/channel/channel.service';
+import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
+import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
+import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
+import { EChannelTypes } from 'src/chat/channel/types/channel-types.enum';
 
 const N = 20;
 
@@ -20,6 +22,7 @@ describe('App e2e', () => {
 	let prisma: PrismaService;
 	let authService: AuthService;
 	let discService: DiscussionService;
+	let chanService: ChannelService;
 	
 	let dummyJwt: {access_token: string};
 	let dummyUser: User
@@ -56,80 +59,31 @@ describe('App e2e', () => {
 		const channelArr: Channel[] = [];
 		let i = 0;
 		for ( ; i < N/4 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: false,
-					protected: false,
-					channelUsers: {
-						create: [{
-							userId: userArr[0].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					}
-				},
+			const channel = await chanService.create(userArr[0].id, {
+				name: `channel${i}`,
+				type: EChannelTypes.NORMAL,
 			});
 			channelArr.push(channel);
 		}
 		for ( ; i < N/2 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: true,
-					protected: false,
-					channelUsers: {
-						create: [{
-							userId: userArr[1].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
-			});
-			channelArr.push(channel);
-		}
-		for ( ; i < N/2 + N/4 ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: false,
-					protected: true,
-					hash: `password${i}`,
-					channelUsers: {
-						create: [{
-							userId: userArr[2].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
+			const channel = await chanService.create(userArr[2].id, {
+				name: `channel${i}`,
+				type: EChannelTypes.PROTECTED,
+				hash: `password${i}`,
+
 			});
 			channelArr.push(channel);
 		}
 		for ( ; i < N ; i++) {
-			const name: string = 'channel' + `${i}`;
-			const channel: Channel = await prisma.channel.create({
-				data: {
-					name: name,
-					private: true,
-					protected: true,
-					hash: `password${i}`,
-					channelUsers: {
-						create: [{
-							userId: userArr[3].id,
-							status: EChannelStatus.NORMAL,
-							role: EChannelRoles.OWNER,
-						}],
-					},
-				},
+
+			const channel = await chanService.create(userArr[1].id, {
+				name: `channel${i}`,
+				type: EChannelTypes.PRIVATE,
 			});
+
 			channelArr.push(channel);
 		}
-		return channelArr;
+			return channelArr;
 	}
 
 	const seedChannelUsers = async function() {
@@ -140,20 +94,19 @@ describe('App e2e', () => {
 				data: {
 					userId: userArr[i].id,
 					channelId: chanArr[0].id,
-					status: EChannelStatus.NORMAL,
 					role: EChannelStatus.NORMAL,
 				}
 			});
 			channelUserArr.push(channelUser);
 		}
-		await prisma.channelUser.create({
+		const dummyChanUser = await prisma.channelUser.create({
 			data: {
 				userId: dummyUser.id,
 				channelId: chanArr[1].id,
-				status: 0,
 				role: 0,
 			}
-		})
+		});
+		channelUserArr.push(dummyChanUser);
 		return channelUserArr;
 	}
 
@@ -384,6 +337,7 @@ describe('App e2e', () => {
 		
 		prisma = app.get(PrismaService);
 		authService = app.get(AuthService);
+		chanService = app.get(ChannelService);
 		await prisma.cleanDb();
 
 		// DUMMY USER AND JWT INIT
@@ -1067,7 +1021,7 @@ describe('App e2e', () => {
 				.expectStatus(201)
 				.expectBodyContains(userId)
 				.expectBodyContains(dummyUser.id)
-				.inspect();
+				// .inspect();
 			});
 // 
 			it('NON VALID DTO- should 201', () => {
@@ -1136,7 +1090,6 @@ describe('App e2e', () => {
 			});
 		});	// DESCRIBE(DISCUSSION/CREATE)
 
-
 		describe('Retrieve GET /discussion/', () => {
 		
 			it('VALID - HAS DISCUSSIONS - should 200', () => {
@@ -1200,43 +1153,6 @@ describe('App e2e', () => {
 
 		});	// DESCRIBE (DISCUSSION/RETRIEVE)
 
-		// describe('Retrieve Msgs GET /discussion/user/:id', () => {
-		// 	it('VALID - NO MSGS', () => {
-		// 		return pactum
-		// 		.spec()
-		// 		.get(`/discussion/user/${dummyUser.id}`)
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${jwtArr[0].access_token}`,
-		// 		})
-		// 		.expectStatus(200)
-		// 		// .inspect()
-		// 	});
-
-		// 	it('VALID - HAS MSGS', () => 
-// import { GetUser } from 'src/auth/decorator';{
-		// 		return pactum
-		// 		.spec()
-		// 		.get(`/discussion/user/${dummyUser.id}`)
-		// 		.withHeaders({
-		// 			Authorization: `Bearer ${jwtArr[1].access_token}`,
-		// 		})
-		// 		.expectStatus(200)
-		// 		// .inspect()
-		// 	});
-
-			// NO WEBSOCKET ON TEST, TEST NOT POSSIBLE FOR NOW
-			// it('VALID - NO CONV - should 200 EMPTY ARR', () => {
-			// 	return pactum
-			// 	.spec()
-			// 	.get(`/discussion/user/${dummyUser.id}`)
-			// 	.withHeaders({
-			// 		Authorization: `Bearer ${jwtArr[10].access_token}`,
-			// 	})
-			// 	.expectStatus(200)
-			// 	// .inspect()
-			// });
-		// }); // DESCRIBE (DISCUSSION/:ID)
-
 		describe('GET  /discussion/:id', () => {
 			it('VALID - should 200', () => {
 				const userId = userArr[6].id;
@@ -1268,11 +1184,10 @@ describe('App e2e', () => {
 				})
 				.expectStatus(200)
 				.expectBodyContains(userArr[0].id)
-				.inspect();
+				// .inspect();
 			});
 
 		});
-
 
 	});	// DESCRIBE(DISCUSSION)
 
@@ -1280,12 +1195,11 @@ describe('App e2e', () => {
 
 		const dto : CreateChannelDto = {
 			name: 'customChannel1',
-			protected: false,
-			private: false,
+			type: EChannelTypes.NORMAL,
 		};
 
 		describe('Create POST /channel', () => {
-			it('VALID - should 201', () => {
+			it('VALID public, not protected - should 201', () => {
 				return pactum
 				.spec()
 				.post('/channel')
@@ -1295,8 +1209,8 @@ describe('App e2e', () => {
 				.withBody(dto)
 				.expectStatus(201)
 				.expectBodyContains(dto.name)
-				.expectBodyContains(dto.protected)
-				.expectBodyContains(dummyUser.id)
+				.expectBodyContains(dto.type)
+				// .expectBodyContains(dummyUser.id)
 				// .inspect();
 			});
 
@@ -1314,8 +1228,7 @@ describe('App e2e', () => {
 
 			it('NON VALID DTO - NO name -  should 400', () => {
 				const noNameDto = {
-					protected: false,
-					private: false,
+					type: EChannelTypes.NORMAL,
 				};
 				return pactum
 				.spec()
@@ -1328,44 +1241,26 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NON VALID DTO - NO protected - should 400', () => {
-				const noProtectedDto = {
-					name: 'customChannel1',
-					private: true,
-				}
+			it('NON VALID DTO - NO type -  should 400', () => {
+				const noNameDto = {
+					name: 'lalala',
+				};
 				return pactum
 				.spec()
 				.post('/channel')
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
-				.withBody(noProtectedDto)
+				.withBody(noNameDto)
 				.expectStatus(400)
 				// .inspect();
 			});
 
-			it('NON VALID DTO - NO private - should 400', () => {
-				const noProtectedDto = {
-					name: 'customChannel1',
-					protected: false,
-					hash: 'password',
-				}
-				return pactum
-				.spec()
-				.post('/channel')
-				.withHeaders({
-					Authorization: `Bearer ${dummyJwt.access_token}`,
-				})
-				.withBody(noProtectedDto)
-				.expectStatus(400)
-				// .inspect();
-			});
 
-			it('VALID - should 201', () => {
+			it('VALID - public protected should 201', () => {
 				const protectedDto = {
 					name: 'privCustomChannel',
-					private: false,
-					protected: true, 
+					type: EChannelTypes.PROTECTED,
 					hash: 'password',
 				}
 				return pactum
@@ -1377,16 +1272,15 @@ describe('App e2e', () => {
 				.withBody(protectedDto)
 				.expectStatus(201)
 				.expectBodyContains(protectedDto.name)
-				.expectBodyContains(protectedDto.protected)
-				.expectBodyContains(protectedDto.hash)
+				.expectBodyContains(protectedDto.type)
+				// .expectBodyContains(protectedDto.hash)
 				// .inspect();
 			});
 
 			it ('NON VALID - protected NO hash - should 400', () => {
 				const noHashDto = {
 					name: 'channel',
-					private: false,
-					protected: true, 
+					type: EChannelTypes.PROTECTED,
 				}
 				return pactum
 				.spec()
@@ -1402,8 +1296,7 @@ describe('App e2e', () => {
 			it ('MALFORMED - non-protected + hash - should 200 with null hash', () => {
 				const notProtWithHashDto  = {
 					name: 'notProtWithHashchan',
-					private: false,
-					protected: false, 
+					type: EChannelTypes.NORMAL,
 					hash: 'password',
 				}
 				return pactum
@@ -1414,48 +1307,288 @@ describe('App e2e', () => {
 				})
 				.withBody(notProtWithHashDto)
 				.expectStatus(201)
-				.expectBodyContains(null)
 				.expectBodyContains(notProtWithHashDto.name)
-				.expectBodyContains(notProtWithHashDto.private)
-				.expectBodyContains(notProtWithHashDto.protected)
-				//	CANNOT TEST LIKE THIS => NEED createdAt, updatedAt, id
-				// .expectBodyContains({
-				// 	name: notProtWithHashDto.name,
-				// 	hash: null,
-				// 	private: notProtWithHashDto.private,
-				// 	protected: notProtWithHashDto.protected,
-				// })
-				// .inspect();
+				.expectBodyContains(notProtWithHashDto.type)
+				//.inpect()
 			});
 
-		});	// DESCRIBE(RELATION CREATE POST/channel)
+		});	// DESCRIBE(CREATE POST/channel)
 
-
-		describe('Create GET /channel/all', () => {
+		describe('DELETE /channel/:id', () => {
 
 			it('VALID - should 200', () => {
 				return pactum
 				.spec()
-				.get('/channel/all')
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel/${chanArr[4].id}`)
+				// .withBody({ chanId : chanArr[4].id })
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('NONVALID (!exists)- should 404', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel/${chanArr[4].id}`)
+				// .withBody({ chanId : chanArr[4].id })
+				.expectStatus(404)
+				// .inspect()
+			});
+
+			it('NONVALID (not owner) - should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.delete(`/channel/${chanArr[0].id}`)
+				// .withBody({ chanId : chanArr[0].id })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID (malformed)- should 400', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.delete(`/channel/blablabla`)
+				// .withBody({ chanId : chanArr[4].id })
+				.expectStatus(400)
+				// .inspect()
+			});
+
+		}); // DESCRIBE (DELETE CHANNEL/:id)
+
+		describe('PATCH /channel/:chanId', () => {
+
+			it('VALID change name, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ name : 'newNameForChan3' })
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('NONVALID (!owner), should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.patch(`/channel/${chanArr[0].id}`)
+				.withBody({ name : 'newNameForChan3' })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID (name taken), should 403', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ name : 'channel0' })
+				.expectStatus(403)
+				// .inspect()
+			});
+
+			it('NONVALID type to prot NO hash, should 400', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({ type: EChannelTypes.PROTECTED })
+				.expectStatus(400)
+				// .inspect()
+			});
+
+			it('VALID type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					type: EChannelTypes.PROTECTED,
+					hash: 'password'
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID type to private, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					type: EChannelTypes.PRIVATE,
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID name && type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					name: 'changeCHan3Name',
+					type: EChannelTypes.PROTECTED,
+					hash: 'password',
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+			it('VALID name && type to prot, should 200', () => {
+				return pactum
+				.spec()
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.patch(`/channel/${chanArr[3].id}`)
+				.withBody({
+					name: 'changeCHan3Name',
+					type: EChannelTypes.PROTECTED,
+					hash: 'password',
+				})
+				.expectStatus(200)
+				// .inspect()
+			});
+
+
+		}); // DESCRIBE (PATCH CHANNEL/:id)
+
+		describe('GET /channels/all', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get('/channels/all')
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`,
 				})
 				.withBody(dto)
 				.expectStatus(200)
-				// .expectJsonLength(13)
-				// .expectBodyContains(chanArr[0].name)
-				// .expectBodyContains(chanArr[4].name)
+				.expectJsonLength(12)
 				// .inspect();
 			});
 
-		}); //	DESCRIBE (RELATION GET/all)
+		}); //	DESCRIBE (GET/channel/all)
 
-		describe('Create GET /channel', () => {
+		describe('POST /channel/join', () => {
+
+			it('VALID JOIN PUBLIC - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/join`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.expectStatus(201)
+				// .inspect();
+			});
+
+			it('VALID JOIN protected - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[5].id}/join`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`,
+				})
+				.withBody({
+					password: `password${5}`,
+				})
+				.expectStatus(201)
+				// .inspect();
+			});
+
+			it('NON-VALID JOIN protected - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[5].id}/join`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody({
+					password: `incorrectPWD${5}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NO-hash JOIN protected - should 400', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[5].id}/join`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				// .withBody({
+				// 	hash: `incorrectPWD${5}`,
+				// })
+				.expectStatus(400)
+				// .inspect();
+			});
+
+		}); //	DESCRIBE (POST /channel/join)
+
+		describe(`POST /channel/:chanId/leave`, () => {
+
+			it('VALID leave - should 200', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/leave`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`
+				})
+				// .withBody({
+				// 	chanId: chanArr[0].id,
+				// })
+				.expectStatus(200)
+				// .inspect();
+			});
+
+			it('NOT MEMBER - should 404', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/leave`)
+				.withHeaders({
+					Authorization: `Bearer ${dummyJwt.access_token}`
+				})
+				.expectStatus(404)
+				// .inspect();
+			});
+
+		}); //	DESCRIBE(POST CHANNEL/LEAVE)
+
+		describe('GET /channels', () => {
 
 			it('VALID - should 200', () => {
 				return pactum
 				.spec()
-				.get('/channel')
+				.get('/channels')
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
@@ -1463,9 +1596,400 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-		}); //	DESCRIBE (RELATION GET/all)
+		}); //	DESCRIBE (GET/channel/)
 
+	}); // DESCRIBE (CHANNEL)
+
+
+	describe('ChannelUser', () => {
+
+		describe('PATCH /channel/:chanId/user/:userId + ChannelUserRoleDto', () => {
+			
+			it('VALID role TO ADMIN - should 200', () => {
+				const dto: ChannelUserRoleDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					role: EChannelRoles.ADMIN,
+				};
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectBodyContains(EChannelRoles.ADMIN)
+				.expectBodyContains(chanUserArr[0].userId)
+				.expectStatus(200)
+				// .inspect();
+			});
+
+			it('NONVALID role TO ADMIN (!admin) - should 403', () => {
+				const dto: ChannelUserRoleDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					role: EChannelRoles.NORMAL,
+				};
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('VALID role TO OWNER - should 200', () => {
+			});
+
+			it('CHECK new OWNER - should 200', () => {
+			});
+			
+		}); // DESCRIBE (PATCH /channelUser/role)
+
+		describe('POST /channelUser/:chanId/user/:userId', () => {
+			
+			it('VALID owner invites - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(201)
+				.expectBodyContains(chanArr[0].id)
+				.expectBodyContains(userArr[10].id)
+				.expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (exists) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(403)
+				// .expectBodyContains(chanArr[0].id)
+				// .expectBodyContains(userArr[10].id)
+				// .expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (!admin) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[10].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('VALID admin invites - should 201', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[11].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectStatus(201)
+				.expectBodyContains(chanArr[0].id)
+				.expectBodyContains(userArr[11].id)
+				.expectBodyContains(EChannelRoles.NORMAL)
+				// .inspect();
+			});
+
+			it('NONVALID invite (chan !exists) - should 404', () => {
+				return pactum
+				.spec()
+				.post(`/channel/1000000/user/${userArr[11].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectStatus(404)
+				// .inspect();
+			});
+
+			it('NONVALID invite (user !exists) - should 404', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/1000000`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				// .expectStatus(404)
+				.expectStatus(403) // relationService.is_blocked throws 403
+				// .inspect();
+			});
+
+
+
+		});	// DESCRIBE (INVITE USER)
+
+	}); // DESCRIBE (CHANNELUSER)
+
+	describe('ChannelMute', () => {
+		
+		describe('POST /channelUser/mute + CreateChannelMuteDto', () => {
+
+			it('VALID mute - should 200', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[1].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				// .post('/channelUser/mute')
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[1].userId}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(201)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (mute admin) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+			 
+			it('NONVALID mute (mute owner) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: userArr[0].id,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				// .post('/channelUser/mute')
+				.post(`/channel/${chanArr[0].id}/user/${userArr[0].id}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (dupl) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[0].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (not admin) - should 403', () => {
+				const now = new Date();
+				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[1].userId,
+					expires: inFiveMins,
+				};
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[1].userId}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NONVALID mute (past) - should 403', () => {
+				const now = new Date();
+				const FiveBefore = new Date(now.setMinutes(now.getMinutes() - 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: chanUserArr[2].userId,
+					expires: FiveBefore,
+				};
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[2].userId}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(403)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+			it('NONVALID mute (!exists) - should 404', () => {
+				const now = new Date();
+				const FiveBefore = new Date(now.setMinutes(now.getMinutes() + 5));
+				const dto: CreateChannelMuteDto = {
+					chanId: chanArr[0].id,
+					userId: userArr[9].id,
+					expires: FiveBefore,
+				};
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[9].id}/mute`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.withBody(dto)
+				.expectStatus(404)
+				// .expectBodyContains(EChannelStatus.MUTED)
+				// .expectBodyContains(chanUserArr[0].userId)
+				// .inspect();
+			});
+
+		}); // DESCRIBE (POST /channelUser/mute)
+		
+	}); // DESCRIBE (ChannelMute)
+
+
+	describe('ChannelBan', () => {
+		
+		describe('POST /channelUser/ban + ChannelBanDto', () => {
+			
+			it('VALID ban - should 200', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[1].userId}/ban`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(201)
+				// .inspect();
+			});
+			   
+			it('NONVALID ban (ban admin) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/ban`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NONVALID ban (ban owner) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${userArr[0].id}/ban`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NONVALID ban (dupl) - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/ban`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('NONVALID ban (not admin) - should 403', () => {
+
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[2].userId}/ban`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[3].access_token}`,
+				})
+				.expectStatus(403)
+				// .inspect();
+			});
+
+			it('CHECK banned user should have left', () => {
+			});
+
+			it('CHECK banned user cannot join - should 403', () => {
+				return pactum
+				.spec()
+				.post(`/channel/${chanArr[0].id}/join`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[2].access_token}`,
+				})
+				// .withBody({ chanId: chanArr[0].id })
+				.expectStatus(403)
+				// .inspect()
+
+			});
+
+		}); // DESCRIBE (POST /channelUser/ban)
+		
+	}); // DESCRIBE (ChannelBan)
+
+	
+	describe('Channel - 2', () => {
+
+		describe('GET /channel/:chanId', () => {
+
+			it('VALID - should 200', () => {
+				return pactum
+				.spec()
+				.get(`/channel/${chanArr[0].id}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(200)
+				// .inspect();
+			});
+
+		});
 	});
+
+
+	
 
 	
 
