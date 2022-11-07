@@ -1,3 +1,4 @@
+export * from './Pong'
 export * from './Home'
 export * from './Acceuil'
 export * from './Profile'
@@ -7,5 +8,6 @@ export * from './ErrorPages'
 export * from './Channel'
 export * from './Store'
 export * from './WelcomerTest'
+export * from "./Pong"
 export * from './OtherProfile'
 export * from './Username'

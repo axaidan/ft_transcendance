@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 
-import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest, OtherProfile, UsernameLogger } from "./pages";
+import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest, OtherProfile, UsernameLogger, Pong } from "./pages";
 import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./components";
 
 export default function App() {
@@ -9,6 +9,7 @@ export default function App() {
 			<Routes>
 				<Route path='/' element={<Welcomer />} />
 				<Route path='/home' element={<Home />}>
+					<Route path='game' element={<Pong />} />
 					<Route path='acceuil' element={<Acceuil />} />
 					<Route path='ladder' element={<Ladder />} />
 					<Route path='me' element={<MyNavProfile />}>

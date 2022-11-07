@@ -48,7 +48,7 @@ export function Navbar() {
 		<div className="navbar">
 			<ul className="nav_links">
 				<li className="play">
-					<NavLink to='/game'>
+					<NavLink to='/home/game'>
 						<div className="play_div">
 							<button className="play_btn">
 								Play
