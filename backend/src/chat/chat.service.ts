@@ -8,7 +8,6 @@ import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user
 import { EChannelRoles } from './channel/channel-user/types';
 import { ChannelService } from './channel/channel.service';
 import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
-import { EChannelTypes } from './channel/types/channel-types.enum';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
