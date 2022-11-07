@@ -54,7 +54,6 @@ export function MyNavProfile() {
 	return (
 		<div className='div_user'>
 			<ul className='NavUser'>
-
 				<NavLink to='/home/me/friend' className='user_nav_items'>
 					Friends
 				</NavLink>

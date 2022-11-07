@@ -13,7 +13,6 @@ import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
 import { DflRelationship, IRelationship } from '../types';
 import { IGame } from '../types/interfaces/IGame';
-import { defaultWinrate } from '../types/interfaces/IWinrate';
 
 
 export function OtherProfile() {
@@ -25,6 +24,7 @@ export function OtherProfile() {
 	const [isFriend, setisFriend] = useState(false);
 	const [isBlocked, setisBlocked] = useState(false);
 	const [games, setGames] = useState<IGame[]>([]);
+	const [victories, setVictories] = useState(0);
 	const [defeat, setDefeat] = useState(0);
 	const [draw, setDraw] = useState(0);
 
@@ -32,7 +32,6 @@ export function OtherProfile() {
 		axios.get("/user/" + id)
 			.then((res: AxiosResponse<IUser>) => {
 				let User: IUser = res.data;
-				User.winrate = defaultWinrate;
 				setOthUser(User);
 			})
 			.catch(() => { alert('This user does not exist.') });
@@ -40,11 +39,16 @@ export function OtherProfile() {
 
 
 	useEffect(() => {
+		axios.get('/game/historique/' + id)
+			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
+	}, [games]);
+
+	useEffect(() => {
 		axios.get('/relation/is_friend/' + id)
 			.then((res: AxiosResponse<boolean>) => { setisFriend(res.data) })
 		axios.get('/relation/is_block/' + id)
 			.then((res: AxiosResponse<boolean>) => { setisBlocked(res.data) })
-	})
+	}, [friends, blocks])
 
 	const BlockFriend = async (user: IUser) => {
 		await axios.post('/relation/block_user/' + user.id);
@@ -63,7 +67,6 @@ export function OtherProfile() {
 
 		await axios.post('/relation/remove_friend/' + user.id);
 		const friend = friends.filter(friend => friend.id == user.id);
-		console.log("User: ", user, "\nfriend: ", friend, '\nfriends: ', friends);
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend[0] });
 	}
 
@@ -79,31 +82,23 @@ export function OtherProfile() {
 		return (await axios.get('/relation/is_friend/' + cibleId)).data;
 	}
 
-	useEffect(() => {
-		FillGamesToUser
-	}, []);
 
-	const FillGamesToUser = async () => {
-		(await axios.get('/game/historique/' + othUser.id)).data.map((game: IGame) => {
-			if (game.player1.id === othUser.id || game.player2.id === othUser.id)
-				othUser.winrate.games.push(game);
-		})
 
-	}
-
-	const getVictories = (user: IUser): void => {
-		user.winrate.games.map((game: IGame) => {
-			if (game.player1.id === user.id) {
+	const getVictories = (userId: number): void => {
+		let victories: number = 0;
+		games.map((game: IGame) => {
+			if (game.player1.id === userId) {
 				if (game.score1 > game.score2) {
-					user.winrate.victories++;
+					victories++;
 				}
 			}
-			if (game.player2.id === user.id) {
+			if (game.player2.id === userId) {
 				if (game.score2 > game.score1) {
-					user.winrate.victories++;
+					victories++;
 				}
 			}
 		});
+		setVictories(victories);
 	};
 
 	const getDefeat = (userId: number): void => {
@@ -136,7 +131,7 @@ export function OtherProfile() {
 	};
 
 	useEffect(() => {
-		getVictories(othUser);
+		getVictories(othUser.id);
 		getDefeat(othUser.id);
 		getDraw(othUser.id);
 	});
@@ -148,9 +143,9 @@ export function OtherProfile() {
 					<div className="other-options">
 						{isBlocked ?
 							<></> :
-							isFriend ? <button onClick={() => RemoveFriend(othUser)} >Remove</button> : <button onClick={() => AddFriend(othUser)} >Add</button>
+							isFriend ? <button id="other-remove" onClick={() => RemoveFriend(othUser)} /> : <button id="other-add" onClick={() => AddFriend(othUser)} />
 						}
-						{isBlocked ? <button onClick={() => RemoveBlock(othUser)}>Unblock</button> : <button onClick={() => BlockFriend(othUser)}>Block</button>}
+						{isBlocked ? <button id="other-unblock" onClick={() => RemoveBlock(othUser)} /> : <button id="other-block" onClick={() => BlockFriend(othUser)} />}
 					</div>
 					<div className="other-clan">
 						My clan
@@ -192,7 +187,7 @@ export function OtherProfile() {
 					<div className="other-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							Victories : { }
+							Victories : {victories}
 						</div>
 						<div className="other-txt">
 							Defeats : {defeat}
@@ -201,9 +196,9 @@ export function OtherProfile() {
 							Draw : {draw}
 						</div>
 						<div className="other-txt">
-							Winrate: {othUser.winrate.gamesPlayed === 0 ?
+							{/* Winrate: {othUser.winrate.gamesPlayed === 0 ?
 								Math.round((othUser.winrate.victories / othUser.winrate.gamesPlayed) * 100) + '%' : '0%'
-							}
+							} */}
 						</div>
 
 					</div>

@@ -86,6 +86,82 @@
 	height: 50px;
 }
 
+.other-options button {
+	width: 50px;
+	margin: 10px;
+	height: 50px;
+}
+
+#other-add {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: none;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/othNavProfile/button-add-friend.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 50px;
+	margin-right: 20px;
+}
+
+#other-add:hover {
+	background-image: url('../../../assets/images/othNavProfile/button-add-friend-over.png');
+}
+
+#other-add:active {
+	background-image: url('../../../assets/images/othNavProfile/button-add-friend-down.png');
+}
+
+#other-remove {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: none;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/btn_highlights_delete.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 45px;
+	margin-right: 20px;
+}
+
+#other-block {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/othNavProfile/block_mask.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 35px;
+	margin-right: 20px;
+}
+
+#other-unblock {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/red_x_mark.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	margin-right: 20px;
+}
+
+#other-block:hover,
+#other-unblock:hover {
+	border-color: #938f75;
+	border-style: double;
+}
+
 /*****************************
 ******************************
 			XP BAR

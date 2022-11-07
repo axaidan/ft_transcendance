@@ -9,7 +9,6 @@ export type IUser = {
 	updatedAt: string
 	twoFactorAuth: boolean,
 	avatarUrl: string,
-	winrate: IWinrate
 }
 
 export const DflUser: IUser = {
@@ -21,6 +20,5 @@ export const DflUser: IUser = {
 	updatedAt: "string",
 	twoFactorAuth: false,
 	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
-	winrate: defaultWinrate,
 }
 
