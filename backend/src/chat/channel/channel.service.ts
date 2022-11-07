@@ -200,11 +200,10 @@ export class ChannelService {
         Promise<Channel> {
         const channel: Channel = await this.findOne(chanId);
         if (channel === null)
-            throw new NotFoundException(`channel ${chanId} NOT FOUND`);
+            throw new NotFoundException(`channel not found`);
         if (channel.type === EChannelTypes.PRIVATE)
             throw new ForbiddenException('cannot join a private channel');
         if (channel.type === EChannelTypes.PROTECTED) {
-            //  check hash if channel protected
             if (dto === undefined || ('password' in dto) === false) {
                 throw new BadRequestException('need password');
             }
@@ -264,8 +263,7 @@ export class ChannelService {
             throw new NotFoundException('user not found in channel');
         if (dto.role === EChannelRoles.OWNER)
             currentChannelUser = await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
-        else
-            channelUser = await this.channelUserService.editRole(channelUser, dto.role);
+        channelUser = await this.channelUserService.editRole(channelUser, dto.role);
         return channelUser;
     }
 
@@ -291,7 +289,7 @@ export class ChannelService {
             throw new ForbiddenException('user blocked you');
         const channelBan = await this.channelBanService.findOne(userId, chanId);
         if (channelBan !== null)
-            throw new ForbiddenException('user is banned from channel');
+            throw new ForbiddenException('user banned from channel');
         const channelUser = await this.channelUserService.create({
             channelId: chanId,
             userId: userId,

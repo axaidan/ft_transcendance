@@ -1,11 +1,13 @@
 import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
-import { Channel, ChannelUser } from '@prisma/client';
+import { Channel, ChannelBan, ChannelMute, ChannelUser } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionMessageDto } from 'src/chat/discussion-message/dto/discussion-message.dto';
+import { ChannelMessageService } from './channel/channel-message/channel-message.service';
+import { ChannelMessageDto } from './channel/channel-message/dto';
+import { ChannelMuteService } from './channel/channel-mute/channel-mute.service';
 import { ChannelUserService } from './channel/channel-user/channel-user.service';
-import { ChannelService } from './channel/channel.service';
 import { DiscussionService } from './discussion/discussion.service';
 import { DiscussionDto } from './discussion/dto/discussion.dto';
 
@@ -15,7 +17,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(
         @Inject(forwardRef(() => DiscussionService))
         private discService: DiscussionService,
-        private channelService: ChannelService,
+        private channelMuteService: ChannelMuteService,
+        private channelMessageService: ChannelMessageService,
         private channelUserService: ChannelUserService,
     ) { }
 
@@ -122,9 +125,99 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
             userId: userId,
             chanId: chanId,
+            // status: ,
+            // role: ,
         });
     }
 
+
+    invitedToChannel(channelUser: ChannelUser, channel: Channel) {
+        if (this.clientsMap.has(channelUser.userId)) {
+            const client: Socket = this.clientsMap.get(channelUser.userId);
+            client.emit('invitedToChannel', {
+                chanId: channel.id,
+                name: channel.name, 
+                type: channel.type,
+            });
+        }
+    }
+
+    channelNameEdited(channel: Channel) {
+        this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
+        this.wss.to(`chan${channel.id}`).emit('channelNameEdited', {
+            chanId: channel.id,
+            name: channel.name,
+        });
+    }
+
+    channelTypeEdited(channel: Channel) {
+        this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
+        this.wss.to(`chan${channel.id}`).emit('channelTypeEdited', {
+            chanId: channel.id,
+            type: channel.type,
+        });
+    }
+
+    channelDeleted(channel: Channel) {
+        this.logger.log(`CHANNEL ${channel.id} DELETED`);
+        this.wss.to(`chan${channel.id}`).emit('channelDeleted', {
+            chanId: channel.id,
+        });
+        const clientsIds = this.wss.sockets.adapter.rooms.get(`chan${channel.id}`);
+        for (const clientId of clientsIds) {
+            const clientSocket = this.wss.sockets.sockets.get(clientId);
+            clientSocket.leave(`chan${channel.id}`);
+        }
+        // this.wss.sockets.in(`chan${channel.id}`).socketsLeave(`chan${channel.id}`);
+    }
+
+    channelUserRoleEdited(channelUser: ChannelUser) {
+        this.wss.to(`chan${channelUser.channelId}`).emit('channelUserRoleEdited', {
+            userId: channelUser.userId,
+            chanId: channelUser.channelId,
+            role: channelUser.role,
+        });
+    }
+
+    //////////////////
+    //  BAN EVENTS  //
+    //////////////////
+
+    channelUserBanned(channelBan: ChannelBan) {
+        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserBanned', {
+            chanId: channelBan.channelId,
+            userId: channelBan.userId,
+        });
+    }
+
+    channelUserUnbanned(channelBan: ChannelBan) {
+        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserUnbanned', {
+            chanId: channelBan.channelId,
+            userId: channelBan.userId,
+        });
+    }
+
+    ///////////////////
+    //  MUTE EVENTS  //
+    ///////////////////
+
+    channelUserMuted(channelMute: ChannelMute) {
+        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserMuted', {
+            chanId: channelMute.channelId,
+            userId: channelMute.userId,
+        });
+    }
+
+    channelUserUnmuted(channelMute: ChannelMute) {
+        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserUnmuted', {
+            chanId: channelMute.channelId,
+            userId: channelMute.userId,
+        });
+    }
+
+    // channelUserMuteExtended(channeMute: ChannelMute) {
+    // 
+    // }
 
     ///////////////////////////
     //  LOGIN/LOGOUT EVENTS  //
@@ -154,10 +247,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.broadcast.emit('logoutToClient', userId);
     }
 
-    ////////////////////////////////
-    //  DISCUSSION SUBSCRIPTIONS  //
-    ////////////////////////////////
+    /////////////////////////////
+    //  MESSAGE SUBSCRIPTIONS  //
+    /////////////////////////////
     @SubscribeMessage('discMsgToServer')
+    // @UseGuards(NotBlockedGuard)
     async handleDiscMsg(
         client: Socket,
         dto: DiscussionMessageDto):
@@ -165,9 +259,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
         this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         const message = await this.discService.createDiscMsg(dto);
-        const roomName = `disc${dto.discId}`;
-        this.wss.to(roomName).emit('discMsgToclient', message);
+        this.wss.to(`disc${dto.discId}`).emit('discMsgToClient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
+    }
+
+    @SubscribeMessage('chanMsgToServer')
+    // @UseGuards(NotMutedGuard)
+    async handleChanMsg(
+        client: Socket,
+        dto: ChannelMessageDto
+    )
+    {
+        const channelMute = this.channelMuteService.findOne(dto.userId, dto.chanId);
+        if (channelMute !== null) {
+            this.logger.log(`IN CHAN ${dto.chanId} RECEIVED MSG FROM MUTED USER ${dto.userId}`);
+            throw new WsException('you are muted in this channel');
+        }
+        this.logger.log(`IN CHAN ${dto.chanId} RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
+        const message = await this.channelMessageService.create(dto.userId, dto.chanId, dto.text);
+        this.wss.to(`chan${dto.chanId}`).emit('chanMsgToClient', message);
+        this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'chan${dto.chanId}'`);
     }
 
     //////////////

@@ -10,6 +10,10 @@ import { UserModule } from 'src/users/users.module';
 import { UserService } from 'src/users/users.service';
 import { ChannelUserModule } from './channel/channel-user/channel-user.module';
 import { ChannelUserService } from './channel/channel-user/channel-user.service';
+import { ChannelMuteModule } from './channel/channel-mute/channel-mute.module';
+import { ChannelMessageModule } from './channel/channel-message/channel-message.module';
+import { ChannelMuteService } from './channel/channel-mute/channel-mute.service';
+import { ChannelMessageService } from './channel/channel-message/channel-message.service';
 
 @Module({
     imports: [
@@ -17,6 +21,8 @@ import { ChannelUserService } from './channel/channel-user/channel-user.service'
         DiscussionModule,
         ChannelModule,
         ChannelUserModule,
+        ChannelMuteModule,
+        ChannelMessageModule,
     ],
     controllers: [
         ChatController,
@@ -26,6 +32,8 @@ import { ChannelUserService } from './channel/channel-user/channel-user.service'
         ChatGateway,
         UserService,
         ChannelUserService,
+        ChannelMuteService,
+        ChannelMessageService,
     ],
 })
 export class ChatModule {}

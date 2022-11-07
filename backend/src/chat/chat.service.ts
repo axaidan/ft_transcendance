@@ -8,6 +8,7 @@ import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user
 import { EChannelRoles } from './channel/channel-user/types';
 import { ChannelService } from './channel/channel.service';
 import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
+import { EChannelTypes } from './channel/types/channel-types.enum';
 import { ChatGateway } from './chat.gateway';
 import { DiscussionService } from './discussion/discussion.service';
 import { CreateDiscussionDto, DiscussionDto } from './discussion/dto';
@@ -85,7 +86,6 @@ export class ChatService {
     //  CHANNEL METHODS //
     //////////////////////
 
-    //  GET /channel/all
     async getAllPublicChannels(currentUserId: number) : 
     Promise<Channel[]>
     {
@@ -93,7 +93,6 @@ export class ChatService {
         return channels;
     }
 
-    //  GET /channel
     async getAllChannelsForUser(userId: number) :
     Promise<Channel[]>
     {
@@ -101,7 +100,6 @@ export class ChatService {
         return channels;
     }
 
-    //  GET /channel/:chanId
     async getChannelWusersWmessages(currentUserId: number, chanId: number)
     : Promise<Channel>
     {
@@ -109,7 +107,6 @@ export class ChatService {
         return channel;
     }
 
-    //  POST /channel
     async createChannel(
         currentUserId: number,
         dto: CreateChannelDto
@@ -144,17 +141,23 @@ export class ChatService {
         const channel: Channel = await this.channelService.findOne(chanId);
         if (channel === null)
             throw new NotFoundException('channel not found');
+
         const channelUser: ChannelUser = await this.channelUserService.findOne(currentUserId, chanId);
         if (channelUser === null)
             throw new NotFoundException('channel not joined');
+
         if (channelUser.role === EChannelRoles.OWNER) {
             const nextOwner = await this.channelService.passOwnership(channelUser, channel);
-            // if (nextOwner === null)
-            //     await this.channelService.delete(chanId);
-            // else
-            // ?newRole?
+            if (nextOwner === null) {
+                const deletedChannel = await this.channelService.delete(chanId);
+                this.chatGateway.channelDeleted(deletedChannel);
+            }
+            else
+                this.chatGateway.channelUserRoleEdited(nextOwner);
         }
+
         await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
+
         this.channelService.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: false,
@@ -163,25 +166,27 @@ export class ChatService {
         this.chatGateway.leaveChannelRoom(currentUserId, chanId);
         this.chatGateway.userLeftChannel(currentUserId, chanId);
         return channel;
-
-        // const channel = await this.channelService.leave(currentUserId, chanId);
-        // return channel;
     }
 
-    //  PATCH /channel/:chanId
     async editChannel(currentUserId: number, chanId: number, dto: EditChannelDto)
     : Promise<Channel>
     {
-        const channel = await this.channelService.edit(currentUserId, chanId, dto);
-        // event channelEdited
-        return channel;
+        const originalChannel = await this.channelService.findOne(chanId);
+        if (originalChannel === null) 
+            throw new NotFoundException('channel not found');
+        const editedChannel = await this.channelService.edit(currentUserId, chanId, dto);
+        if (originalChannel.name !== editedChannel.name)
+            this.chatGateway.channelNameEdited(editedChannel);
+        if (originalChannel.type !== editedChannel.type)
+            this.chatGateway.channelTypeEdited(editedChannel);
+        return editedChannel;
     }
 
     async deleteChannel(chanId: number)
     : Promise<Channel>
     {
-        const channel = this.channelService.delete(chanId);
-        // event newChanDelete
+        const channel = await this.channelService.delete(chanId);
+        this.chatGateway.channelDeleted(channel);
         return channel;
     }
 
@@ -193,8 +198,11 @@ export class ChatService {
     : Promise<ChannelUser>
     {
         const channelUser = await this.channelService.editChannelUserRole(currentUserId, dto);
-        // event newRole
-        // ?event newRole
+        this.chatGateway.channelUserRoleEdited(channelUser);
+        if (channelUser.role === EChannelRoles.OWNER) {
+            const ancientOwner = await this.channelUserService.findOne(currentUserId, dto.chanId);
+            this.chatGateway.channelUserRoleEdited(ancientOwner);
+        }
         return channelUser;
     }
 
@@ -207,8 +215,11 @@ export class ChatService {
     : Promise<ChannelUser>
     {
         const channelUser = await this.channelService.inviteUser(currentUserId, chanId, userId);
-        // event newUser to room
-        // event newChannel to user
+        const user = await this.userService.getUser(userId);
+        this.chatGateway.joinChannelRoom(channelUser.userId, channelUser.channelId);
+        this.chatGateway.userJoinedChannel(channelUser.userId, channelUser.channelId, user.username);
+        const channel = await this.channelService.findOne(channelUser.channelId);
+        this.chatGateway.invitedToChannel(channelUser, channel);
         return channelUser;
     }
 
@@ -220,7 +231,8 @@ export class ChatService {
     : Promise<ChannelBan>
     {
         const channelBan = await this.channelService.banChannelUser(dto);
-        // event newBan
+        this.chatGateway.leaveChannelRoom(channelBan.userId, channelBan.channelId);
+        this.chatGateway.channelUserBanned(channelBan);
         return channelBan;
     }
 
@@ -228,7 +240,7 @@ export class ChatService {
     : Promise<ChannelBan>
     {
         const channelBan = await this.channelService.unbanChannelUser(dto);
-        // event newUnban
+        this.chatGateway.channelUserUnbanned(channelBan);
         return channelBan;
     }
 
@@ -240,7 +252,7 @@ export class ChatService {
     : Promise<ChannelMute>
     {
         const channelMute = await this.channelService.muteChannelUser(dto);
-        // event newMute
+        this.chatGateway.channelUserMuted(channelMute);
         return channelMute;
     }
 
@@ -248,7 +260,7 @@ export class ChatService {
     : Promise<ChannelMute>
     {
         const channelMute = await this.channelService.unmuteChannelUser(dto);
-        // event newUnmute
+        this.chatGateway.channelUserUnmuted(channelMute);
         return channelMute;
     }
 
