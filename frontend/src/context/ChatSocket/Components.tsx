@@ -1,19 +1,21 @@
 // Extern:
+import { AxiosResponse } from "axios";
 import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "react";
 
 // Intern:
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
+import { AxiosJwt } from "../../hooks";
 import { useSocket } from "../../hooks/useSocket";
-import { IMessage } from "../../types";
-import { SocketContext, ESocketActionType  } from "../UserSocket";
+import { IDiscussion, IMessage } from "../../types";
+import { SocketContext  } from "../UserSocket";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {}
 export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
 	const [loadingSocket, setLoading] = useState(true);
+	const axios = AxiosJwt();
 
 	const { me } = useContext(SocketContext).SocketState;
-	const UserDispatch = useContext(SocketContext).SocketDispatch;
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -28,6 +30,12 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
 		ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: me });
 		// Start the envent listeners // 
+
+		axios.get('/discussion')
+		.then((res: AxiosResponse<IDiscussion[]>) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.GET_ALLDISC, payload: res.data});
+		})
+
 		StartListeners();
 		StartHandshake();
 	}, [])
@@ -36,9 +44,6 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
 			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
-			if (message.userId != me.id) {
-				UserDispatch({ type: ESocketActionType.UP_NOTIF, payload: message.userId })
-			}
 		});
 
 		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {

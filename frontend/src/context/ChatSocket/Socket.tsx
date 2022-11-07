@@ -6,6 +6,7 @@ export interface IChatSocketContextState {
 	socket: Socket | undefined;
 	me: IUser;
 	discussion: IDiscussion[];
+	allDiscussions: IDiscussion[];
 	index_active: number;
 	chat_display: boolean;
 }
@@ -14,6 +15,7 @@ export const dflChatSocketContextState: IChatSocketContextState = {
 	socket: undefined,
 	me: DflUser,
 	discussion: [],
+	allDiscussions: [],
 	index_active: -1,
 	chat_display: false,
 }
@@ -26,7 +28,8 @@ export enum EChatSocketActionType {
 	RM_DISC = 'remove_discussion',			// REMOVE D'UNE DISCUSSION 
 	UP_CURR = 'up_current_discussion',		// INDEX DE LA DISCUSSION AFFICHEE
 	NEW_MSG = 'receive_message',			// RECU D'UN NOUVEAU MESSAGE
-	DISPLAY = 'change_chat_display'
+	DISPLAY = 'change_chat_display',
+	GET_ALLDISC = 'get_all_discussion',
 }
 
 export type TChatSocketContextAction = EChatSocketActionType.UP_SOKET |
@@ -36,6 +39,7 @@ export type TChatSocketContextAction = EChatSocketActionType.UP_SOKET |
 	EChatSocketActionType.RM_DISC |
 	EChatSocketActionType.UP_CURR |
 	EChatSocketActionType.NEW_MSG |
+	EChatSocketActionType.GET_ALLDISC |
 	EChatSocketActionType.DISPLAY;
 
 export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage | IDiscussion | IUser | boolean;
@@ -70,9 +74,11 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
 			if (index != -1) {
 				state.discussion[index].messages.push(action.payload as IMessage);
-				// state.discussion[index].notif += 1;
 			}
 			return { ...state };
+		case EChatSocketActionType.GET_ALLDISC:
+			state.allDiscussions = (action.payload as IDiscussion[]);
+			return {...state};
 		default:
 			return { ...state };
 	}

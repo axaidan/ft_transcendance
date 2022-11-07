@@ -2,7 +2,7 @@
 import { PropsWithChildren, useContext, useEffect, useState } from "react";
 
 // Intern:
-import { ChatSocketContext, EChatSocketActionType, SocketContext } from "../../context";
+import { ChatSocketContext, EChatSocketActionType } from "../../context";
 import { AxiosJwt } from "../../hooks";
 import { IDiscussion, IUser } from "../../types";
 
@@ -10,7 +10,6 @@ export interface DiscLinkUserProps extends PropsWithChildren { index: number }
 export const DiscLinkUser: React.FunctionComponent<DiscLinkUserProps> = ({ children, index }) => {
 	const { index_active } = useContext(ChatSocketContext).ChatSocketState;
 	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
-	const userDispatch = useContext(SocketContext).SocketDispatch;
 	const UpDateActiveDiscusion = () => {
 		if (index_active != index) {
 			dispatch({ type: EChatSocketActionType.UP_CURR, payload: index });

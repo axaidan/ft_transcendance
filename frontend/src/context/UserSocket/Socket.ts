@@ -89,7 +89,8 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
 		case ESocketActionType.UP_STATUS:
 			user = state.users.find((friend) => { return friend.userId == (action.payload as IStatus).userId })
 			friend = state.friends.find((friend) => { return friend.id == (action.payload as IStatus).userId })
-			if (user) { user.status = (action.payload as IStatus).status; friend!.status = (action.payload as IStatus).status }
+			if (user) { user.status = (action.payload as IStatus).status;}
+			if (friend) {  friend!.status = (action.payload as IStatus).status; }
 			console.log(user);
 			return { ...state }
 		default:

@@ -13,9 +13,10 @@
 }
 
 .contact-container:hover {
-    background-color: #3cac89;
+    background-color: #6f79817a;
     transition: background-color 50ms linear;
 }
+
 
 .contact-info {
     position: relative;
@@ -26,6 +27,12 @@
 .contact-name {
     margin-left: 11px;
 }
+
+
+.contact-container:hover p {
+    color: rgb(173, 173, 173);
+}
+
 
 .contact-status {
     position: absolute;

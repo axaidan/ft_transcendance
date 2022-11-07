@@ -24,9 +24,14 @@ export function Contact({ user }: ContactProps) {
 		return users.find((user) => { return uid == user.userId })?.status;
 	}
 
+	if (user == undefined)
+		return <></>
+
+	// console.log(user);
 	let status: number = 4;
 	if ( getStatus(user.id) != undefined ) 
 		status = getStatus(user.id)!;
+
 
 	return (
 		<li className='contact-container'>
