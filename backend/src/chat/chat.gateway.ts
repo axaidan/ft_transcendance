@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
 import { Channel, ChannelBan, ChannelMute, ChannelUser } from '@prisma/client';
+import { hasSubscribers } from 'diagnostics_channel';
 import { Server, Socket } from 'socket.io';
 import { JwtGuard } from 'src/auth/guard';
 import { DiscussionMessageDto } from 'src/chat/discussion-message/dto/discussion-message.dto';
@@ -163,12 +164,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.wss.to(`chan${channel.id}`).emit('channelDeleted', {
             chanId: channel.id,
         });
-        const clientsIds = this.wss.sockets.adapter.rooms.get(`chan${channel.id}`);
-        for (const clientId of clientsIds) {
-            const clientSocket = this.wss.sockets.sockets.get(clientId);
-            clientSocket.leave(`chan${channel.id}`);
-        }
-        // this.wss.sockets.in(`chan${channel.id}`).socketsLeave(`chan${channel.id}`);
+        this.wss.socketsLeave(`chan${channel.id}`);
     }
 
     channelUserRoleEdited(channelUser: ChannelUser) {
