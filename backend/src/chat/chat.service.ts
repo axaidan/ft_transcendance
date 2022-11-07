@@ -114,7 +114,7 @@ export class ChatService {
     : Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
-        this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        // this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
 

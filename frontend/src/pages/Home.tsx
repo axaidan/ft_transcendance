@@ -1,44 +1,44 @@
 // Extern:
 import React from "react";
 import { useNavigate, Outlet } from 'react-router-dom'
-import { useEffect, useState } from "react"
-import { AxiosResponse } from "axios";
 
 // Intern:
 import { Friendsbar, Navbar } from '../components'
-import { AxiosJwt } from "../hooks/AxiosJwt";
-import { IUser, DflUser } from "../types";
-import io, { Socket } from 'socket.io-client';
-import { useCookies } from "react-cookie";
+import { IUser } from "../types";
 
 // Assets:
 import '../styles/pages/Home.css'
 import bg_website from '../assets/videos/bg_website.webm'
+import { useAxios } from "../hooks/useAxios";
+import SocketContextComponent from "../context/UserSocket/Components";
+import { ChatSocketContextComponent } from "../context";
+
+function LoadingHome() {
+	return (
+		<div>
+			<video src={bg_website} autoPlay loop muted className='bg_video' />
+		</div>
+	)
+}
 
 export function Home() {
 	const navigate = useNavigate();
-	const [user, setUser] = useState<IUser>(DflUser);
-	// const [socket, setSocket] = useState<Socket>();
+	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me'});
 
-	const axios = AxiosJwt();
+	if (loading) return <LoadingHome />
+	if (error !== '') return navigate('/');
+	if (!user) return navigate('/');
 	
-	useEffect(() => {
-		axios.get("/user/me")
-		.then((res: AxiosResponse<IUser>) => {
-			setUser(res.data);
-			// setSocket(GetSocket(res.data.id));
-		 })
-		.catch(() => { navigate('/'); });
-	}, []);
-
 	return (
-		<div className="set-body">
-			<Navbar me={user} />
-			<div className='container-body'>
-				<video src={bg_website} autoPlay loop muted className='bg_video' />
-				<Outlet context={user} />
-				<Friendsbar userId={user.id} />
-			</div>
-		</div>
+		<SocketContextComponent user={user}>
+			<ChatSocketContextComponent>
+				<Navbar me={user} />
+				<div className='container-body'>
+					<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
+					<Outlet />
+				</div>
+				<Friendsbar />
+			</ChatSocketContextComponent>
+		</SocketContextComponent>
 	)
 }

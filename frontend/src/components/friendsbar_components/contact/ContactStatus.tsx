@@ -1,3 +1,4 @@
+// Intern:
 import { colorStatus } from ".";
 
 type ContactStatusProps = { mode: number };

@@ -38,8 +38,8 @@ model User {
 	channelMutes	ChannelMute[]
 	channelMessages	ChannelMessage[]
 
-	avatar Avatar? @relation(fields: [avatarId], references: [id])
-	avatarId Int?
+	avatar Avatar? @relation(fields: [avatarUrl], references: [url])
+	avatarUrl String?
 
     @@map("user")
 }

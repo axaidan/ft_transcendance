@@ -1,35 +1,44 @@
-import axios from "axios";
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { IDiscussion, IMessage } from "../../types";
+import { DflUser, IDiscussion, IMessage, IUser } from "../../types";
 
 export interface IChatSocketContextState {
 	socket: Socket | undefined;
-	uid: number;
+	me: IUser;
 	discussion: IDiscussion[];
+	index_active: number;
+	chat_display: boolean;
 }
 
 export const dflChatSocketContextState: IChatSocketContextState = {
 	socket: undefined,
-	uid: 0,
-	discussion: []
+	me: DflUser,
+	discussion: [],
+	index_active: -1,
+	chat_display: false,
 }
 
 export enum EChatSocketActionType {
 	UP_SOKET = 'update_socket',
 	UP_UID = 'update_uid',
-	UP_DISC = 'update_discussion',
 	GET_DISC = 'get_discussion',
-	NEW_MSG = 'nouveau_message'
+	UP_DISC = 'add_discussion',				// AJOUT D'UNE NOUVELLE DISCUSION
+	RM_DISC = 'remove_discussion',			// REMOVE D'UNE DISCUSSION 
+	UP_CURR = 'up_current_discussion',		// INDEX DE LA DISCUSSION AFFICHEE
+	NEW_MSG = 'receive_message',			// RECU D'UN NOUVEAU MESSAGE
+	DISPLAY = 'change_chat_display'
 }
 
-export type TChatSocketContextAction = EChatSocketActionType.GET_DISC |
-	EChatSocketActionType.UP_SOKET |
+export type TChatSocketContextAction = EChatSocketActionType.UP_SOKET |
 	EChatSocketActionType.UP_UID |
+	EChatSocketActionType.GET_DISC |
 	EChatSocketActionType.UP_DISC |
-	EChatSocketActionType.NEW_MSG;
+	EChatSocketActionType.RM_DISC |
+	EChatSocketActionType.UP_CURR |
+	EChatSocketActionType.NEW_MSG |
+	EChatSocketActionType.DISPLAY;
 
-export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage;
+export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage | IDiscussion | IUser | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;
@@ -43,21 +52,26 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.UP_SOKET:
 			return { ...state, socket: action.payload as Socket };
 		case EChatSocketActionType.UP_UID:
-			return { ...state, uid: action.payload as number };
+			return { ...state, me: action.payload as IUser };
 		case EChatSocketActionType.UP_DISC:
-			return { ...state, newMessages: [...state.discussion, action.payload as number] };
-		case EChatSocketActionType.GET_DISC:
-			return { ...state, newMessages: action.payload as number[] };
+			return { ...state, discussion: [ ...state.discussion ] };
+		case EChatSocketActionType.RM_DISC:
+			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
+		case EChatSocketActionType.UP_CURR:
+			const newIndex = action.payload as number;
+			if (newIndex != -1) {
+				// state.discussion[newIndex].notif = 0;
+				// console.log("reset notif: ", state.discussion[newIndex].notif);
+			}
+			return { ...state, index_active: newIndex };
+		case EChatSocketActionType.DISPLAY:
+			return { ...state, chat_display: action.payload as boolean };
 		case EChatSocketActionType.NEW_MSG:
-			for (let i = 0; state.discussion[i]; i++)
-				if (state.discussion[i].discId == (action.payload as IMessage).discussionId) {
-					state.discussion[i].messages.push(action.payload as IMessage)
-					break ;
-				}
-					// return {
-					// 	...state,
-					// 	discussion: [...state.discussion, ...state.discussion[i].messages, [...state.discussion[i].messages, (action.payload as IMessageDto)]]
-					// };
+			const index = state.discussion.findIndex(disc => disc.id == (action.payload as IMessage).discussionId)
+			if (index != -1) {
+				state.discussion[index].messages.push(action.payload as IMessage);
+				// state.discussion[index].notif += 1;
+			}
 			return { ...state };
 		default:
 			return { ...state };

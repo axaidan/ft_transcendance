@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseEnumPi
 import { Discussion, Channel, ChannelUser, ChannelBan, ChannelMute } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { domainToASCII } from 'url';
 import { CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto } from './channel/channel-user/dto';
 import { ChannelRoles } from './channel/decorators/roles.decorator';
@@ -45,9 +44,13 @@ export class ChatController {
     async getDiscussionByUserId(
         @GetUser('id') currentUserId: number,
         @Param('id', ParseIntPipe) user2Id: number,
-    ):
-        Promise<Discussion> {
+    )
+    // : Promise<Discussion>
+    {
         const discussion = await this.chatService.getDiscussionByUserIds(currentUserId, user2Id);
+        if (discussion === null) {
+            return (JSON.stringify(null));
+        }
         return discussion;
     }
 

@@ -13,6 +13,7 @@ import { AvatarModule } from './avatar/avatar.module';
 import { AppGateway } from './app.gateway';
 import { ChatModule } from './chat/chat.module';
 import { ChannelBanModule } from './chat/channel/channel-ban/channel-ban.module';
+import { LobbyModule } from './lobby/lobby.module';
 
 @Module({
 	imports: [
@@ -29,9 +30,9 @@ import { ChannelBanModule } from './chat/channel/channel-ban/channel-ban.module'
 		AvatarModule,
 		ChatModule,
 		ChannelBanModule,
+		LobbyModule,
 	],
 	providers: [
-		AppGateway,
 	]
 })
 export class AppModule {}

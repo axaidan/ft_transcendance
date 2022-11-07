@@ -1,132 +1,118 @@
-import { AxiosResponse } from "axios";
-import { useContext, useEffect, useReducer, useState } from "react";
-import { Socket } from "socket.io-client";
-import { ChatNav, DiscussionNav } from ".";
-import { ChatSocketContext } from "../../context/ChatSocket";
-import { AxiosJwt } from "../../hooks";
 
+// Extern:
+import { useContext, useEffect } from "react";
+
+// Intern:
+import { ChatNav, DiscussionNav, ChatOption, ChatUser, UserCreateChat } from ".";
+import { ChatSocketContext, SocketContext } from "../../context";
+import { DflUser, IMessage } from "../../types";
+
+// Assets:
 import '../../styles/components/discussion_components/Chat.css'
-import { dflDiscussion, DflUser, IDiscussion, IMessage, IUser } from "../../types";
 
 
-type ChatBodyProps = { disc: IDiscussion };
-export function ChatBody({ disc }: ChatBodyProps) {
-
-	const axios = AxiosJwt();
-	const [user, setUser] = useState<IUser>(DflUser);
-
-	useEffect(() => {
-		axios.get('/user/me')
-			.then((res) => {
-				setUser(res.data)
-			})
-	}, []);
-
-	// LISTE DES DISCUSSIONS SUR LE COTE
-	// const discussion: Discussion[] = axios.get('/discussion');
-
-	//  A L'OUVERTURE D'UNE FENETRE
-	// const messages: DiscussionMessage[] = axios.get('/discussion/discussion[i].id');
-
-	// DANS LA STATE
-	// - 1 DiscussionMessage
-	//	QUI CHANGE DES QUE JE RECOIS 'discMsgToClient'
-
-	let comp_style: string;
+type DiscMessageProps = { msg: IMessage }
+export function DiscMessage({ msg }: DiscMessageProps) {
+	const { me } = useContext(SocketContext).SocketState;
+	const message_side = () => { return ((me.id != msg.userId ? "left" : "right")); }
 
 	return (
-		<div className='messages-body'>
-			{disc.messages.map((message: IMessage) => {
-				comp_style = (user.id === message.userId ? 'message-right' : 'message-left');
-				return (
-					<div className={comp_style}>
-						{message.text}
-					</div>
-				)
+		<div className={"message-" + message_side()}>
+			<div id={"triangle-" + message_side()}></div>
+			<p>{msg.text}</p>
+		</div>
+	)
+}
+
+export function ChatBody() {
+	const { discussion, index_active } = useContext(ChatSocketContext).ChatSocketState;
+	if (!discussion) return <></>
+
+	useEffect(() => {
+		let element = document.getElementById("messages-body");
+		element!.scrollTop = element!.scrollHeight;
+	})
+
+	return (
+		<div id='messages-body'>
+			<p id='messages-careful'>N'oubliez pas que notre equipe transendence ne vous demandera jamais votre mot de passe pour vous aider.</p>
+			{discussion[index_active]?.messages?.map((message, index) => {
+				return <DiscMessage key={index} msg={message} />
 			})}
 		</div>
 	)
 }
 
-type ChatProps = { userDisc: number; userId: number }
-export function Chat({ userDisc, userId }: ChatProps) {
-	const { socket, uid } = useContext(ChatSocketContext).ChatSocketState;
-	const [discussion, setDiscussion] = useState<IDiscussion[]>([dflDiscussion,]);
-	const [activeDisc, setActiveDisc] = useState<number>(0);
-	const [othUser, setOthUser] = useState<string>('RANDOM');
-	const axios = AxiosJwt();
-	const [loading, setLoading] = useState(true)
+export function Chat() {
+	const { me, chat_display, socket, index_active, discussion } = useContext(ChatSocketContext).ChatSocketState;
 
-	useEffect(() => {
-		setLoading(true)
-		let did = getDiscId(userDisc);
-		if (did == undefined) {
-			axios.post('/discussion', { user2Id: userDisc })
-				.then((res: AxiosResponse<IDiscussion>) => {
-					console.log(res.data);
-					setDiscussion(current => [...current, res.data]);
-					console.log('ASYNC ActiveDisc', activeDisc);
-					setOthUser(getOthUser(userId, res.data.user1, res.data.user2))
-					setLoading(false)
-				});
-			console.log('La discusion est cree et push dans le tableau de discussion');
+	const handleKeyDown = (e: any) => {
+		const input = document.getElementById('messages-input') as HTMLInputElement;
+		if (e.key === 'Enter') {
+			if (input.value.length != 0) {socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });}
+			input.value = "";
 		}
-		else {
-			setActiveDisc(did!);
-			setOthUser(getOthUser(userId, discussion[did!].user1, discussion[did!].user2));
-			setLoading(false)
-		}
-		console.log('ActiveDisc', activeDisc);
-		console.log(discussion);
-	}, [userDisc])
-
-
-	useEffect(() => {
-		HandleChange(socket, uid, discussion[activeDisc].discId)
-		setActiveDisc(getDiscId(userDisc)!)
-	}, [discussion])
-
-	function getOthUser(me: number, user1: { id: number, username: string }, user2: { id: number, username: string }) {
-		return (me != user1.id ? user1.username : user2.username)
 	}
 
-	function getDiscId(userDisc: number): number | undefined {
-		for (let i = 0; discussion[i]; i++) {
-			if (discussion[i].user1Id == userDisc || discussion[i].user2Id == userDisc)
-				return i;
-		}
-		return undefined;
+	const ChatAble = () => {
+		return (
+			<>
+				<DiscussionNav />
+				<div className='messages-container'>
+					<ChatNav />
+					<ChatBody />
+					<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
+				</div>
+			</>
+		);
 	}
 
+	const ChatNotAble = () => { return (
+			<>
+				<DiscussionCreate />
+				<div className='messages-container-search'>
+					<ChatSearch />
+					<input id="messages-input" placeholder='  Filter' onKeyDown={handleKeyDown} />
+					<ChatSearchFriends />
+				</div>
+			</>
+	)}
 
 	return (
-		<div id="chat-container">
-			<DiscussionNav />
-			<div className='messages-container'>
-				{loading ? <div>Incoming</div> : <ChatNav user={othUser} />}
-				{loading || activeDisc == undefined ? <div>Creation de votre discussion</div> : <ChatBody disc={discussion[activeDisc]} />}
-				<input id="messages-input" placeholder='Tapez votre message ici...' />
-			</div>
+		<div id={chat_display ? "chat-container-display" : "chat-container-none"}>
+			{(index_active != -1 ? < ChatAble /> : <ChatNotAble />)}
 		</div>
 	)
 }
 
-function HandleChange(socket: any, uid: any, did: number) {
-	const input = document.getElementById('messages-input') as HTMLInputElement;
+function ChatSearchFriends() {
+	const { friends } = useContext(SocketContext).SocketState;
+	return (
+		<div id='chat-search-friends'>{friends.map(friend => { return (
+			<UserCreateChat user={friend}>
+				<div className="disc-user">
+					<ChatUser user={friend} msg={friend.login + " #EUW"} />
+				</div>
+			</UserCreateChat>
+		)})}</div>)
+}
 
-	input.addEventListener("keypress", function (event) {
-		if (event.key === 'Enter') {
-			console.log('Enter pressed: ');
-			console.log(socket);
-			console.log('handleChange(): uid = ', uid);
-			console.log('handleChange(): did = ', did);
-			console.log('handleChange(): text = ', input.value);
-			socket!.emit('discMsgToServer', {
-				userId: uid,
-				text: input.value,
-				discId: did,
-			});
-			input.value = "";
-		}
-	})
+function ChatSearch() {
+	return (
+		<div className='messages-nav'>
+			<ChatUser user={DflUser} msg={undefined} />
+			<ChatOption />
+		</div>
+	)
+}
+
+function DiscussionCreate() {
+	return (
+		<div className='discussion-container'>
+			<div className='disc-user-active'>
+				<div className="disc-box-active" />
+				<ChatUser user={DflUser} msg={'creation d\'un nouveau...'} />
+			</div>
+		</div>
+	)
 }

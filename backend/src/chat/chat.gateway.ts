@@ -259,7 +259,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
         this.logger.log(`RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         const message = await this.discService.createDiscMsg(dto);
-        this.wss.to(`disc${dto.discId}`).emit('discMsgToClient', message);
+        const roomName = `disc${dto.discId}`;
+        this.wss.to(roomName).emit('discMsgToClient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'disc${dto.discId}'`);
     }
 

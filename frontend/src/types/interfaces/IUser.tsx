@@ -1,21 +1,22 @@
 export type IUser = {
-    id: number,
-    login: string,
-    username: string,
-    email: string,
-    createdAt: string,
-    updatedAt: string
-    twoFactorAuth: boolean,
-    avatar: string,
+	id: number,
+	login: string,
+	username: string,
+	email: string,
+	createdAt: string,
+	updatedAt: string
+	twoFactorAuth: boolean,
+	avatarUrl: string,
 }
 
-export const DflUser:IUser = {
+export const DflUser: IUser = {
 	id: 0,
 	login: "username",
-    username: "string",
-    email: "string",
-    createdAt: "string",
-    updatedAt: "string",
-    twoFactorAuth: false,
-    avatar: ""
+	username: "Nouveau message",
+	email: "string",
+	createdAt: "string",
+	updatedAt: "string",
+	twoFactorAuth: false,
+	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg"
 }
+

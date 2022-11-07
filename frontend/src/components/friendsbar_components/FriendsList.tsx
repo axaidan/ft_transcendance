@@ -1,59 +1,48 @@
+// Extern:
+import { useContext, useState } from "react";
 
-import { AxiosResponse } from "axios";
-import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// Intern:
 import { Contact } from ".";
-import { SocketContext } from "../../context";
-import { AxiosJwt } from "../../hooks";
 import { IUser } from "../../types";
+import { SocketContext } from "../../context";
+import { UserCreateChat } from "../discussion_components";
 
+// Assets:
+import '../../styles/components/friendsbar_components/FriendsList.css'
 
-type FriendListProps = { setDisc: (arg: number) => void }
-export function FriendsList({ setDisc }: FriendListProps) {
-	const axios = AxiosJwt();
-	const [friends, setFriends] = useState<IUser[]>([]);
-	const { users } = useContext(SocketContext).SocketState;
+interface UserListCategorieProps { users: IUser[], title: string, counter: boolean };
+const UserListCategorie: React.FunctionComponent<UserListCategorieProps> = ({ users, title, counter }) => {
 
-	useEffect(() => {
-		axios.get('/relation/list_friend')
-			.then((res: AxiosResponse<IUser[]>) => { setFriends(res.data) });
-	}, []);
+	const [ active, setActive ] = useState<boolean>(true);
+	const activeCategorie = () => { setActive(!active) }
 
-	const isOnline = (uid: number, index: number, user: IUser) => {
-		if (users.includes(uid)) {
-			return (
-				<div onClick={() => {
-					setDisc(user.id)!;
-					HandleClicContact();
-				}}>
-					<Contact user={user} status={0} />
-				</div>
-			)
-		}
-	}
+	return (
+		<div>
+			<div id='title-container' onClick={() => activeCategorie()}>
+				<div id={ 'triangle-categories' + (active ? '-active' : '' )} />
+				<p id="title-categories">{title}</p>
+				<p id="title-categories">{(counter ? " (" + users.length + ")" : "")}</p>
+			</div>
+			{ active ? users.map((user, index) => { return (
+				<UserCreateChat key={index} user={user}> 
+					<Contact user={user} status={4}/>
+				</UserCreateChat>
+			)}) : <></> }
+		</div>
+	);
+}
 
-	const isOffline = (uid: number, index: number, user: IUser) => {
-		if (users.includes(uid) == false) {
-			return (
-				<div onClick={() => {
-					setDisc(user.id)!;
-					HandleClicContact();
-				}}>
-					<Contact user={user} status={4} />
-				</div>
-			)
-		}
-	}
+export function FriendsList() {
+	const { users, friends } = useContext(SocketContext).SocketState;
+	const userOnline = () => { return friends.filter((friend) => { return (users.includes(friend.id) == true)})}
+	const userOffline = () => { return friends.filter((friend) => { return (users.includes(friend.id) == false)})}
 
 	return (
 		<ul id='contact-list'>
-			{friends.map((user: IUser, index) => (isOnline(user.id, index, user)))}
-			{friends.map((user: IUser, index) => (isOffline(user.id, index, user)))}
+			<UserListCategorie users={[]} title="CHANNELS" counter={false}/>
+			<UserListCategorie users={userOnline()} title="ONLINE" counter={true}/>
+			<UserListCategorie users={userOffline()} title="OFFLINE" counter={true}/>
 		</ul>
 	)
 }
 
-function HandleClicContact() {
-	const chatComponents = document.querySelector('#chat-container') as HTMLElement;
-	chatComponents.style.display = 'grid';
-}

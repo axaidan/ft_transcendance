@@ -1,4 +1,5 @@
 
+// Assets:
 import '../../styles/components/friendsbar_components/HeaderFriendBar.css'
 
 export function HeaderFriendBar() {

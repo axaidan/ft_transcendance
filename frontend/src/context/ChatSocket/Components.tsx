@@ -1,26 +1,18 @@
-import { AxiosResponse } from "axios";
-import { PropsWithChildren, useEffect, useReducer, useState } from "react";
-import { ChatSocketContext, ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
+// Extern:
+import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "react";
+
+// Intern:
+import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { useSocket } from "../../hooks/useSocket";
-import { IDiscussion, IMessage } from "../../types";
-import { AxiosJwt } from "../../hooks";
+import { IDiscussion, IMessage, IUser } from "../../types";
+import { SocketContext } from "../UserSocket";
 
-
-export interface IChatSocketContextComponentProps extends PropsWithChildren {
-	userId: number;
-}
-
-type IMessageDto = {
-	text: string;
-	userId: number;
-	discId: number;
-}
-
-export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = (props) => {
-	const { children } = props;
+export interface IChatSocketContextComponentProps extends PropsWithChildren {}
+export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketContextComponentProps> = ({ children }) => {
 	const [ChatSocketState, ChatSocketDispatch] = useReducer(ChatSocketReducer, dflChatSocketContextState);
-	const [loading, setLoading] = useState(true);
-	const axios = AxiosJwt();
+	const [loadingSocket, setLoading] = useState(true);
+
+	const { me } = useContext(SocketContext).SocketState
 
 	const chatSocket = useSocket('localhost:3000/chatNs', {
 		reconnectionAttempts: 5,
@@ -29,62 +21,35 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 	})
 
 	useEffect(() => {
-		// Connect to the Web Socket //
-		if (props.userId != 0) {
-			chatSocket.connect();
-			// Save the socket in context //
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: props.userId });
-			axios.get('/discussion')
-				.then((res: AxiosResponse<IDiscussion[]>) => {
-					ChatSocketDispatch({ type: EChatSocketActionType.GET_DISC, payload: res.data });
-					console.log(res.data);
-					// Start the envent listeners // 
-					StartListeners();
-					// Send the handshake //
-					StartHandshake(props.userId);
-				});
-		}
-	}, [props.userId])
+		console.log("UserId: ", me.id);
+		chatSocket.connect();
+		// Save the socket in context //
+		ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
+		ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: me });
+		// Start the envent listeners // 
+		StartListeners();
+		StartHandshake();
+	}, [])
 
 	const StartListeners = () => {
-
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
-            console.info('J\'ai recu un nouveau message.');
+			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
-		})
+		});
 
-		// /** Reconnect event **/
-		// chatSocket.io.on('reconnect', (attempt) => {
-		//     console.info('Reconnected on attempt: ' + attempt);
-		// });
-
-		// /** Reconnect attempt event **/
-		// chatSocket.io.on('reconnect_attempt', (attempt) => {
-		//     console.info('Reconnection attempt: ' + attempt);
-		// });
-
-		// chatSocket.io.on('reconnect_failed', () => {
-		//     console.info('Reconnection failure');
-		// });
-
-
-
+		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
+		//     console.info('J\'ai recu une nouvelle discussion.');
+		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
+		// })
 	};
 
-	const StartHandshake = (userId: number) => {
+	const StartHandshake = () => {
 		console.info('Sending handshake to server ...');
-
-		// Recuperation des users en ligne
-
-		// Emission de notre connections au autres
-		chatSocket.emit('loginToServer', userId);
-
-		// socket2.emit('loginToServer', userId);
-
-		// Fin de l'ecan d'affichage d'erreur
+		chatSocket.emit('loginToServer', me.id);
 		setLoading(false);
 	};
+
+	if (loadingSocket) return <p>Loading socket IO ... </p>;
 
 	return (<ChatSocketContextProvider value={{ ChatSocketState, ChatSocketDispatch }}>
 		{children}
