@@ -1,5 +1,5 @@
 // Extern:
-import React, { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
 // Intern:
@@ -27,16 +27,18 @@ export function Profile() {
 	const axios = AxiosJwt();
 
 	const DflChecked: boolean = me.twoFactorAuth;
-	const [toggle2facheckbox, set2facheckbox] = useState(DflChecked);
 	const [toggleEdit, setToggleEdit] = useState(false);
 	const [nick, setNick] = useState(false);
 
-	const ExistantUsername = (value: string) => {
-		axios.get('/user/is_user/' + value).then((res) => setNick(res.data));
-		return nick;
+	const ExistantUsername = async (value: string) => {
+		return (await (await axios.get('/user/is_user/' + value)).data);
 	}
 
+	const regex = "^[A-Za-z0-9 -_.]$";
+
 	const resolver: Resolver<FormValues> = async (values) => {
+
+
 		return {
 			values: values.username ? values : {},
 			errors: !values.username
@@ -57,7 +59,7 @@ export function Profile() {
 					}
 					: {}
 						&&
-						ExistantUsername(values.username) ?
+						await ExistantUsername(values.username) ?
 						{
 							username: {
 								type: 'required',
@@ -102,14 +104,13 @@ export function Profile() {
 						</div>
 						<form onSubmit={onSubmit} className={toggleEdit ? "user-edit-input" : "user-disabled"}>
 							<div className="user-input-kit">
-								<input {...register("username")} placeholder={me.username} maxLength={20} id={errors.username ? 'user-inputbox-error' : 'user-input'} />
+								<input {...register("username")} placeholder={me.username} maxLength={15} id={errors.username ? 'user-inputbox-error' : 'user-input'} pattern={regex} />
 								<div className="user-buttons">
 									<button onClick={onSubmit} id='user-validate' />
 									<button onClick={toggleUserEdit} id='user-cancel' />
 								</div>
 							</div>
 							{errors?.username && <p id='user-error-input'>{errors.username.message}</p>}
-
 						</form>
 					</div>
 					<div className="user-clan">

@@ -13,6 +13,7 @@ import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
 import { DflRelationship, IRelationship } from '../types';
 import { IGame } from '../types/interfaces/IGame';
+import { defaultWinrate } from '../types/interfaces/IWinrate';
 
 
 export function OtherProfile() {
@@ -26,13 +27,16 @@ export function OtherProfile() {
 	const [games, setGames] = useState<IGame[]>([]);
 	const [defeat, setDefeat] = useState(0);
 	const [draw, setDraw] = useState(0);
-	const [victories, setVictories] = useState(0);
 
 	useEffect(() => {
 		axios.get("/user/" + id)
-			.then((res: AxiosResponse<IUser>) => { setOthUser(res.data) })
-			.catch(() => { alert('This user does not exist.'); useNavigate() });
-	}, [id]);
+			.then((res: AxiosResponse<IUser>) => {
+				let User: IUser = res.data;
+				User.winrate = defaultWinrate;
+				setOthUser(User);
+			})
+			.catch(() => { alert('This user does not exist.') });
+	}, []);
 
 
 	useEffect(() => {
@@ -76,25 +80,30 @@ export function OtherProfile() {
 	}
 
 	useEffect(() => {
-		axios.get('/game/historique/' + othUser.id)
-			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
-	}, [games]);
+		FillGamesToUser
+	}, []);
 
-	const getVictories = (userId: number): void => {
-		let victories: number = 0;
-		games.map((game: IGame) => {
-			if (game.player1.id === userId) {
+	const FillGamesToUser = async () => {
+		(await axios.get('/game/historique/' + othUser.id)).data.map((game: IGame) => {
+			if (game.player1.id === othUser.id || game.player2.id === othUser.id)
+				othUser.winrate.games.push(game);
+		})
+
+	}
+
+	const getVictories = (user: IUser): void => {
+		user.winrate.games.map((game: IGame) => {
+			if (game.player1.id === user.id) {
 				if (game.score1 > game.score2) {
-					victories++;
+					user.winrate.victories++;
 				}
 			}
-			if (game.player2.id === userId) {
+			if (game.player2.id === user.id) {
 				if (game.score2 > game.score1) {
-					victories++;
+					user.winrate.victories++;
 				}
 			}
 		});
-		setVictories(victories);
 	};
 
 	const getDefeat = (userId: number): void => {
@@ -127,7 +136,7 @@ export function OtherProfile() {
 	};
 
 	useEffect(() => {
-		getVictories(othUser.id);
+		getVictories(othUser);
 		getDefeat(othUser.id);
 		getDraw(othUser.id);
 	});
@@ -183,7 +192,7 @@ export function OtherProfile() {
 					<div className="other-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							Victories : {victories}
+							Victories : { }
 						</div>
 						<div className="other-txt">
 							Defeats : {defeat}
@@ -192,8 +201,8 @@ export function OtherProfile() {
 							Draw : {draw}
 						</div>
 						<div className="other-txt">
-							Winrate: {(victories + defeat + draw) ?
-								Math.round((victories / (victories + defeat + draw)) * 100) + '%' : '0%'
+							Winrate: {othUser.winrate.gamesPlayed === 0 ?
+								Math.round((othUser.winrate.victories / othUser.winrate.gamesPlayed) * 100) + '%' : '0%'
 							}
 						</div>
 
