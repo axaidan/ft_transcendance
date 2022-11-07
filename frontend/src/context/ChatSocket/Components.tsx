@@ -46,10 +46,10 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		});
 
-		// chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
-		//     console.info('J\'ai recu une nouvelle discussion.');
-		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
-		// })
+		chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
+		    console.info('J\'ai recu une nouvelle discussion.');
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
+		})
 	};
 
 	const StartHandshake = () => {

@@ -41,20 +41,12 @@ export function othUserChat() {
 	const { me, allDiscussions } = useContext(ChatSocketContext).ChatSocketState;
 	const { friends } = useContext(SocketContext).SocketState;
 
-	console.log("ALL DISCUSSION: ", allDiscussions);
-
 	let othUser: IUser[] = [];
 	const discTab = allDiscussions;
-
-
-
 	for (const disc of discTab) {
-		console.log( friends );
-		console.log("U1 IS IN ? " , friends.includes(disc.user1))
-		console.log("U2 IS IN ? " , friends.includes(disc.user2))
-		if (disc.user1Id != me.id && friends.includes(disc.user1)) {
+		if (disc.user1Id != me.id && !friends.filter( friend => {return friend.id == disc.user1Id}).length ) {
 			othUser.push( disc.user1 );
-		} else if (disc.user2Id != me.id && friends.includes(disc.user2)) {
+		} else if (disc.user2Id != me.id && !friends.filter( friend => {return friend.id == disc.user2Id}).length ) {
 			othUser.push( disc.user2 );
 		}
 	}

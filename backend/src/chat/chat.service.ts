@@ -70,14 +70,14 @@ export class ChatService {
         this.chatGateway.joinDiscRoom(discussion.user1Id, discussion.id);
         this.chatGateway.joinDiscRoom(discussion.user2Id, discussion.id);
 
-        const newDiscDto: DiscussionDto = {
-            user1Id: discussion.user1Id,
-            user2Id: discussion.user2Id,
-            username1: discussion.user1.username,
-            username2: discussion.user2.username,
-            id: discussion.id,
-        };
-        this.chatGateway.newDisc(newDiscDto);
+        // const newDiscDto: DiscussionDto = {
+        //     user1Id: discussion.user1Id,
+        //     user2Id: discussion.user2Id,
+        //     username1: discussion.user1.username,
+        //     username2: discussion.user2.username,
+        //     id: discussion.id,
+        // };
+        this.chatGateway.newDisc(discussion);
         return discussion;
     }
 

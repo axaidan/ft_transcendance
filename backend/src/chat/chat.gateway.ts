@@ -11,6 +11,7 @@ import { ChannelMuteService } from './channel/channel-mute/channel-mute.service'
 import { ChannelUserService } from './channel/channel-user/channel-user.service';
 import { DiscussionService } from './discussion/discussion.service';
 import { DiscussionDto } from './discussion/dto/discussion.dto';
+import { DiscussionWithUsers } from './discussion/types';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chatNs' })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -74,9 +75,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    newDisc(dto: DiscussionDto) {
-        const roomName: string = 'disc' + dto.id;
-        this.wss.to(roomName).emit('newDiscToClient', dto);
+    newDisc(discussion: DiscussionWithUsers) {
+        const roomName: string = 'disc' + discussion.id;
+        this.wss.to(roomName).emit('newDiscToClient', discussion);
     }
 
     //////////////////////
