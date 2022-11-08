@@ -1,10 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ChannelUser } from '@prisma/client';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Channel, ChannelUser } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { isInstance } from 'class-validator';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateChanelUserDto } from './dto/create-channel-user.dto';
-import { EChannelStatus } from './types';
+import { CreateChannelUserDto } from './dto/create-channel-user.dto';
+import { EChannelRoles } from './types';
 
 @Injectable()
 export class ChannelUserService {
@@ -12,15 +11,15 @@ export class ChannelUserService {
         private prisma: PrismaService,
     ) {}
 
-    async create(dto: CreateChanelUserDto) :
-    Promise<ChannelUser>
+    async create(dto: CreateChannelUserDto)
+    : Promise<ChannelUser>
     {
         try {
             const channelUser: ChannelUser = await this.prisma.channelUser.create({
                 data: {
                     userId: dto.userId,
                     channelId: dto.channelId,
-                    status: dto.status,
+                    // status: dto.status,
                     role: dto.role,
                 },
             });
@@ -28,31 +27,62 @@ export class ChannelUserService {
         } catch (e) {
             if (e instanceof PrismaClientKnownRequestError) {
                 if (e.code === 'P2002') {
-                    throw new ForbiddenException(`ChannelUser (userId: ${dto.userId}, channelId: ${dto.channelId}) already exists.`);
+                    throw new ForbiddenException(`channel already joined`);
                 }
             }
         }
     }
 
-    async getAllNonBannedChannelUsers(userId: number):
-    Promise<ChannelUser[]>
+    async delete(userId: number, chanId: number)
+    : Promise<void>
+    {
+        await this.prisma.channelUser.delete({
+            where: { channelId_userId: { channelId: chanId, userId: userId } },
+        });
+    }
+
+    async getAllJoinedChannelUsers(userId: number)
+    : Promise<ChannelUser[]>
     {
         const channelUsers : ChannelUser[] = await this.prisma.channelUser.findMany({
-            where: {
-                userId: userId,
-                status: { not: EChannelStatus.BANNED },
-            },
+            where: { userId: userId },
         });
         return channelUsers;
     }
 
-    async findOne(userId: number, chanId: number) {
-        const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
-            where: {
-                channelId_userId: { channelId: chanId, userId: userId },
-            },
+    async editRole(channelUser: ChannelUser, role: number)
+    : Promise<ChannelUser>
+    {
+        channelUser = await this.prisma.channelUser.update({
+            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
+            data: { role: role },
         });
         return channelUser;
+    }
+
+    async findOne(userId: number, chanId: number)
+    : Promise<ChannelUser>
+    {
+        const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
+            where: { channelId_userId: { channelId: chanId, userId: userId } },
+        });
+        return channelUser;
+    }
+
+    async findNextOwner(channel: Channel)
+    : Promise<ChannelUser>
+    {
+        let nextOwner = await this.prisma.channelUser.findFirst({
+            where: { channelId: channel.id, role: EChannelRoles.ADMIN },
+            orderBy: { updatedAt: 'asc' },
+        });
+        if (nextOwner !== null)
+            return nextOwner;
+        nextOwner = await this.prisma.channelUser.findFirst({
+            where: { channelId: channel.id },
+            orderBy: { createdAt: 'asc' },
+        });
+        return nextOwner;
     }
 
 }

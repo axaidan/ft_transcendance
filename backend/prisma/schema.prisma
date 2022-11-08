@@ -33,7 +33,10 @@ model User {
 	discussion2 Discussion[] @relation("discussion2")
 	discussionMsgs DiscussionMessage[] //@relation("discussionMsgs")
 
-	channelUsers ChannelUser[]
+	channelUsers	ChannelUser[]
+	channelBans		ChannelBan[]
+	channelMutes	ChannelMute[]
+	channelMessages	ChannelMessage[]
 
 	avatar Avatar? @relation(fields: [avatarUrl], references: [url])
 	avatarUrl String?
@@ -105,15 +108,17 @@ model Channel {
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
-	name			String
-	private			Boolean
-	protected		Boolean
+	name			String	 @unique
+	type			Int
 	hash			String?
  
-	channelUsers	ChannelUser[]
+	users		ChannelUser[]
+	bans		ChannelBan[]
+	mutes		ChannelMute[]
+	messages	ChannelMessage[]
 
 	@@map("channel")
-	@@unique([name, private])
+	// @@unique([name, private])
 }
 
 model ChannelUser {
@@ -122,15 +127,63 @@ model ChannelUser {
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
-	status			Int
+	// status			Int
 	role			Int
+	userId			Int
+	channelId		Int
+	// statusTime		DateTime?
+
+	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	@@map("channelUser")
+}
+
+model ChannelBan {
+	@@id([channelId, userId])
+
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+
 	userId			Int
 	channelId		Int
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
 	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
 
-	@@map("channelUser")
+	@@map("channelBan")
+}
+
+model ChannelMute {
+	@@id([channelId, userId])
+
+	createdAt		DateTime @default(now())
+	updatedAt		DateTime @updatedAt
+
+	userId			Int
+	channelId		Int
+	muteExpires		DateTime
+
+	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	@@map("channelMute")
+}
+
+model ChannelMessage {
+	
+	id			Int	@id	@default(autoincrement())
+    createAt	DateTime @default(now())
+
+	channelId	Int
+	userId		Int
+	
+	user		User	@relation(fields: [userId], references: [id], onDelete: Cascade)
+	channnel	Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+	text		String
+
+	@@map("channelMessage")
 }
 
 
