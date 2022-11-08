@@ -224,10 +224,10 @@ export class ChatController {
     async mute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        @Body() dto: CreateChannelMuteDto,
+        // @Body() dto: CreateChannelMuteDto,
     )
         : Promise<ChannelMute> {
-        const channelMute = await this.chatService.muteChannelUser(dto);
+        const channelMute = await this.chatService.muteChannelUser(userId, chanId);
         return channelMute;
     }
 
@@ -236,22 +236,22 @@ export class ChatController {
     async unmute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        @Body() dto: CreateChannelMuteDto
+        // @Body() dto: CreateChannelMuteDto
         )
         : Promise<ChannelMute> {
-        const channelMute = await this.chatService.unmuteChannelUser(dto);
+        const channelMute = await this.chatService.unmuteChannelUser(userId, chanId);
         return channelMute;
     }
 
-    @Patch('channel/:chanId/user/:userId/mute')
+    @Patch('channel/:chanId/user/:userId/mute/more')
     @ChannelRoles('admin')
     async editMute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        @Body() dto: CreateChannelMuteDto
+        // @Body() dto: CreateChannelMuteDto
         )
         : Promise<ChannelMute> {
-        const channelMute = await this.chatService.editMute(dto);
+        const channelMute = await this.chatService.editMute(userId, chanId);
         return channelMute;
     }
 

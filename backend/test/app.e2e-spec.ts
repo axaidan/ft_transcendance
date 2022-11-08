@@ -12,7 +12,6 @@ import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/typ
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
 import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
-import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
 import { EChannelTypes } from 'src/chat/channel/types/channel-types.enum';
 
 const N = 20;
@@ -1740,11 +1739,7 @@ describe('App e2e', () => {
 			it('VALID mute - should 200', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[1].userId,
-					expires: inFiveMins,
-				};
+
 				return pactum
 				.spec()
 				// .post('/channelUser/mute')
@@ -1752,7 +1747,6 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(201)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1762,18 +1756,13 @@ describe('App e2e', () => {
 			it('NONVALID mute (mute admin) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					expires: inFiveMins,
-				};
+
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1783,19 +1772,14 @@ describe('App e2e', () => {
 			it('NONVALID mute (mute owner) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: userArr[0].id,
-					expires: inFiveMins,
-				};
+
 				return pactum
-				.spec()
 				// .post('/channelUser/mute')
+				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${userArr[0].id}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1805,18 +1789,12 @@ describe('App e2e', () => {
 			it('NONVALID mute (dupl) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					expires: inFiveMins,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1826,58 +1804,25 @@ describe('App e2e', () => {
 			it('NONVALID mute (not admin) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[1].userId,
-					expires: inFiveMins,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[1].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[2].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
-				// .inspect();
-			});
-
-			it('NONVALID mute (past) - should 403', () => {
-				const now = new Date();
-				const FiveBefore = new Date(now.setMinutes(now.getMinutes() - 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[2].userId,
-					expires: FiveBefore,
-				};
-				return pactum
-				.spec()
-				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[2].userId}/mute`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[0].access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(403)
-				// .expectBodyContains(EChannelStatus.MUTED)
-				// .expectBodyContains(chanUserArr[0].userId)
 				// .inspect();
 			});
 
 			it('NONVALID mute (!exists) - should 404', () => {
 				const now = new Date();
 				const FiveBefore = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: userArr[9].id,
-					expires: FiveBefore,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${userArr[9].id}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(404)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)

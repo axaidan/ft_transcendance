@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Channel, ChannelBan, ChannelMute, ChannelUser, Prisma } from '@prisma/client';
+import { Channel, ChannelBan, ChannelUser, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChannelUserService } from './channel-user/channel-user.service';
 import { ChannelBanService } from './channel-ban/channel-ban.service';
@@ -10,10 +10,8 @@ import { ChannelPasswordDto, EditChannelDto, UserPropetiesDto } from './dto';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import * as argon from 'argon2';
 import { ChannelUserRoleDto } from './channel-user/dto';
-import { ChannelMuteDto, CreateChannelMuteDto } from './channel-mute/dto';
 import { ChannelBanDto } from './channel-ban/dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { PassThrough } from 'stream';
 import { RelationService } from 'src/relations/relation.service';
 
 @Injectable()
@@ -195,7 +193,6 @@ export class ChannelService {
     }
 
     //  POST /channel/join + ChannelDto
-    //  reject if channel is private (??? YES OR NO ?)
     async join(currentUserId: number, chanId: number, dto: ChannelPasswordDto):
         Promise<Channel> {
         const channel: Channel = await this.findOne(chanId);
@@ -322,34 +319,9 @@ export class ChannelService {
         return channelBan;
     }
 
-    ///////////////////
-    //  MUTE METHODS //
-    ///////////////////
-
-    async muteChannelUser(dto: CreateChannelMuteDto)
-        : Promise<ChannelMute> {
-        const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
-        // CHECK IF MUTED USER EXISTS IN CHANNEL
-        if (channelUser === null)
-            throw new NotFoundException('user not found in channel');
-        // CHECK IF MUTED USER THE OWNER OR ANOTHER ADMIN
-        if (channelUser.role !== EChannelRoles.NORMAL)
-            throw new ForbiddenException('cannot mute an admin or owner');
-        const channelMute = await this.channelMuteService.create(dto);
-        return channelMute;
-    }
-
-    async unmuteChannelUser(dto: ChannelMuteDto)
-        : Promise<ChannelMute> {
-        const channelMute = await this.channelMuteService.delete(dto);
-        return channelMute;
-    }
-
-    async editMute(dto: CreateChannelMuteDto)
-        : Promise<ChannelMute> {
-        const channelMute = await this.channelMuteService.edit(dto);
-        return channelMute;
-    }
+    //////////////
+    //  HELPERS //
+    //////////////
 
     async setUserProperties(userId: number, channel: Channel, dto: UserPropetiesDto) {
         const channelMute = await this.channelMuteService.findOne(userId, channel.id);

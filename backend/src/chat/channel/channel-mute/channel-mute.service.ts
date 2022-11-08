@@ -3,7 +3,7 @@ import { ChannelMute } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChannelMuteDto, CreateChannelMuteDto, EditChannelMuteDto } from './dto';
+import { ChannelMuteDto, EditChannelMuteDto } from './dto';
 
 @Injectable()
 export class ChannelMuteService {
@@ -21,22 +21,17 @@ export class ChannelMuteService {
         return channelMute;
     }
 
-    async create(dto: CreateChannelMuteDto)
+    async create(userId: number, chanId: number)
     : Promise<ChannelMute>
     {
         try {
             const now = new Date();
-            const expires = new Date(dto.expires);
-            // console.log(`expires\t=\t${dto.expires}`);
-            // console.log(`now\t\t=\t${now}`)
-            // console.log(`expires < now = ${expires < now}`);
-            if (expires < now)
-                throw new ForbiddenException('expiration must be in the future')
+            const expires = new Date(now.setMinutes(now.getMinutes() + 5));
             const channelMute = await this.prisma.channelMute.create({
                 data: {
-                    channelId: dto.chanId,
-                    userId: dto.userId,
-                    muteExpires: dto.expires,
+                    channelId: chanId,
+                    userId: userId,
+                    muteExpires: expires,
                 },
             });
             return channelMute;
@@ -51,12 +46,12 @@ export class ChannelMuteService {
         }
     }
 
-    async delete(dto: ChannelMuteDto)
+    async delete(userId: number, chanId: number)
     : Promise<ChannelMute>
     {
         try {
             const channelMute = await this.prisma.channelMute.delete({
-                where: { channelId_userId: { channelId: dto.chanId, userId: dto.userId } },
+                where: { channelId_userId: { channelId: chanId, userId: userId } },
             });
             return channelMute;
         } catch (e) {
@@ -66,18 +61,26 @@ export class ChannelMuteService {
         }
     }
 
-    async edit(dto: EditChannelMuteDto)
+    async edit(userId: number, chanId: number)
     : Promise<ChannelMute>
     {
-        const now = new Date();
-        const expires = new Date(dto.expires);
-        if (expires < now)
-            throw new ForbiddenException('expiration must be in the future')
+        const oldChannelMute = await this.prisma.channelMute.findUnique({
+            where: { channelId_userId: { channelId: chanId, userId: userId } },
+        });
+        const expires = new Date(oldChannelMute.muteExpires);
+        expires.setMinutes(expires.getMinutes() + 5);
         const channelMute = await this.prisma.channelMute.update({
-            where: { channelId_userId : { channelId: dto.chanId, userId: dto.userId } },
-            data: { muteExpires: dto.expires },
+            where: { channelId_userId : { channelId: chanId, userId: userId } },
+            data: { muteExpires: expires },
         });
         return channelMute;
+    }
+
+    async all()
+    : Promise<ChannelMute[]>
+    {
+        const channelMutes = await this.prisma.channelMute.findMany();
+        return channelMutes;
     }
 
 }

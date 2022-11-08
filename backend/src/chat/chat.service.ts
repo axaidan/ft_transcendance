@@ -2,9 +2,9 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan, User } from '@prisma/client';
 import { UserService } from 'src/users/users.service';
 import { ChannelBanDto } from './channel/channel-ban/dto';
-import { ChannelMuteDto, CreateChannelMuteDto } from './channel/channel-mute/dto';
+import { ChannelMuteService } from './channel/channel-mute/channel-mute.service';
 import { ChannelUserService } from './channel/channel-user/channel-user.service';
-import { ChannelUserRoleDto, ChannelUserStatusDto } from './channel/channel-user/dto';
+import { ChannelUserRoleDto } from './channel/channel-user/dto';
 import { EChannelRoles } from './channel/channel-user/types';
 import { ChannelService } from './channel/channel.service';
 import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
@@ -20,6 +20,7 @@ export class ChatService {
         private discService: DiscussionService,
         private channelService: ChannelService,
         private channelUserService: ChannelUserService,
+        private channelMuteService: ChannelMuteService,
         private userService: UserService,
     ) {}
 
@@ -247,26 +248,35 @@ export class ChatService {
     //  MUTE METHODS  //
     ////////////////////
 
-    async muteChannelUser(dto: CreateChannelMuteDto)
+    async muteChannelUser(userId: number, chanId: number)
     : Promise<ChannelMute>
     {
-        const channelMute = await this.channelService.muteChannelUser(dto);
+        const channelUser = await this.channelUserService.findOne(userId, chanId);
+        // CHECK IF MUTED USER EXISTS IN CHANNEL
+        if (channelUser === null)
+            throw new NotFoundException('user not found in channel');
+        // CHECK IF MUTED USER THE OWNER OR ANOTHER ADMIN
+        if (channelUser.role !== EChannelRoles.NORMAL)
+            throw new ForbiddenException('cannot mute an admin or owner');
+        // const channelMute = await this.channelMuteService.create(userId, chanId);
+        // return channelMute;
+        const channelMute = await this.channelMuteService.create(userId, chanId);
         this.chatGateway.channelUserMuted(channelMute);
         return channelMute;
     }
 
-    async unmuteChannelUser(dto: ChannelMuteDto) 
+    async unmuteChannelUser(userId: number, chanId: number) 
     : Promise<ChannelMute>
     {
-        const channelMute = await this.channelService.unmuteChannelUser(dto);
+        const channelMute = await this.channelMuteService.delete(userId, chanId);
         this.chatGateway.channelUserUnmuted(channelMute);
         return channelMute;
     }
 
-    async editMute(dto: CreateChannelMuteDto)
+    async editMute(userId: number, chanId: number)
     : Promise<ChannelMute>
     {
-        const channelMute = this.channelService.editMute(dto);
+        const channelMute = this.channelMuteService.edit(userId, chanId);
         // event newEditMute
         return channelMute;
     }
