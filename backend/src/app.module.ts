@@ -14,12 +14,14 @@ import { AppGateway } from './app.gateway';
 import { ChatModule } from './chat/chat.module';
 import { ChannelBanModule } from './chat/channel/channel-ban/channel-ban.module';
 import { LobbyModule } from './lobby/lobby.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true,
 		}),
+		ScheduleModule.forRoot(),
 		PrismaModule,
 		AuthModule,
 		UserModule,

@@ -65,6 +65,7 @@ export class ChannelUserService {
     {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
             where: { channelId_userId: { channelId: chanId, userId: userId } },
+            include: { user : { select: { username: true } } },
         });
         return channelUser;
     }

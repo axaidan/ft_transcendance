@@ -12,7 +12,6 @@ import { EChannelRoles, EChannelStatus } from 'src/chat/channel/channel-user/typ
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { ChannelUserRoleDto } from 'src/chat/channel/channel-user/dto';
 import { ChannelBanDto } from 'src/chat/channel/channel-ban/dto';
-import { CreateChannelMuteDto } from 'src/chat/channel/channel-mute/dto';
 import { EChannelTypes } from 'src/chat/channel/types/channel-types.enum';
 
 const N = 20;
@@ -1570,14 +1569,14 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NOT MEMBER - should 404', () => {
+			it('NOT MEMBER - should 403', () => {
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/leave`)
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`
 				})
-				.expectStatus(404)
+				.expectStatus(403)
 				// .inspect();
 			});
 
@@ -1606,18 +1605,12 @@ describe('App e2e', () => {
 		describe('PATCH /channel/:chanId/user/:userId + ChannelUserRoleDto', () => {
 			
 			it('VALID role TO ADMIN - should 200', () => {
-				const dto: ChannelUserRoleDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					role: EChannelRoles.ADMIN,
-				};
 				return pactum
 				.spec()
-				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.ADMIN}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectBodyContains(EChannelRoles.ADMIN)
 				.expectBodyContains(chanUserArr[0].userId)
 				.expectStatus(200)
@@ -1625,27 +1618,55 @@ describe('App e2e', () => {
 			});
 
 			it('NONVALID role TO ADMIN (!admin) - should 403', () => {
-				const dto: ChannelUserRoleDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					role: EChannelRoles.NORMAL,
-				};
 				return pactum
 				.spec()
-				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.NORMAL}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[1].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .inspect();
 			});
 
-			it('VALID role TO OWNER - should 200', () => {
+			it('VALID role TO OWNER 1 - should 200 ', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.OWNER}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectBodyContains(EChannelRoles.OWNER)
+				.expectBodyContains(chanUserArr[0].userId)
+				.expectStatus(200)
+				// .inspect();
 			});
 
-			it('CHECK new OWNER - should 200', () => {
+			it('VALID role TO OWNER 2 - should 200', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${userArr[0].id}/${EChannelRoles.OWNER}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectBodyContains(EChannelRoles.OWNER)
+				.expectBodyContains(userArr[0].id)
+				.expectStatus(200)
+				// .inspect();
 			});
+
+			it('NONVALID role TO 4 - should 400', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${userArr[0].id}/4`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			// it('CHECK new OWNER - should 200', () => {
+			// });
 			
 		}); // DESCRIBE (PATCH /channelUser/role)
 
@@ -1673,9 +1694,6 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.expectStatus(403)
-				// .expectBodyContains(chanArr[0].id)
-				// .expectBodyContains(userArr[10].id)
-				// .expectBodyContains(EChannelRoles.NORMAL)
 				// .inspect();
 			});
 
@@ -1740,11 +1758,7 @@ describe('App e2e', () => {
 			it('VALID mute - should 200', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[1].userId,
-					expires: inFiveMins,
-				};
+
 				return pactum
 				.spec()
 				// .post('/channelUser/mute')
@@ -1752,7 +1766,6 @@ describe('App e2e', () => {
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(201)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1762,18 +1775,13 @@ describe('App e2e', () => {
 			it('NONVALID mute (mute admin) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					expires: inFiveMins,
-				};
+
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1783,19 +1791,14 @@ describe('App e2e', () => {
 			it('NONVALID mute (mute owner) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: userArr[0].id,
-					expires: inFiveMins,
-				};
+
 				return pactum
-				.spec()
 				// .post('/channelUser/mute')
+				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${userArr[0].id}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1805,18 +1808,12 @@ describe('App e2e', () => {
 			it('NONVALID mute (dupl) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					expires: inFiveMins,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
@@ -1826,58 +1823,25 @@ describe('App e2e', () => {
 			it('NONVALID mute (not admin) - should 403', () => {
 				const now = new Date();
 				const inFiveMins = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[1].userId,
-					expires: inFiveMins,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[1].userId}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[2].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
-				// .inspect();
-			});
-
-			it('NONVALID mute (past) - should 403', () => {
-				const now = new Date();
-				const FiveBefore = new Date(now.setMinutes(now.getMinutes() - 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[2].userId,
-					expires: FiveBefore,
-				};
-				return pactum
-				.spec()
-				.post(`/channel/${chanArr[0].id}/user/${chanUserArr[2].userId}/mute`)
-				.withHeaders({
-					Authorization: `Bearer ${jwtArr[0].access_token}`,
-				})
-				.withBody(dto)
-				.expectStatus(403)
-				// .expectBodyContains(EChannelStatus.MUTED)
-				// .expectBodyContains(chanUserArr[0].userId)
 				// .inspect();
 			});
 
 			it('NONVALID mute (!exists) - should 404', () => {
 				const now = new Date();
 				const FiveBefore = new Date(now.setMinutes(now.getMinutes() + 5));
-				const dto: CreateChannelMuteDto = {
-					chanId: chanArr[0].id,
-					userId: userArr[9].id,
-					expires: FiveBefore,
-				};
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/user/${userArr[9].id}/mute`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(404)
 				// .expectBodyContains(EChannelStatus.MUTED)
 				// .expectBodyContains(chanUserArr[0].userId)
