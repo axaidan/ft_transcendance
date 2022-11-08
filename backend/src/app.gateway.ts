@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { OnlineStatusDto } from './users/dto';
 
@@ -253,8 +253,20 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	@SubscribeMessage('printscore')
-	editScore(score1: number, score2:number) {
-		console.log(`score1: ${score1}-${score2} :score2 `)
+	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body:string) {
+		const b: string[] = body.split(':');
+		console.log(`string: ${body}`)
+		console.log(`score1: ${b[0]}-${b[1]} :score2 `)
+	}
+
+	@SubscribeMessage('updateGame')
+	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body : string){
+		const b: string[] = body.split(':');
+
+		console.log('test socket bacj')
+
+		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]}`)
+		this.wss.to(b[4]).emit("updatePos", b[0], b[1],b[2],b[3]);
 	}
 
 }

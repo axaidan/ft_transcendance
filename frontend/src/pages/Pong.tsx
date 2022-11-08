@@ -36,6 +36,39 @@ export function Pong() {
 
 
 
+	function playerMove(event: any) {
+//		console.log("test move event")
+		//console.log(`meid: ${me.id}, gameplayeid1: ${game.player.player} gameplayerid2: ${game.player2.player}`)
+		// Get the mouse location in the canvas
+		var canvasLocation = canvas.getBoundingClientRect();
+		var mouseLocation = event.clientY - canvasLocation.y;
+		// Emit socket player position
+		if (me.id === game.player.player) {
+			game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
+			if (mouseLocation < PLAYER_HEIGHT / 2) {
+				game.player.y = 0;
+			} else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2) {
+				game.player.y = canvas.height - PLAYER_HEIGHT;
+			} else {
+				game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
+			}
+			//emit to room pos palette1 pallette2 balle x y vitesse x y 
+			socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+		} else if (me.id === game.player2.player) {
+			game.player2.y = mouseLocation - PLAYER_HEIGHT / 2;
+			if (mouseLocation < PLAYER_HEIGHT / 2) {
+				game.player2.y = 0;
+			} else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2) {
+				game.player2.y = canvas.height - PLAYER_HEIGHT;
+			} else {
+				game.player2.y = mouseLocation - PLAYER_HEIGHT / 2;
+			}
+			//emit to room pos palette1 pallette2 balle x y vitesse x y 
+			socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+		}
+	}
+	
+
 
 	function ballMove() {
 		// Rebounds on top and bottom
@@ -70,7 +103,7 @@ export function Pong() {
 				game.ball.speed.x = BALL_SPEED * -1;
 				// Update score
 				game.player2.score++;
-				socket.emit('printscore', game.player.score, game.player2.score);
+				socket!.emit('printscore', game.player.score +":" + game.player2.score);
 	//			socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":right");
 				document.querySelector('#player2-score').textContent = game.player2.score;
 				if (game.player2.score === 5 ){//|| document.querySelector('#player2-score').textContent == "5") {
@@ -82,7 +115,7 @@ export function Pong() {
 				game.ball.speed.x = BALL_SPEED;
 				// Update score
 				game.player.score++;
-				socket.emit('printscore', game.player.score, game.player2.score);
+				socket!.emit('printscore', game.player.score +":" + game.player2.score);
 		//		socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":left");
 				document.querySelector('#player-score').textContent = game.player.score;
 				if (game.player.score === 5) {// || document.querySelector('#player-score').textContent == "5") {
@@ -91,12 +124,14 @@ export function Pong() {
 				}
 			}
 		} else {
+
 		// Increase speed and change direction
 		if (BALL_ACCELERATE)
 			game.ball.speed.x *= -1.2;
 		else
 			game.ball.speed.x *= -1;
 		changeDirection(player.y);
+			//socket!.emit('updateGame', game.player.y, game.player2.y, game.ball.x, game.ball.y, game.roomName)
 		}
 	}
 
@@ -173,18 +208,20 @@ export function Pong() {
 			draw();
 		}
 	}
-	function topinitParty() {
+	function topinitParty(playerId1: number,playerId2: number, lobbyId:number) {
 		console.log("fajklsdakljfsdolfjszdlkjfsdklajfsdkla")
 		if (canvas) {
 			game = {
 				player: {
 					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
 					score: 0,
+					player: playerId1,
 
 				},
 				player2: {
 					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
 					score: 0,
+					player: playerId2
 				},
 				ball: {
 					x: canvas.width / 2 - BALL_HEIGHT / 2,
@@ -193,7 +230,9 @@ export function Pong() {
 						x: 2,
 						y: 2, 
 					}
-				}
+				},
+				roomName: 'game' + lobbyId.toString(), 
+				mode: 1,
 			}
 			draw();
 		}
@@ -251,6 +290,8 @@ export function Pong() {
 		initScreen();
 	//	initParty();
 		play();
+		canvas.addEventListener('mousemove', playerMove);
+
 	//	if (live == null)
 	//	canvas.addEventListener('mousemove', playerMove);
 	//	return () => { isMounted = false };
@@ -258,15 +299,23 @@ export function Pong() {
 	}, []);
 
 	const StartListeners = ()=> {
-	socket.on("startGame", (...arg) => {
-		console.log("je suiis passe par socket.on start game")
-		game.player.player = arg[0];
-		game.player2.player = arg[1];
-		game.roomName = arg[2];
-		game.mode = arg[3];
-		topinitParty();
+	socket!.on("startGame", (...arg) => {
+		game.player.player = arg[0].p1;
+		game.player2.player = arg[0].p2;
+		game.roomName = arg[0].lobbyId;
+		game.mode = arg[0].mode;
+		topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId);
 
 	}); 
+
+	socket!.on("updatePos", (...arg) => {
+		console.log('test update')
+		game.player.y = arg[0];
+		game.player2.y = arg[1];
+		game.ball.x = arg[2];
+		game.ball.y = arg[3];
+
+	});
 	};
 
 	return (
