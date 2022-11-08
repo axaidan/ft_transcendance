@@ -10,6 +10,8 @@ import { AxiosJwt } from "../../hooks";
 import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
 import { UserCreateChat } from '../discussion_components/ChatUtils';
 
+import '../../styles/pages/Ladder.css'
+
 
 type FriendProps = {
 	friend: IUser;

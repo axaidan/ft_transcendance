@@ -355,3 +355,15 @@
 	display: flex;
 	justify-content: center;
 }
+
+.other-winrate-pos {
+	color: green;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-top: 100px;
+}
+
+.other-winrate-neg {
+	color: red;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-top: 100px;
+}

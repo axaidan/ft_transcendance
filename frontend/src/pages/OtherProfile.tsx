@@ -13,20 +13,19 @@ import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
 import { DflRelationship, IRelationship } from '../types';
 import { IGame } from '../types/interfaces/IGame';
+import { DflWinrate } from '../hooks';
 
 
 export function OtherProfile() {
 	const axios = AxiosJwt();
 	const { id } = useParams();
 	const [othUser, setOthUser] = useState<IUser>(DflUser);
-	const { me, friends, blocks } = useContext(SocketContext).SocketState;
+	const { friends, blocks } = useContext(SocketContext).SocketState;
 	const dispatch = useContext(SocketContext).SocketDispatch
 	const [isFriend, setisFriend] = useState(false);
 	const [isBlocked, setisBlocked] = useState(false);
 	const [games, setGames] = useState<IGame[]>([]);
-	const [victories, setVictories] = useState(0);
-	const [defeat, setDefeat] = useState(0);
-	const [draw, setDraw] = useState(0);
+	const [winrate, setWinrate] = useState(DflWinrate);
 
 	useEffect(() => {
 		axios.get("/user/" + id)
@@ -82,58 +81,49 @@ export function OtherProfile() {
 		return (await axios.get('/relation/is_friend/' + cibleId)).data;
 	}
 
+	const fillWinrate = (userId: number): void => {
+		let wr = DflWinrate;
+		let victories = 0;
+		let defeat = 0;
+		let draws = 0;
 
-
-	const getVictories = (userId: number): void => {
-		let victories: number = 0;
 		games.map((game: IGame) => {
-			if (game.player1.id === userId) {
-				if (game.score1 > game.score2) {
-					victories++;
-				}
+			if (game.score1 === game.score2) {
+				draws++;
 			}
-			if (game.player2.id === userId) {
-				if (game.score2 > game.score1) {
-					victories++;
+			else {
+				if (game.player1.id === userId) {
+					if (game.score1 > game.score2) {
+						victories++;
+					}
+					else {
+						defeat++;
+					}
+				}
+				else {
+					if (game.score2 > game.score1) {
+						victories++;
+					}
+					else {
+						defeat++;
+					}
 				}
 			}
 		});
-		setVictories(victories);
-	};
-
-	const getDefeat = (userId: number): void => {
-		let defeat: number = 0;
-		games.map((game: IGame) => {
-			if (game.player1.id === userId) {
-				if (game.score1 < game.score2) {
-					defeat++;
-				}
-			}
-			if (game.player2.id === userId) {
-				if (game.score2 < game.score1) {
-					defeat++;
-				}
-			}
-		});
-		setDefeat(defeat);
-	};
-
-	const getDraw = (userId: number): void => {
-		let draws: number = 0;
-		games.map((game: IGame) => {
-			if (game.player1.id === userId || game.player2.id === userId) {
-				if (game.score1 === game.score2) {
-					draws++;
-				}
-			}
-		});
-		setDraw(draws);
-	};
+		wr.victories = victories;
+		wr.defeats = defeat;
+		wr.draws = draws;
+		if (games.length !== 0) {
+			wr.winrate = Math.round(wr.victories * 100 / games.length);
+		}
+		else {
+			wr.winrate = 0;
+		}
+		setWinrate(wr);
+	}
 
 	useEffect(() => {
-		getVictories(othUser.id);
-		getDefeat(othUser.id);
-		getDraw(othUser.id);
+		fillWinrate(othUser.id);
 	});
 
 	return (
@@ -187,18 +177,19 @@ export function OtherProfile() {
 					<div className="other-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							Victories : {victories}
+							Victories : {winrate.victories}
 						</div>
 						<div className="other-txt">
-							Defeats : {defeat}
+							Defeats : {winrate.defeats}
 						</div>
 						<div className="other-txt">
-							Draw : {draw}
+							Draw : {winrate.draws}
 						</div>
+
 						<div className="other-txt">
-							{/* Winrate: {othUser.winrate.gamesPlayed === 0 ?
-								Math.round((othUser.winrate.victories / othUser.winrate.gamesPlayed) * 100) + '%' : '0%'
-							} */}
+							<div className={winrate.winrate >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
+								Winrate: {winrate.winrate}%
+							</div>
 						</div>
 
 					</div>

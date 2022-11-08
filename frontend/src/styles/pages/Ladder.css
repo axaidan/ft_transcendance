@@ -1,0 +1,81 @@
+.ladder-body {
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+}
+
+.ladder-list {
+	margin-top: 50px;
+	border-bottom: 2px solid #16222a;
+
+}
+
+
+.ladder-title {
+	display: flex;
+	justify-content: center;
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: x-large;
+	margin-bottom: 50px;
+}
+
+.ladder-buttons {
+	display: flex;
+	margin-left: 15px;
+}
+
+.ladder-stats {
+	margin-left: auto;
+	margin-right: 100px;
+}
+
+.ladder-avatar-div {
+	margin-left: 50px;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-image: url('../../assets/images/avatar-border.png');
+	background-size: 70px;
+	background-position: center;
+}
+
+#ladder-avatar {
+	width: 52px;
+	height: 50px;
+	border-radius: 50%;
+
+}
+
+.ladder-user-div {
+	display: flex;
+	background: linear-gradient(to left, rgba(2, 9, 18, 0.8) 0, rgba(9, 23, 32, 0.5) 50%, rgba(2, 9, 18, 0.8));
+	background-repeat: repeat-x;
+	width: 100%;
+	height: 80px;
+	align-items: center;
+	border-top: 2px solid #16222a;
+
+}
+
+.ladder-user-div:nth-child(2) {
+	background-image: url('../../assets/images/Ladder/icon-challenger-crown-yellow.png');
+	background-position-y: center;
+	background-repeat: no-repeat;
+	background-size: 70px;
+	background-position-x: calc(100% - 15px);
+}
+
+.ladder-username {
+	color: #938f75;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-left: 25px;
+	font-size: x-large;
+	margin-right: 25px;
+}
+
+.ladder-user-div a {
+	text-decoration: none;
+}
