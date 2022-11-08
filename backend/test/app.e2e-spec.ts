@@ -1569,14 +1569,14 @@ describe('App e2e', () => {
 				// .inspect();
 			});
 
-			it('NOT MEMBER - should 404', () => {
+			it('NOT MEMBER - should 403', () => {
 				return pactum
 				.spec()
 				.post(`/channel/${chanArr[0].id}/leave`)
 				.withHeaders({
 					Authorization: `Bearer ${dummyJwt.access_token}`
 				})
-				.expectStatus(404)
+				.expectStatus(403)
 				// .inspect();
 			});
 
@@ -1605,18 +1605,12 @@ describe('App e2e', () => {
 		describe('PATCH /channel/:chanId/user/:userId + ChannelUserRoleDto', () => {
 			
 			it('VALID role TO ADMIN - should 200', () => {
-				const dto: ChannelUserRoleDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					role: EChannelRoles.ADMIN,
-				};
 				return pactum
 				.spec()
-				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.ADMIN}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
-				.withBody(dto)
 				.expectBodyContains(EChannelRoles.ADMIN)
 				.expectBodyContains(chanUserArr[0].userId)
 				.expectStatus(200)
@@ -1624,27 +1618,55 @@ describe('App e2e', () => {
 			});
 
 			it('NONVALID role TO ADMIN (!admin) - should 403', () => {
-				const dto: ChannelUserRoleDto = {
-					chanId: chanArr[0].id,
-					userId: chanUserArr[0].userId,
-					role: EChannelRoles.NORMAL,
-				};
 				return pactum
 				.spec()
-				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}`)
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.NORMAL}`)
 				.withHeaders({
 					Authorization: `Bearer ${jwtArr[1].access_token}`,
 				})
-				.withBody(dto)
 				.expectStatus(403)
 				// .inspect();
 			});
 
-			it('VALID role TO OWNER - should 200', () => {
+			it('VALID role TO OWNER 1 - should 200 ', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${chanUserArr[0].userId}/${EChannelRoles.OWNER}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectBodyContains(EChannelRoles.OWNER)
+				.expectBodyContains(chanUserArr[0].userId)
+				.expectStatus(200)
+				// .inspect();
 			});
 
-			it('CHECK new OWNER - should 200', () => {
+			it('VALID role TO OWNER 2 - should 200', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${userArr[0].id}/${EChannelRoles.OWNER}`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[1].access_token}`,
+				})
+				.expectBodyContains(EChannelRoles.OWNER)
+				.expectBodyContains(userArr[0].id)
+				.expectStatus(200)
+				// .inspect();
 			});
+
+			it('NONVALID role TO 4 - should 400', () => {
+				return pactum
+				.spec()
+				.patch(`/channel/${chanArr[0].id}/user/${userArr[0].id}/4`)
+				.withHeaders({
+					Authorization: `Bearer ${jwtArr[0].access_token}`,
+				})
+				.expectStatus(400)
+				// .inspect();
+			});
+
+			// it('CHECK new OWNER - should 200', () => {
+			// });
 			
 		}); // DESCRIBE (PATCH /channelUser/role)
 
@@ -1672,9 +1694,6 @@ describe('App e2e', () => {
 					Authorization: `Bearer ${jwtArr[0].access_token}`,
 				})
 				.expectStatus(403)
-				// .expectBodyContains(chanArr[0].id)
-				// .expectBodyContains(userArr[10].id)
-				// .expectBodyContains(EChannelRoles.NORMAL)
 				// .inspect();
 			});
 

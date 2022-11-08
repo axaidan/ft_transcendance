@@ -76,10 +76,15 @@ export class ChannelMuteService {
         return channelMute;
     }
 
-    async all()
+    async allExpired()
     : Promise<ChannelMute[]>
     {
-        const channelMutes = await this.prisma.channelMute.findMany();
+        const now = new Date();
+        const channelMutes = await this.prisma.channelMute.findMany({
+            where: {
+                muteExpires: { lt: now },
+            },
+        });
         return channelMutes;
     }
 

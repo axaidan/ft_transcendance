@@ -1,13 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseEnumPipe, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseEnumPipe, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { Discussion, Channel, ChannelUser, ChannelBan, ChannelMute } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
-import { CreateChannelMuteDto } from './channel/channel-mute/dto';
 import { ChannelUserRoleDto } from './channel/channel-user/dto';
+import { EChannelRoles } from './channel/channel-user/types';
 import { ChannelRoles } from './channel/decorators/roles.decorator';
 import { ChannelPasswordDto, CreateChannelDto, EditChannelDto } from './channel/dto';
+import { ChannelJoined } from './channel/guards/channel-joined.guard';
 import { NotBannedGuard } from './channel/guards/not-banned.guard';
 import { ChannelRolesGuard } from './channel/guards/roles.guard';
+import { TargetChannelExists } from './channel/guards/target-channel-exists.guard';
+import { TargetChannelUserJoined } from './channel/guards/target-channel-user-joined.guard';
 import { ChatService } from './chat.service';
 import { CreateDiscussionBodyDto } from './discussion/dto';
 import { DiscussionWithUsers } from './discussion/types';
@@ -94,7 +97,7 @@ export class ChatController {
     }
 
     @Get('channel/:chanId')
-    @UseGuards(NotBannedGuard)
+    @UseGuards(ChannelJoined, TargetChannelExists, NotBannedGuard)
     async getChannelWusersWmessages(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -105,6 +108,7 @@ export class ChatController {
     }
 
     @Patch('channel/:chanId')
+    @UseGuards(ChannelJoined, TargetChannelExists)
     @ChannelRoles('owner')
     async editChannel(
         @GetUser('id') currentUserId: number,
@@ -117,6 +121,7 @@ export class ChatController {
     }
 
     @Delete('channel/:chanId')
+    @UseGuards(ChannelJoined, TargetChannelExists)
     @ChannelRoles('owner')
     async deleteChannel(
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -126,9 +131,8 @@ export class ChatController {
         return channel;
     }
 
-    // @Post('channel/join')
     @Post('channel/:chanId/join')
-    @UseGuards(NotBannedGuard)
+    @UseGuards(TargetChannelExists, NotBannedGuard)
     async joinChannel(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -139,6 +143,7 @@ export class ChatController {
     }
 
     @HttpCode(200)
+    @UseGuards(ChannelJoined, TargetChannelExists)
     @Post('channel/:chanId/leave')
     async leaveChannel(
         @GetUser('id') currentUserId: number,
@@ -154,6 +159,7 @@ export class ChatController {
 
     // INVITE USER
     @Post('channel/:chanId/user/:userId')
+    @UseGuards(TargetChannelExists)
     @ChannelRoles('admin')
     async inviteUserToChannel(
         @GetUser('id') currentUserId: number,
@@ -166,19 +172,22 @@ export class ChatController {
     }
 
     // EDIT ChannelUser'S role
-    @Patch('channel/:chanId/user/:userId')
+    @Patch('channel/:chanId/user/:userId/:role')
+    @UseGuards(TargetChannelExists, TargetChannelUserJoined)
     @ChannelRoles('owner')
     async editChannelUserRole(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        @Body() dto: ChannelUserRoleDto,
+        @Param('role', ParseIntPipe) role: number,
     )
         : Promise<ChannelUser> {
+        if (role < EChannelRoles.NORMAL || role > EChannelRoles.OWNER)
+            throw new BadRequestException('role must as: 0 <= role <= 2');
         const channelUser = await this.chatService.editChannelUserRole(currentUserId, {
             chanId: chanId,
             userId: userId,
-            role: dto.role,
+            role: role,
         });
         return channelUser;
     }
@@ -188,6 +197,7 @@ export class ChatController {
     ///////////////////
 
     @Post('channel/:chanId/user/:userId/ban')
+    @UseGuards(TargetChannelExists, TargetChannelUserJoined)
     @ChannelRoles('admin')
     async ban(
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -202,6 +212,7 @@ export class ChatController {
     }
 
     @Delete('channel/:chanId/user/:userId/ban')
+    @UseGuards(TargetChannelExists)
     @ChannelRoles('admin')
     async unban(
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -220,11 +231,11 @@ export class ChatController {
     ////////////////////
 
     @Post('channel/:chanId/user/:userId/mute')
+    @UseGuards(TargetChannelExists, TargetChannelUserJoined)
     @ChannelRoles('admin')
     async mute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        // @Body() dto: CreateChannelMuteDto,
     )
         : Promise<ChannelMute> {
         const channelMute = await this.chatService.muteChannelUser(userId, chanId);
@@ -232,11 +243,11 @@ export class ChatController {
     }
 
     @Delete('channel/:chanId/user/:userId/mute')
+    @UseGuards(TargetChannelExists)
     @ChannelRoles('admin')
     async unmute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        // @Body() dto: CreateChannelMuteDto
         )
         : Promise<ChannelMute> {
         const channelMute = await this.chatService.unmuteChannelUser(userId, chanId);
@@ -244,11 +255,11 @@ export class ChatController {
     }
 
     @Patch('channel/:chanId/user/:userId/mute/more')
+    @UseGuards(TargetChannelExists)
     @ChannelRoles('admin')
     async editMute(
         @Param('chanId', ParseIntPipe) chanId: number,
         @Param('userId', ParseIntPipe) userId: number,
-        // @Body() dto: CreateChannelMuteDto
         )
         : Promise<ChannelMute> {
         const channelMute = await this.chatService.editMute(userId, chanId);

@@ -1,4 +1,5 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan, User } from '@prisma/client';
 import { UserService } from 'src/users/users.service';
 import { ChannelBanDto } from './channel/channel-ban/dto';
@@ -23,6 +24,8 @@ export class ChatService {
         private channelMuteService: ChannelMuteService,
         private userService: UserService,
     ) {}
+
+    private logger: Logger = new Logger('ChatService');
 
     //////////////////////////
     //  DISCUSSION METHODS  //
@@ -114,7 +117,7 @@ export class ChatService {
     : Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
-        // this.chatGateway.joinChannelRoom(currentUserId, channel.id);
+        this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
 
@@ -126,9 +129,11 @@ export class ChatService {
     : Promise<Channel>
     {
         const channel: Channel = await this.channelService.join(currentUserId, chanId, dto);
-        const user: User = await this.userService.getUser(currentUserId);
+        const channelUser = await this.channelUserService.findOne(currentUserId, channel.id);
+        const channelMute = await this.channelMuteService.findOne(currentUserId, channel.id);
+        channelUser[`mute`] = channelMute;
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
-        this.chatGateway.userJoinedChannel(currentUserId, channel.id, user.username);
+        this.chatGateway.userJoinedChannel(channelUser);
         return channel;
     }
 
@@ -139,13 +144,7 @@ export class ChatService {
     : Promise<Channel>
     {
         const channel: Channel = await this.channelService.findOne(chanId);
-        if (channel === null)
-            throw new NotFoundException('channel not found');
-
         const channelUser: ChannelUser = await this.channelUserService.findOne(currentUserId, chanId);
-        if (channelUser === null)
-            throw new NotFoundException('channel not joined');
-
         if (channelUser.role === EChannelRoles.OWNER) {
             const nextOwner = await this.channelService.passOwnership(channelUser, channel);
             if (nextOwner === null) {
@@ -155,9 +154,7 @@ export class ChatService {
             else
                 this.chatGateway.channelUserRoleEdited(nextOwner);
         }
-
         await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
-
         this.channelService.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: false,
@@ -172,8 +169,6 @@ export class ChatService {
     : Promise<Channel>
     {
         const originalChannel = await this.channelService.findOne(chanId);
-        if (originalChannel === null) 
-            throw new NotFoundException('channel not found');
         const editedChannel = await this.channelService.edit(currentUserId, chanId, dto);
         if (originalChannel.name !== editedChannel.name)
             this.chatGateway.channelNameEdited(editedChannel);
@@ -197,16 +192,24 @@ export class ChatService {
     async editChannelUserRole(currentUserId: number, dto: ChannelUserRoleDto)
     : Promise<ChannelUser>
     {
-        const channelUser = await this.channelService.editChannelUserRole(currentUserId, dto);
-        this.chatGateway.channelUserRoleEdited(channelUser);
-        if (channelUser.role === EChannelRoles.OWNER) {
-            const ancientOwner = await this.channelUserService.findOne(currentUserId, dto.chanId);
-            this.chatGateway.channelUserRoleEdited(ancientOwner);
+        let currentChannelUser = await this.channelUserService.findOne(currentUserId, dto.chanId);
+        let channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
+
+        if (dto.role !== EChannelRoles.OWNER && channelUser === currentChannelUser) {
+            const channel = await this.channelService.findOne(dto.chanId);
+            const newOwner = await this.channelService.passOwnership(currentChannelUser, channel);
+            this.chatGateway.channelUserRoleEdited(newOwner);
         }
+        else if (dto.role === EChannelRoles.OWNER) {
+            currentChannelUser = await this.channelUserService.editRole(currentChannelUser, EChannelRoles.ADMIN);
+            this.chatGateway.channelUserRoleEdited(currentChannelUser);
+        }
+
+        channelUser = await this.channelUserService.editRole(channelUser, dto.role);
+        this.chatGateway.channelUserRoleEdited(channelUser);
         return channelUser;
     }
 
-    //  POST /channel/:chanId/user/:userId/invite
     async inviteUserToChannel(
         currentUserId: number,
         chanId: number,
@@ -215,9 +218,10 @@ export class ChatService {
     : Promise<ChannelUser>
     {
         const channelUser = await this.channelService.inviteUser(currentUserId, chanId, userId);
-        const user = await this.userService.getUser(userId);
+        const channelMute = await this.channelMuteService.findOne(userId, chanId);
+        channelUser[`mute`] = channelMute;
         this.chatGateway.joinChannelRoom(channelUser.userId, channelUser.channelId);
-        this.chatGateway.userJoinedChannel(channelUser.userId, channelUser.channelId, user.username);
+        this.chatGateway.userJoinedChannel(channelUser);
         const channel = await this.channelService.findOne(channelUser.channelId);
         this.chatGateway.invitedToChannel(channelUser, channel);
         return channelUser;
@@ -253,13 +257,11 @@ export class ChatService {
     {
         const channelUser = await this.channelUserService.findOne(userId, chanId);
         // CHECK IF MUTED USER EXISTS IN CHANNEL
-        if (channelUser === null)
-            throw new NotFoundException('user not found in channel');
+        // if (channelUser === null)
+        //     throw new NotFoundException('user not found in channel');
         // CHECK IF MUTED USER THE OWNER OR ANOTHER ADMIN
         if (channelUser.role !== EChannelRoles.NORMAL)
             throw new ForbiddenException('cannot mute an admin or owner');
-        // const channelMute = await this.channelMuteService.create(userId, chanId);
-        // return channelMute;
         const channelMute = await this.channelMuteService.create(userId, chanId);
         this.chatGateway.channelUserMuted(channelMute);
         return channelMute;
@@ -280,5 +282,16 @@ export class ChatService {
         // event newEditMute
         return channelMute;
     }
+
+    @Cron(CronExpression.EVERY_10_SECONDS)
+    async muteExpirationCheck() {
+        // this.logger.log('running muteExpirationCheck');
+        const expiredChannelMutes: ChannelMute[] = await this.channelMuteService.allExpired();
+        for (const channelMute of expiredChannelMutes) {
+            await this.channelMuteService.delete(channelMute.userId, channelMute.channelId);
+            this.logger.log(`channelMute expired detected : userId: \t${channelMute.userId}\tchannelId: ${channelMute.channelId}`);
+            this.chatGateway.channelUserUnmuted(channelMute);
+        }
+    };
 
 }

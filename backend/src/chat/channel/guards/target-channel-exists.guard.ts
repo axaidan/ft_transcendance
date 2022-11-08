@@ -1,29 +1,26 @@
 import { Injectable, CanActivate, ExecutionContext, NotFoundException, Logger, BadRequestException, ParseIntPipe, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { ChannelBanService } from '../channel-ban/channel-ban.service';
+import { ChannelService } from '../channel.service';
 
 @Injectable()
-export class NotBannedGuard implements CanActivate {
+export class TargetChannelExists implements CanActivate {
 
     constructor(
-        private reflector: Reflector,
-        private channelBanService: ChannelBanService,
+        private channelService: ChannelService,
     ) { }
 
     async canActivate(context: ExecutionContext)
         : Promise<boolean> {
 
         const request = context.switchToHttp().getRequest();
-        const userId = request.user['id'];
         const chanId = Number(request.params.chanId);
         if (Number.isInteger(chanId) === false)
             throw new BadRequestException(':chanId must be an integer');
 
-        const channelBan = await this.channelBanService.findOne(userId, chanId);
+        const channel = await this.channelService.findOne(chanId);
 
-        if (channelBan === null)
-            return true;
+        if (channel === null)
+            throw new NotFoundException(`GUARD - channel ${chanId} not found`);
         else
-            throw new ForbiddenException('GUARD - banned from channel');
+            return true;
     }
 }
