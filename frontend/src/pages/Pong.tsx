@@ -1,20 +1,41 @@
-import { useEffect } from 'react';
+import { faGreaterThanEqual, faTrashRestore } from '@fortawesome/free-solid-svg-icons';
+import { useContext, useEffect } from 'react';
+import { SocketContext } from '../context';
+import SocketContextComponent from '../context/UserSocket/Components';
+import { AxiosJwt } from '../hooks';
+import { useSocket } from '../hooks/useSocket';
 import './pong.css'
+
+
 
 export function Pong() {
 
 
-	var canvas;
-	var game;
-	var anim;
+	let canvas: HTMLCanvasElement;
+	let game: 	{ball: {x:number, y:number, 
+						speed: {x:number, y:number}} 
+				player: {score:number, y:number, player:number}		
+				player2: {score:number, y:number, player:number}		
+				roomName: string
+				mode: number	
+				};
+	let anim: number;
 // On peut changer les dimensions de la balle et des joueurs, ex: autres modes de jeux
 	var PLAYER_HEIGHT = 60;
 	var PLAYER_WIDTH = 5;
 	var BALL_HEIGHT = 10;
-	var BALL_SPEED = 2;
+	let BALL_SPEED = 2;
 	var BALL_ACCELERATE = true;
 	const queryParams = new URLSearchParams(window.location.search);
 	const live = queryParams.get('live');
+
+
+		const axios = AxiosJwt();
+
+	const {me, socket} = useContext(SocketContext).SocketState;
+
+
+
 
 	function ballMove() {
 		// Rebounds on top and bottom
@@ -34,7 +55,7 @@ export function Pong() {
 		}
 	}
 
-	function collide(player) {
+	function collide(player: {score:number, y:number}) {
 
 		var bottom: Number;
 		bottom = Number(player.y) + Number(PLAYER_HEIGHT);
@@ -49,6 +70,7 @@ export function Pong() {
 				game.ball.speed.x = BALL_SPEED * -1;
 				// Update score
 				game.player2.score++;
+				socket.emit('printscore', game.player.score, game.player2.score);
 	//			socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":right");
 				document.querySelector('#player2-score').textContent = game.player2.score;
 				if (game.player2.score === 5 ){//|| document.querySelector('#player2-score').textContent == "5") {
@@ -60,6 +82,7 @@ export function Pong() {
 				game.ball.speed.x = BALL_SPEED;
 				// Update score
 				game.player.score++;
+				socket.emit('printscore', game.player.score, game.player2.score);
 		//		socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":left");
 				document.querySelector('#player-score').textContent = game.player.score;
 				if (game.player.score === 5) {// || document.querySelector('#player-score').textContent == "5") {
@@ -77,7 +100,7 @@ export function Pong() {
 		}
 	}
 
-	function changeDirection(playerPosition) {
+	function changeDirection(playerPosition:number) {
 	// Ball bounce
 		var impact = game.ball.y - playerPosition - PLAYER_HEIGHT / 2;
 		var ratio = 100 / (PLAYER_HEIGHT / 2);
@@ -89,8 +112,9 @@ export function Pong() {
 	function draw() {
 	// Draw Canvas
 		if (canvas) {
-			var context = canvas.getContext('2d');
+			let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
 
+			if (context) { 
 			context.fillStyle = 'black';
 			context.fillRect(0, 0, canvas.width, canvas.height);
 			// Draw middle line
@@ -107,6 +131,7 @@ export function Pong() {
 			context.fillStyle = 'white';
 			context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
 			context.fill();
+			}
 
 		}
 	}
@@ -125,8 +150,7 @@ export function Pong() {
 
 
 	}
-
-	function initParty() {
+	function initScreen() {
 		if (canvas) {
 			game = {
 				player: {
@@ -141,8 +165,58 @@ export function Pong() {
 					x: canvas.width / 2 - BALL_HEIGHT / 2,
 					y: canvas.height / 2 - BALL_HEIGHT / 2,
 					speed: {
-						x: BALL_SPEED,
-						y: BALL_SPEED
+						x: 0,
+						y: 0, 
+					}
+				}
+			}
+			draw();
+		}
+	}
+	function topinitParty() {
+		console.log("fajklsdakljfsdolfjszdlkjfsdklajfsdkla")
+		if (canvas) {
+			game = {
+				player: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+
+				},
+				player2: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+				},
+				ball: {
+					x: canvas.width / 2 - BALL_HEIGHT / 2,
+					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					speed: {
+						x: 2,
+						y: 2, 
+					}
+				}
+			}
+			draw();
+		}
+	}
+	function initParty() {
+
+		if (canvas) {
+			game = {
+				player: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+
+				},
+				player2: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+				},
+				ball: {
+					x: canvas.width / 2 - BALL_HEIGHT / 2,
+					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					speed: {
+						x: 2,
+						y: 2, 
 					}
 				}
 			}
@@ -156,18 +230,44 @@ export function Pong() {
 		anim = requestAnimationFrame(play);
 	}
 
+	function restore() {
+		console.log("restore button clic")
+		initParty();
+		play();
+
+	}
+
+	function getIntoLobby() {
+			axios.get('/lobby/join');
+	}
+
+	function deleteLobby() {
+		axios.delete('/lobby/cleanAll')
+	}
 
 	useEffect(() => {
 		let isMounted = true;
 		canvas = document.getElementById('canvas');
-		initParty();
+		initScreen();
+	//	initParty();
 		play();
 	//	if (live == null)
 	//	canvas.addEventListener('mousemove', playerMove);
-		return () => { isMounted = false };
+	//	return () => { isMounted = false };
+		StartListeners();
 	}, []);
 
+	const StartListeners = ()=> {
+	socket.on("startGame", (...arg) => {
+		console.log("je suiis passe par socket.on start game")
+		game.player.player = arg[0];
+		game.player2.player = arg[1];
+		game.roomName = arg[2];
+		game.mode = arg[3];
+		topinitParty();
 
+	}); 
+	};
 
 	return (
 		<div>
@@ -178,8 +278,10 @@ export function Pong() {
 		<em className="canvas-score" id="player-score">0</em> - <em id="joueur2"></em>
 		<em className="canvas-score" id="player2-score">0</em></p>
          <canvas id="canvas"  />
-		<button onClick={draw()}> playyyyyyyyyyyyyyyy </button>
-		<button onClick={initParty()}> playyakfjsk</button>
+		<button onClick={restore}> restore </button>
+		<button onClick={initParty}> initParty</button>
+		<button onClick={getIntoLobby}> queue</button>
+		<button onClick={deleteLobby}> delete lobby</button>
         </main>
         <p>Jeu a mettre ici</p>
       </div>

@@ -15,6 +15,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private logger: Logger = new Logger('AppGateway');
 	private clientsMap = new Map<number, Socket>(); // userid socket
+	private clientsMapStatus = new Map<number, number>(); // userid status 
+
 	private clientsMapRooms = new Map<string, Set<number> >();  // map de RoomName ArrayUserId
 
 
@@ -28,6 +30,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	// @UseGuards(JwtGuard)
 	handleConnection(client: Socket, ...args: any[]) {
 		 this.logger.log(`CLIENT ${client.id} CONNECTED: app.gateway`);
+		client.broadcast.emit('loginToClient', client.id);
+
 	}
 
 	handleDisconnect(client: Socket) {
@@ -240,6 +244,17 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			return roomName;
 		})
 		return null 
+	}
+
+	startGame(userId1: number, userId2: number, lobbyId: number){
+		console.log('test emitions ')
+		console.log(`emit to game + ${lobbyId}`);
+        this.wss.to('game' + lobbyId).emit("startGame", {p1: userId1 , p2:userId2 , lobbyId:lobbyId, mode: 1});
+	}
+
+	@SubscribeMessage('printscore')
+	editScore(score1: number, score2:number) {
+		console.log(`score1: ${score1}-${score2} :score2 `)
 	}
 
 }

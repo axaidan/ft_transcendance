@@ -41,10 +41,10 @@ export class LobbyService {
 
     async joinLobby(meId: number) {
         console.log('lobbyservice');
-   /*     if (findUserInLobby(meId)) {
+        if (await this.findUserInLobby(meId) === true) {
             console.log('tu es deja log; need to throw execption');
             return ;
-        }*/
+        }
         console.log('user %d ,join queue ', meId);
         this.joinQueue(meId);
         if (this.queue.length < 2)
@@ -61,7 +61,8 @@ export class LobbyService {
         await this.socket.joinGameRoom(u2, lobbyId);
 
         var lobby = this.lobbies.get(lobbyId);
-//        this.socket.wss.to('game'+ lobbyId).emit("startGame", lobby);
+        await this.socket.startGame(u1, u2, lobbyId);
+		
      //   await this.socket.exitGameRoom(u1, lobbyId)
      //   await this.socket.exitGameRoom(u2, lobbyId)
     //        await this.socket.closeRoom(lobbyId);
@@ -88,6 +89,18 @@ export class LobbyService {
     console.log(lobby.LobbyId);
     return lobby.LobbyId;
     }
+
+	async findUserInLobby(userId: number) : Promise<boolean> {
+        for (const l of this.lobbies.values()) {
+            var ret = l.PlayersId.find(e => e === userId);
+            if (ret) {
+				console.log(l.LobbyId)
+				console.log(l.PlayersId)
+                return true;
+            }
+        }
+        return false;
+	}
 
     async findUserInLobbies(userId: number) {
    //     const lobbyArray : Lobby[] = this.lobbies.values();
