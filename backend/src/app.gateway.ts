@@ -265,8 +265,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 		console.log('test socket bacj')
 
-		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]}`)
-		this.wss.to(b[4]).emit("updatePos", b[0], b[1],b[2],b[3]);
+		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
+		this.wss.to(b[4]).emit("updatePos", parseInt(b[0]), parseInt(b[1]) ,parseInt(b[2]) , parseInt(b[3]));
 	}
 
 }

@@ -88,7 +88,7 @@ export function Pong() {
 		}
 	}
 
-	function collide(player: {score:number, y:number}) {
+	function collide(player: {score:number, y:number, player: number}) {
 
 		var bottom: Number;
 		bottom = Number(player.y) + Number(PLAYER_HEIGHT);
@@ -106,7 +106,7 @@ export function Pong() {
 				socket!.emit('printscore', game.player.score +":" + game.player2.score);
 	//			socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":right");
 				document.querySelector('#player2-score').textContent = game.player2.score;
-				if (game.player2.score === 5 ){//|| document.querySelector('#player2-score').textContent == "5") {
+				if (game.player2.score >= 5 ){//|| document.querySelector('#player2-score').textContent == "5") {
 					stop();
 			//		clearDataGame();
 				}
@@ -118,7 +118,7 @@ export function Pong() {
 				socket!.emit('printscore', game.player.score +":" + game.player2.score);
 		//		socket.emit('roundStart', 0 + ":" + joueur1 + ":" + joueur2 + ":" + game.player.score + ":" + game.player2.score + ":left");
 				document.querySelector('#player-score').textContent = game.player.score;
-				if (game.player.score === 5) {// || document.querySelector('#player-score').textContent == "5") {
+				if (game.player.score >= 5) {// || document.querySelector('#player-score').textContent == "5") {
 					stop();
 			//		clearDataGame();
 				}
