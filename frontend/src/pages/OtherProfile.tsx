@@ -13,34 +13,23 @@ import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
 import { DflRelationship, IRelationship } from '../types';
 import { IGame } from '../types/interfaces/IGame';
-import { DflWinrate } from '../hooks';
+import { DflWinrate, useWinrate } from '../hooks/useWinrate';
+import { useUser } from '../hooks/useUser';
 
 
 export function OtherProfile() {
-	const axios = AxiosJwt();
+
 	const { id } = useParams();
-	const [othUser, setOthUser] = useState<IUser>(DflUser);
 	const { friends, blocks } = useContext(SocketContext).SocketState;
+	const { me } = useContext(SocketContext).SocketState;
 	const dispatch = useContext(SocketContext).SocketDispatch
+
+	const axios = AxiosJwt();
+	const othUser = useUser(id);
+	const winrate = useWinrate(othUser.id)
+
 	const [isFriend, setisFriend] = useState(false);
 	const [isBlocked, setisBlocked] = useState(false);
-	const [games, setGames] = useState<IGame[]>([]);
-	const [winrate, setWinrate] = useState(DflWinrate);
-
-	useEffect(() => {
-		axios.get("/user/" + id)
-			.then((res: AxiosResponse<IUser>) => {
-				let User: IUser = res.data;
-				setOthUser(User);
-			})
-			.catch(() => { alert('This user does not exist.') });
-	}, []);
-
-
-	useEffect(() => {
-		axios.get('/game/historique/' + id)
-			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
-	}, [games]);
 
 	useEffect(() => {
 		axios.get('/relation/is_friend/' + id)
@@ -81,61 +70,20 @@ export function OtherProfile() {
 		return (await axios.get('/relation/is_friend/' + cibleId)).data;
 	}
 
-	const fillWinrate = (userId: number): void => {
-		let wr = DflWinrate;
-		let victories = 0;
-		let defeat = 0;
-		let draws = 0;
-
-		games.map((game: IGame) => {
-			if (game.score1 === game.score2) {
-				draws++;
-			}
-			else {
-				if (game.player1.id === userId) {
-					if (game.score1 > game.score2) {
-						victories++;
-					}
-					else {
-						defeat++;
-					}
-				}
-				else {
-					if (game.score2 > game.score1) {
-						victories++;
-					}
-					else {
-						defeat++;
-					}
-				}
-			}
-		});
-		wr.victories = victories;
-		wr.defeats = defeat;
-		wr.draws = draws;
-		if (games.length !== 0) {
-			wr.winrate = Math.round(wr.victories * 100 / games.length);
-		}
-		else {
-			wr.winrate = 0;
-		}
-		setWinrate(wr);
-	}
-
-	useEffect(() => {
-		fillWinrate(othUser.id);
-	});
-
 	return (
 		<div className="otherProfileBody">
 			<div className="other-left-side">
 				<div className="other-banner">
 					<div className="other-options">
-						{isBlocked ?
+						{othUser.id === me.id ?
 							<></> :
-							isFriend ? <button id="other-remove" onClick={() => RemoveFriend(othUser)} /> : <button id="other-add" onClick={() => AddFriend(othUser)} />
+							isBlocked ?
+								<></> :
+								isFriend ? <button id="other-remove" onClick={() => RemoveFriend(othUser)} /> : <button id="other-add" onClick={() => AddFriend(othUser)} />
 						}
-						{isBlocked ? <button id="other-unblock" onClick={() => RemoveBlock(othUser)} /> : <button id="other-block" onClick={() => BlockFriend(othUser)} />}
+						{othUser.id === me.id ?
+							<></> :
+							isBlocked ? <button id="other-unblock" onClick={() => RemoveBlock(othUser)} /> : <button id="other-block" onClick={() => BlockFriend(othUser)} />}
 					</div>
 					<div className="other-clan">
 						My clan

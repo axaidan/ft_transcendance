@@ -1,24 +1,22 @@
 // Extern:
-import React, { useRef } from 'react';
-import { Outlet, useOutletContext, Link, NavLink, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+
+//Assets
 import "../../styles/components/profile_components/MyNavProfile.css";
 
 // Intern:
-import { DflUser, IUser } from "../../types";
 import { AxiosJwt } from '../../hooks';
 import { useForm, Resolver } from 'react-hook-form';
 import { FormValues } from '../../pages/Profile';
-import { useContext, useState } from 'react';
-import { SocketContext, ESocketActionType } from '../../context/UserSocket/Socket';
+import { useContext } from 'react';
+import { SocketContext } from '../../context/UserSocket/Socket';
 
 export function MyNavProfile() {
 
 	const navigate = useNavigate();
-	const dispatch = useContext(SocketContext).SocketDispatch
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
 
-	const [nick, setNick] = useState(true);
 
 	const ExistantUsername = async (value: string) => {
 		return (await axios.get('/user/is_user/' + value)).data;
@@ -27,7 +25,7 @@ export function MyNavProfile() {
 	const resolver: Resolver<FormValues> = async (values) => {
 		return {
 			values: values.username ? values : {},
-			errors: await ExistantUsername(values.username) ?
+			errors: (await ExistantUsername(values.username) && values.username) ?
 				{} :
 				{
 					username: {
@@ -35,7 +33,6 @@ export function MyNavProfile() {
 						message: 'This user does not exist.',
 					}
 				}
-
 		};
 	};
 
@@ -43,11 +40,8 @@ export function MyNavProfile() {
 	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
 
 	const onSubmit = handleSubmit(async (data) => {
-		// if (ExistantUsername(data.username)) {
-		// await axios.get('/user/get_user_by_name/' + data.username).then((res) => navigate('/home/' + res.data));
 		const userId: number = (await axios.get('/user/get_user_by_name/' + data.username)).data;
 		navigate('/home/' + userId);
-		// }
 	});
 
 

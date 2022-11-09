@@ -19,35 +19,61 @@ export const DflWinrate: IWinrate = {
 	winrate: 0,
 }
 
-export const useWinrate = async (userId: number) => {
-	const winrate = DflWinrate;
-	const axios = AxiosJwt();
+export const useWinrate = (userId: number) => {
 
-	winrate.games = (await axios.get('/game/historique/' + userId)).data
-	winrate.games.map((game: IGame) => {
-		if (game.score1 === game.score2)
-			winrate.draws++;
-		else {
-			if (game.player1.id === userId) {
-				if (game.score1 > game.score2)
-					winrate.victories++;
-				else
-					winrate.defeats++;
+	const axios = AxiosJwt();
+	const [games, setGames] = useState<IGame[]>([]);
+	const [winrate, setWinrate] = useState(DflWinrate);
+
+	useEffect(() => {
+		axios.get('/game/historique/' + userId)
+			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
+	}, [games]);
+
+	const fillWinrate = (userId: number): void => {
+		let wr = DflWinrate;
+		let victories = 0;
+		let defeat = 0;
+		let draws = 0;
+
+		games.map((game: IGame) => {
+			if (game.score1 === game.score2) {
+				draws++;
 			}
 			else {
-				if (game.score2 > game.score1) {
-					winrate.victories++;
+				if (game.player1.id === userId) {
+					if (game.score1 > game.score2) {
+						victories++;
+					}
+					else {
+						defeat++;
+					}
 				}
 				else {
-					winrate.defeats++;
+					if (game.score2 > game.score1) {
+						victories++;
+					}
+					else {
+						defeat++;
+					}
 				}
 			}
+		});
+		wr.victories = victories;
+		wr.defeats = defeat;
+		wr.draws = draws;
+		if (games.length !== 0) {
+			wr.winrate = Math.round(wr.victories * 100 / games.length);
 		}
+		else {
+			wr.winrate = 0;
+		}
+		setWinrate(wr);
+	}
+
+	useEffect(() => {
+		fillWinrate(userId);
 	});
-	if (winrate.games.length !== 0)
-		winrate.winrate = Math.round((winrate.victories * 100) / (winrate.games.length));
-	else
-		winrate.winrate = 0;
 
 	return winrate;
 }

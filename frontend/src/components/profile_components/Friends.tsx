@@ -1,8 +1,6 @@
 // Extern:
-import { useEffect, useState, useContext } from "react"
-import { useOutletContext, Link } from "react-router-dom";
-import { AxiosResponse } from "axios";
-import '../../styles/components/profile_components/Friends.css'
+import { useContext } from "react"
+import { Link } from "react-router-dom";
 
 // Intern:
 import { IUser } from '../../types/interfaces/IUser';
@@ -10,6 +8,8 @@ import { AxiosJwt } from "../../hooks";
 import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
 import { UserCreateChat } from '../discussion_components/ChatUtils';
 
+//Asset
+import '../../styles/components/profile_components/Friends.css'
 import '../../styles/pages/Ladder.css'
 
 

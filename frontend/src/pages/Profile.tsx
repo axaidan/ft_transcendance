@@ -1,15 +1,13 @@
 // Extern:
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 
 // Intern:
-import { IUser } from "../types";
+import { ESocketActionType, SocketContext } from "../context";
 
 //Hooks
 import { AxiosJwt } from '../hooks/AxiosJwt';
-import { useCookies } from 'react-cookie';
 import { useForm, Resolver } from 'react-hook-form'
-import { ESocketActionType, SocketContext } from "../context";
+import { useWinrate } from "../hooks";
 
 // Assets:
 import '../styles/pages/Profile.css'
@@ -18,23 +16,20 @@ export type FormValues = {
 	username: string;
 };
 
-
-
 export function Profile() {
 
 	const dispatch = useContext(SocketContext).SocketDispatch
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
+	const winrate = useWinrate(me.id);
 
-	const DflChecked: boolean = me.twoFactorAuth;
 	const [toggleEdit, setToggleEdit] = useState(false);
-	const [nick, setNick] = useState(false);
 
 	const ExistantUsername = async (value: string) => {
 		return (await (await axios.get('/user/is_user/' + value)).data);
 	}
 
-	const regex = "^[A-Za-z0-9 -_.]$";
+	const regex = new RegExp('[`~@#$%&{};\'"<>.,/?:+=]');
 
 	const resolver: Resolver<FormValues> = async (values) => {
 
@@ -59,14 +54,23 @@ export function Profile() {
 					}
 					: {}
 						&&
-						await ExistantUsername(values.username) ?
+						(regex.test(values.username)) ?
 						{
 							username: {
 								type: 'required',
-								message: 'This username is already taken',
+								message: 'Bad expression (don\'t use: `~@#$%&{};\'"<>.,/?:+=)',
 							}
 						}
 						: {}
+							&&
+							await ExistantUsername(values.username) ?
+							{
+								username: {
+									type: 'required',
+									message: 'This username is already taken',
+								}
+							}
+							: {}
 		};
 	};
 
@@ -104,7 +108,7 @@ export function Profile() {
 						</div>
 						<form onSubmit={onSubmit} className={toggleEdit ? "user-edit-input" : "user-disabled"}>
 							<div className="user-input-kit">
-								<input {...register("username")} placeholder={me.username} maxLength={15} id={errors.username ? 'user-inputbox-error' : 'user-input'} pattern={regex} />
+								<input {...register("username")} placeholder={me.username} maxLength={15} id={errors.username ? 'user-inputbox-error' : 'user-input'} />
 								<div className="user-buttons">
 									<button onClick={onSubmit} id='user-validate' />
 									<button onClick={toggleUserEdit} id='user-cancel' />
@@ -176,8 +180,20 @@ export function Profile() {
 					</div>
 					<div className="user-champion">
 						<h3>Victories</h3>
-						<div className="user-txt">
-							No game yet
+						<div className="other-txt">
+							Victories : {winrate.victories}
+						</div>
+						<div className="other-txt">
+							Defeats : {winrate.defeats}
+						</div>
+						<div className="other-txt">
+							Draw : {winrate.draws}
+						</div>
+
+						<div className="other-txt">
+							<div className={winrate.winrate >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
+								Winrate: {winrate.winrate}%
+							</div>
 						</div>
 					</div>
 					<div className="user-trophee">

@@ -16,6 +16,8 @@ export function UsernameLogger() {
 		return (await axios.get('/user/is_user/' + value)).data;
 	}
 
+	const regex = new RegExp('[`~@#$%&{};\'"<>.,/?:+=]');
+
 	const resolver: Resolver<FormValues> = async (values) => {
 		return {
 			values: values.username ? values : {},
@@ -37,14 +39,23 @@ export function UsernameLogger() {
 					}
 					: {}
 						&&
-						await ExistantUsername(values.username) ?
+						(regex.test(values.username)) ?
 						{
 							username: {
 								type: 'required',
-								message: 'This username is already taken',
+								message: 'Bad expression (don\'t use: `~@#$%&{};\'"<>.,/?:+=)',
 							}
 						}
 						: {}
+							&&
+							await ExistantUsername(values.username) ?
+							{
+								username: {
+									type: 'required',
+									message: 'This username is already taken',
+								}
+							}
+							: {}
 		};
 	};
 
@@ -53,8 +64,9 @@ export function UsernameLogger() {
 
 	const onSubmit = handleSubmit(async (data) => {
 		await axios.patch('/user', data);
-		if (!me.username !== null)
+		if (!me.username !== null) {
 			navigate('/home/acceuil')
+		}
 	}
 	);
 

@@ -1,18 +1,52 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserCreateChat } from "../components";
 import { AxiosJwt } from '../hooks/AxiosJwt'
 import { IUser } from '../types/interfaces/IUser';
+import { DflWinrate, IWinrate, useWinrate } from '../hooks/useWinrate';
+import { SocketContext } from "../context";
 
 type LadderProps = {
-	user: IUser
+	user: IUser,
+
+}
+
+function LadderList({ user }: LadderProps) {
+
+	const { me } = useContext(SocketContext).SocketState;
+
+	return (
+		<div className="ladder-user-div">
+			<div className="ladder-avatar-div">
+				<img id="ladder-avatar" src={user.avatarUrl} />
+			</div>
+			<Link to={"/home/" + user.id} >
+				<div className="ladder-username" key={user.id}>
+					{user.username}
+				</div>
+			</Link>
+			<Link to={"/home/" + user.id}>
+				<button id='friend-redirect' />
+			</Link>
+			<div className="ladder-buttons">
+				{user.id === me.id ?
+					<></> :
+					<UserCreateChat user={user}>
+						<button id='friend-chat' className="ladder-chat"></button>
+					</UserCreateChat>
+				}
+			</div>
+			<div className="ladder-stats">
+				Rank: {user.id}
+			</div>
+		</div>
+	);
 }
 
 export function Ladder() {
 
-	const [users, setUsers] = useState([]);
+	const [users, setUsers] = useState<IUser[]>([]);
 	const axios = AxiosJwt();
-	const [ladder, setLadder] = useState([]);
 
 	useEffect(() => {
 		axios.get('/user/all')
@@ -30,28 +64,8 @@ export function Ladder() {
 				<div className="ladder-title">
 					LADDERBOARD
 				</div>
-				{SortUsersByWinrate(users).map((user: IUser) => (
-					<div className="ladder-user-div">
-						<div className="ladder-avatar-div">
-							<img id="ladder-avatar" src={user.avatarUrl} />
-						</div>
-						<Link to={"/home/" + user.id} >
-							<div className="ladder-username" key={user.id}>
-								{user.username}
-							</div>
-						</Link>
-						<Link to={"/home/" + user.id}>
-							<button id='friend-redirect' />
-						</Link>
-						<div className="ladder-buttons">
-							<UserCreateChat user={user}>
-								<button id='friend-chat' className="ladder-chat"></button>
-							</UserCreateChat>
-						</div>
-						<div className="ladder-stats">
-							Rank: {user.id}
-						</div>
-					</div>
+				{SortUsersByWinrate(users).map((user: IUser, index: number) => (
+					<LadderList key={index} user={user} />
 				))}
 			</ul>
 		</div>

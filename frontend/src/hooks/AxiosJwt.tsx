@@ -23,6 +23,7 @@ export const AxiosJwt = () => {
 	return {
 		get: (url: string, options = {}) => axios.get(API_URL + url, { ...defaultOptions, ...options }),
 		post: (url: string, data = {}, options = {}) => axios.post(API_URL + url, data, { ...defaultOptions, ...options }),
+		post2: (url: string, data = {}, options = {}) => axios.post(API_URL + url, data, { ...uploadOptions, ...options }),
 		put: (url: string, data: string, options = {}) => axios.put(API_URL + url, data, { ...uploadOptions, ...options }),
 		delete: (url: string, options = {}) => axios.delete(API_URL + url, { ...defaultOptions, ...options }),
 		patch: (url: string, data = {}, options = {}) => axios.patch(API_URL + url, data, { ...uploadOptions, ...options }),

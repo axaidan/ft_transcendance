@@ -60,6 +60,18 @@
 
 }
 
+.ladder-user-div:hover {
+	box-shadow: inset 0px 0px 50px -25px white;
+}
+
+.ladder-user-div button:hover {
+	scale: 1.1;
+}
+
+.ladder-user-div button:active {
+	scale: 1;
+}
+
 .ladder-user-div:nth-child(2) {
 	background-image: url('../../assets/images/Ladder/icon-challenger-crown-yellow.png');
 	background-position-y: center;
