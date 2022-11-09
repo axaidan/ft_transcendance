@@ -93,10 +93,7 @@ export const ChannelSocketReducer = (state: IChannelSocketContextState, action: 
 			return { ...state, channel_display: action.payload as boolean };
 		case EChannelSocketActionType.NEW_MSG:
 			const index = state.channels.findIndex(disc => disc.id == (action.payload as IChannelMessage).channelsId)
-			if (index != -1) {
-				state.channels[index].messages.push(action.payload as IChannelMessage);
-                if ( index != state.index_active) state.channels[index].notif += 1;
-			}
+			if (index != -1) { state.channels[index].messages.push(action.payload as IChannelMessage); }
 			return { ...state };
 		default:
 			return { ...state };

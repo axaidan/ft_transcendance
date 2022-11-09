@@ -20,14 +20,10 @@ export const ChannelSocketContextComponent: React.FunctionComponent<IChannelSock
 	})
 
 	useEffect(() => {
-		console.log("UserId: ", me.id);
 		channelSocket.connect();
 		// Save the socket in context //
 		ChannelSocketDispatch({ type: EChannelSocketActionType.UP_SOKET, payload: channelSocket });
 		ChannelSocketDispatch({ type: EChannelSocketActionType.UP_UID, payload: me });
-
-        // ICI JE DOIS RECUPPERER TOUT LES CHANNEL EN COURS ET ME CONNECTER ( POUR LES NOTIF )
-        // REGARDE UN TUTO POUR LES NOTIFICATION HISTOIRE DE PAS FAIRE DE LA MERDE
 
 		// Start the envent listeners // 
 		StartListeners();
@@ -48,7 +44,9 @@ export const ChannelSocketContextComponent: React.FunctionComponent<IChannelSock
 
 	const StartHandshake = () => {
 		console.info('Sending handshake to server ...');
+
 		channelSocket.emit('loginToServer', me.id);
+		
 		setLoading(false);
 	};
 

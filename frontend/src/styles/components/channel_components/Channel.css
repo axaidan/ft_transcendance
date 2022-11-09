@@ -1,0 +1,16 @@
+#channel-container-display {
+	position: absolute;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-column: auto;
+	bottom: 0;
+	left: -701px;
+	border: 1px solid #16222a;
+	background-color: #020912be;
+	height: 600px;
+	width: 700px;
+}
+
+#channel-container-none {
+	display: none;
+}
