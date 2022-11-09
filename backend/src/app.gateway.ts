@@ -255,18 +255,42 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	@SubscribeMessage('printscore')
 	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body:string) {
 		const b: string[] = body.split(':');
-		console.log(`string: ${body}`)
-		console.log(`score1: ${b[0]}-${b[1]} :score2 `)
+
+		console.log(`score edit: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
+/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
+			this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
+		}*/
+			this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
 	}
 
 	@SubscribeMessage('updateGame')
 	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body : string){
-		const b: string[] = body.split(':');
+		const b: string[] = body.toString().split(':');
 
-		console.log('test socket bacj')
+	//	console.log('test socket bacj')
 
-		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
+//		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
 		this.wss.to(b[4]).emit("updatePos", parseInt(b[0]), parseInt(b[1]) ,parseInt(b[2]) , parseInt(b[3]));
+	}
+
+	@SubscribeMessage('padUpdate')
+	async padUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+		
+		this.wss.to(b[0]).emit("padUpdat", parseInt(b[1]), parseInt(b[2]));
+	}
+
+	@SubscribeMessage('updateBall')
+	async ballUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+		this.wss.to(b[0]).emit('updatBall', parseInt(b[1]), parseInt(b[2]), parseInt(b[3]), parseInt(b[4]));
+	}
+
+	@SubscribeMessage('end')
+	async end(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+
+		this.wss.to(b[0]).emit('end', parseInt(b[1]), parseInt(b[2]));
 	}
 
 }
