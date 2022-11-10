@@ -38,6 +38,7 @@ export interface IChannelSocketContextState {
 	channels: IChannel[];
 	index_active: number;
 	channel_display: boolean;
+	settings_display: boolean;
 }
 
 export const dflChannelSocketContextState: IChannelSocketContextState = {
@@ -46,6 +47,7 @@ export const dflChannelSocketContextState: IChannelSocketContextState = {
 	channels: [],
 	index_active: -1,
 	channel_display: false,
+	settings_display: false,
 }
 
 export enum EChannelSocketActionType {
@@ -56,7 +58,8 @@ export enum EChannelSocketActionType {
 	RM_DISC = 'remove_channel',			        // REMOVE D'UNE CHANNEL 
 	UP_CURR = 'up_current_channel',		        // INDEX DE LA CHANNEL AFFICHEE
 	NEW_MSG = 'receive_channel_message',	    // RECU D'UN NOUVEAU MESSAGE
-	DISPLAY = 'change_channel_display'
+	DISPLAY = 'change_channel_display',
+	SETDISPLAY = 'change_channel_settings_display'
 }
 
 export type TChannelSocketContextAction = EChannelSocketActionType.UP_SOKET |
@@ -66,6 +69,7 @@ export type TChannelSocketContextAction = EChannelSocketActionType.UP_SOKET |
 	EChannelSocketActionType.RM_DISC |
 	EChannelSocketActionType.UP_CURR |
 	EChannelSocketActionType.NEW_MSG |
+	EChannelSocketActionType.SETDISPLAY |
 	EChannelSocketActionType.DISPLAY;
 
 export type TChannelSocketContextPayload = number | Socket | number[] | IChannel[] | IChannelMessage | IChannel | IUser | IUserChannel | boolean;
@@ -95,6 +99,8 @@ export const ChannelSocketReducer = (state: IChannelSocketContextState, action: 
 			const index = state.channels.findIndex(disc => disc.id == (action.payload as IChannelMessage).channelsId)
 			if (index != -1) { state.channels[index].messages.push(action.payload as IChannelMessage); }
 			return { ...state };
+		case EChannelSocketActionType.SETDISPLAY:
+			return { ...state, settings_display: (action.payload as boolean) };
 		default:
 			return { ...state };
 	}

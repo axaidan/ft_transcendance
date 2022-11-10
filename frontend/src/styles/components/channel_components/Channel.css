@@ -1,16 +1,140 @@
 #channel-container-display {
 	position: absolute;
 	display: grid;
-	grid-template-columns: 1fr;
+	grid-template-columns: 2fr 5fr;
 	grid-column: auto;
 	bottom: 0;
-	left: -701px;
+	left: -601px;
 	border: 1px solid #16222a;
-	background-color: #020912be;
-	height: 600px;
-	width: 700px;
+	background-color: #020912;
+    box-sizing: border-box;
+	height: 800px;
+	width: 600px;
+	margin-bottom: 2px;
 }
 
 #channel-container-none {
 	display: none;
+}
+
+#channel-body {
+	position: relative;
+	display: grid;
+	grid-template-rows: 65px 690px 45px;
+	border-left: 1px solid #16222a;
+}
+
+
+#channel-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-left: 20px;
+	padding-right: 20px;
+	border-bottom: 1px solid #785a28;
+}
+
+.channel-user {
+	position: relative;
+	box-sizing: border-box;
+	height: 55px;
+	width: auto;
+	background-color: rgba(0, 0, 0, 0);
+    transition: background-color  600ms linear, height 100ms linear;
+}
+
+.channel-user-box {
+	position: relative;
+	box-sizing: border-box;
+}
+
+#channel-user-pannel {
+	position: absolute;
+	right: -120px;
+	top: 0;
+	width: 120px;
+	background-color: #16222a;
+	z-index: 1;
+	border: 1px solid #785a28;
+}
+
+.channel-user-pannel-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	color: #797979;
+	background-color: #00000000;
+	height: 25px;
+    transition: background-color 600ms linear, color 600ms linear;
+}
+
+.channel-user-pannel-btn:hover {
+	color: #ffffff;
+	background-color: #2d414f;
+    transition: background-color 10ms linear, color 10ms linear;
+}
+
+
+.channel-user:hover {
+    cursor: pointer;
+    background-color: #2d414f;
+    transition: background-color  200ms linear, height 100ms linear;
+}
+
+
+
+.red {
+	background-color: red;
+}
+
+.blue {
+	background-color: rgb(13, 0, 255);
+}
+
+.green {
+	background-color: rgb(30, 255, 0);
+}
+
+
+
+
+#channel-option {
+	position: relative;
+}
+
+#channel-option button{
+	margin-left: 10px;
+	width: 25px;
+	height: 25px;
+	border: none;
+	cursor: pointer;
+}
+
+#channel-option-menu {
+	position: absolute;
+	margin-top: 20px;
+	top: 5px;
+	right: 0;
+	width: 100px;
+	background-color: #16222a;
+	z-index: 1;
+	border: 1px solid #785a28;
+}
+
+.chan-mess-owner {
+	color: #797979;
+	font-size: 0.8em;
+	margin-left: 15px;
+}
+
+.chan-mess {
+	/* overflow: scroll; */
+	overflow-x: hidden;
+}
+
+#channel-message-body {
+	overflow: scroll;
+	overflow-x: hidden;
 }

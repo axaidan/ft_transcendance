@@ -22,3 +22,15 @@ export const DflUser: IUser = {
 	status: 4,
 }
 
+export const DflChannel: IUser = {
+	id: 0,
+	login: "username",
+	username: "Channel",
+	email: "string",
+	createdAt: "string",
+	updatedAt: "string",
+	twoFactorAuth: false,
+	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
+	status: 4,
+}
+

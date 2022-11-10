@@ -23,6 +23,8 @@
 	background-color: #020912be;
 	height: 600px;
 	width: 700px;
+	box-sizing: border-box;
+	margin-bottom: 2px;
 }
 
 .chat-user {
