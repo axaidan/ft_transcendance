@@ -217,23 +217,14 @@ export function Pong() {
 			context.lineTo(canvas.width / 2, canvas.height - 1);
 			context.stroke();
 
-			context.beginPath();
-			context.moveTo(0, 0)
-			context.lineTo(canvas.width, 0);
-			context.stroke();
-
-			context.beginPath();
-			context.moveTo(0, canvas.height)
-			context.lineTo(canvas.width, canvas.height);
-			context.stroke();
 
 			context.fillStyle = 'white';
 			context.fillRect(0, game.player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 			context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 			context.beginPath();
 			context.fillStyle = 'red';
-			// context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
-			context.arc(game.ball.x + (BALL_HEIGHT / 2), game.ball.y, BALL_HEIGHT / 2, 0, 2 * Math.PI);
+			 context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
+			//context.arc(game.ball.x + (BALL_HEIGHT / 2), game.ball.y, BALL_HEIGHT / 2, 0, 2 * Math.PI);
 			context.fill();
 
 			}
