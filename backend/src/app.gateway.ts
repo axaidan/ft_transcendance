@@ -270,20 +270,22 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	//	console.log('test socket bacj')
 
 //		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
-		this.wss.to(b[4]).emit("updatePos", parseInt(b[0]), parseInt(b[1]) ,parseInt(b[2]) , parseInt(b[3]));
+		this.wss.to(b[4]).emit("updatePos", Number(b[0]), Number(b[1]) ,Number(b[2]) , Number(b[3]));
 	}
 
 	@SubscribeMessage('padUpdate')
 	async padUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
 		
-		this.wss.to(b[0]).emit("padUpdat", parseInt(b[1]), parseInt(b[2]));
+		this.wss.to(b[0]).emit("padUpdat", Number(b[1]), Number(b[2]));
 	}
 
 	@SubscribeMessage('updateBall')
 	async ballUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
-		this.wss.to(b[0]).emit('updatBall', parseInt(b[1]), parseInt(b[2]), parseInt(b[3]), parseInt(b[4]));
+
+	//	console.log(b)
+		this.wss.to(b[0]).emit('updatBall', Number(b[1]), Number(b[2]), Number(b[3]), Number(b[4]));
 	}
 
 	@SubscribeMessage('end')

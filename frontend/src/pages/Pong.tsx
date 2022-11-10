@@ -4,12 +4,15 @@ import { SocketContext } from '../context';
 import SocketContextComponent from '../context/UserSocket/Components';
 import { AxiosJwt } from '../hooks';
 import { useSocket } from '../hooks/useSocket';
-import './pong.css'
+//import './pong.css'
+import { useRef } from 'react';
 
+//import useWindowDimensions from "./useWindowDimensions"
 
 
 export function Pong() {
 
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
 	let canvas: HTMLCanvasElement;
 	let game: 	{ball: {x:number, y:number, 
@@ -34,6 +37,7 @@ export function Pong() {
 
 	const {me, socket} = useContext(SocketContext).SocketState;
 
+	//const { height, width } = useWindowDimensions();
 
 
 	function playerMove(event: any) {
@@ -47,27 +51,27 @@ export function Pong() {
 		// Emit socket player position
 		if (me.id === game.player.player) {
 			game.player.y = mouseLocation - PLAYER_HEIGHT / 2;
-			if (mouseLocation <= PLAYER_HEIGHT) {
+			if (mouseLocation <= PLAYER_HEIGHT / 2) {
 				game.player.y = 0;
-			} else if (mouseLocation > canvas.height * 2 - PLAYER_HEIGHT) {
+			} else if (mouseLocation > canvas.height  - PLAYER_HEIGHT / 2) {
 				game.player.y = canvas.height - PLAYER_HEIGHT;
 			} else {
-				game.player.y = mouseLocation/2  - PLAYER_HEIGHT/2 ;
+				game.player.y = mouseLocation  - PLAYER_HEIGHT/2 ;
 			}
 			//emit to room pos palette1 pallette2 balle x y vitesse x y 
 			// je dois emit seulement les pad et non la balle 
-			socket!.emit('padUpdate', game.roomName + ':' + game.player.y + ':' + game.player2.y);
+			socket!.emit('padUpdate', game.roomName + ':' + (game.player.y / canvas.height) + ':' + (game.player2.y/ canvas.height));
 		} else if (me.id === game.player2.player) {
 			game.player2.y = mouseLocation - PLAYER_HEIGHT / 2;
-			if (mouseLocation <= PLAYER_HEIGHT) {
+			if (mouseLocation <= PLAYER_HEIGHT / 2) {
 				game.player2.y = 0;
-			} else if (mouseLocation > canvas.height * 2 - PLAYER_HEIGHT) {
+			} else if (mouseLocation > canvas.height - PLAYER_HEIGHT / 2) {
 				game.player2.y = canvas.height - PLAYER_HEIGHT;
 			} else {
-				game.player2.y = mouseLocation/2  - PLAYER_HEIGHT/2 ;
+				game.player2.y = mouseLocation  - PLAYER_HEIGHT/2 ;
 			}
 			//emit to room pos palette1 pallette2 balle x y vitesse x y 
-			socket!.emit('padUpdate', game.roomName + ':' + game.player.y + ':' + game.player2.y);
+			socket!.emit('padUpdate', game.roomName + ':' + (game.player.y /canvas.height) + ':' + (game.player2.y/canvas.height));
 			//socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
 		}
 	}
@@ -105,7 +109,7 @@ export function Pong() {
 			game.ball.y += game.ball.speed.y;
 			//socket.emit('ballMoveFront', joueur1 + ":" + joueur2 + ":" + game.ball.x + ":" + game.ball.y + ":" + game.ball.speed.x + ":" + game.ball.speed.y);
 			// emit seulement la balle
-			socket!.emit('updateBall', game.roomName + ':' +game.ball.x +':'+game.ball.y + ':'+ game.ball.speed.x +':' + game.ball.speed.y)
+			socket!.emit('updateBall', game.roomName + ':' +(game.ball.x/ canvas.width) +':'+ (game.ball.y/ canvas.height) + ':'+ (game.ball.speed.x / canvas.width)+':' + (game.ball.speed.y / canvas.height))
 //			socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
 	}
 
@@ -128,7 +132,7 @@ export function Pong() {
 				game.player2.score++;
 				socket!.emit('printscore', game.roomName + ":" + game.player.score +":" + game.player2.score);
 
-				socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+				socket!.emit('updateGame', (game.player.y / canvas.height) + ':' + (game.player2.y / canvas.height) + ':' + (game.ball.x/canvas.width) +':'+ (game.ball.y/ canvas.height) + ':' + game.roomName)
 				document.querySelector('#player2-score')!.textContent = game.player2.score.toString();
 				var t = document.querySelector('#player2-score')!.textContent;
 
@@ -151,7 +155,8 @@ export function Pong() {
 				// Update score
 				game.player.score++;
 				socket!.emit('printscore', game.roomName + ":" + game.player.score +":" + game.player2.score);
-				socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+				//socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+				socket!.emit('updateGame', (game.player.y / canvas.height) + ':' + (game.player2.y / canvas.height) + ':' + (game.ball.x/canvas.width) +':'+ (game.ball.y/ canvas.height) + ':' + game.roomName)
 				document.querySelector('#player-score')!.textContent = game.player.score.toString();
 				var t = document.querySelector('#player-score')!.textContent;
 				if (game.player2.score >= 5 || (t && parseInt(t) >= 5)) {
@@ -169,7 +174,8 @@ export function Pong() {
 		else
 			game.ball.speed.x *= -1;
 		changeDirection(player.y);
-		socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
+		socket!.emit('updateBall', game.roomName + ':' +(game.ball.x/ canvas.width) +':'+ (game.ball.y/ canvas.height) + ':'+ (game.ball.speed.x / canvas.width)+':' + (game.ball.speed.y / canvas.height))
+		//socket!.emit('updateGame', game.player.y + ':' + game.player2.y + ':' + game.ball.x +':'+game.ball.y + ':' + game.roomName)
 
 
 		}
@@ -197,6 +203,11 @@ export function Pong() {
 			let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
 
 			if (context) { 
+				PLAYER_HEIGHT = canvas.height/3;
+				PLAYER_WIDTH = canvas.width/100;
+				BALL_HEIGHT = canvas.height/12;
+				BALL_SPEED= canvas.width /400;
+
 			context.fillStyle = 'black';
 			context.fillRect(0, 0, canvas.width, canvas.height);
 			// Draw middle line
@@ -213,9 +224,20 @@ export function Pong() {
 			context.fillStyle = 'white';
 			context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
 			context.fill();
+
 			}
 
 		}
+	}
+
+	function handleResize() {
+		canvas.height = window.innerHeight - 100;
+		canvas.width = window.innerWidth - 270;
+
+		PLAYER_HEIGHT = canvas.height/3;
+		PLAYER_WIDTH = canvas.width/100;
+		BALL_HEIGHT = canvas.height/12;
+		//draw();
 	}
 
 	function stop() {
@@ -346,14 +368,21 @@ export function Pong() {
 
 	useEffect(() => {
 		let isMounted = true;
+		window.addEventListener("resize", handleResize);
 		canvas = document.getElementById('canvas');
 		initScreen();
 	//	initParty();
 		play();
 		canvas.addEventListener('mousemove', playerMove);
-
 		StartListeners();
 	}, []);
+
+
+	/*
+	window.addEventListener('resize', function (event) {
+		draw();
+	}, true);
+	*/
 
 	const StartListeners = ()=> {
 
@@ -367,10 +396,10 @@ export function Pong() {
 		}); 
 
 		socket!.on("updatePos", (...arg) => {
-			game.player.y = arg[0];
-			game.player2.y = arg[1];
-			game.ball.x = arg[2];
-			game.ball.y = arg[3];
+			game.player.y = arg[0] * canvas.height;
+			game.player2.y = arg[1]* canvas.height;
+			game.ball.x = arg[2]* canvas.width;
+			game.ball.y = arg[3]* canvas.height;
 		});
 
 		socket!.on("updateScore", (...arg) => {
@@ -381,15 +410,19 @@ export function Pong() {
 		});
 
 		socket!.on("padUpdat", (...arg) => {
-			game.player.y = arg[0];
-			game.player2.y = arg[1];
+			game.player.y = arg[0] * canvas.height;
+			game.player2.y = arg[1] * canvas.height;
 		});
 
 		socket!.on("updatBall", (...arg)=> {
+		//	console.log(`arg :${arg[0]}, ${arg[1]}`)
 			game.ball.x = arg[0];
+			game.ball.x *= canvas.width;
 			game.ball.y = arg[1];
-			game.ball.speed.x = arg[2];
-			game.ball.speed.y = arg[3];
+			game.ball.y *= canvas.height;
+			console.log(`canvas width height ${canvas.width}, ${canvas.height}`)
+			game.ball.speed.x = arg[2] * canvas.width;
+			game.ball.speed.y = arg[3] * canvas.height;
 		});
 
 		socket!.on('end', (...arg) => {
@@ -418,7 +451,7 @@ export function Pong() {
 		<em className="canvas-score" id="joueur1"></em>
 		<em className="canvas-score" id="player-score">0</em> - <em id="joueur2"></em>
 		<em className="canvas-score" id="player2-score">0</em></p>
-         <canvas id="canvas"  />
+         <canvas id={'canvas'}  /> 
 		<button onClick={restore}> restore </button>
 		<button onClick={initParty}> initParty</button>
 		<button onClick={getIntoLobby}> queue</button>
