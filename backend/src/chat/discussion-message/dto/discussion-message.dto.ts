@@ -1,15 +1,15 @@
 import { IsDate, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class DiscussionMessageDto {
-   
-    @IsInt()
-    userId: number;
 
-    @IsInt()
-    discId: number;
+	@IsInt()
+	userId: number;
 
-    @IsString()
-    @IsNotEmpty()
-    text: string;
+	@IsInt()
+	discId: number;
+
+	@IsString()
+	@IsNotEmpty()
+	text: string;
 
 }

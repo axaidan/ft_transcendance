@@ -49,4 +49,20 @@ export class UserService {
 			}
 		}
 	}
+
+	async isUser(userName: string ) {
+		let user = await this.prisma.user.findFirst({where: {username: userName}});
+		if (user) {
+			return true;
+		}
+		return false;
+	}
+
+	async getUserIdByName(userName: string ) {
+		let user = await this.prisma.user.findFirst({where: {username: userName}});
+		if (user) {
+			return user.id;
+		}
+		return undefined;
+	}
 }

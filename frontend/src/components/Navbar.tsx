@@ -4,13 +4,12 @@ import { useEffect } from 'react';
 import { IUser } from "../types";
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import '../styles/components/Navbar.css'
+import { useContext } from 'react';
+import { SocketContext } from '../context/UserSocket/Socket';
 
-type NavProps = {
-	me: IUser;
-}
+export function Navbar() {
 
-export function Navbar({ me }: NavProps) {
-
+	const { me } = useContext(SocketContext).SocketState;
 	const request = AxiosJwt();
 	const [toggleMenu, setToggleMenu] = useState(false);
 	const [largeur, setLargeur] = useState(window.innerWidth);
@@ -83,7 +82,7 @@ export function Navbar({ me }: NavProps) {
 					</NavLink>
 				</li>
 				<div className="nav_user">
-				<div className="avatar">
+					<div className="avatar">
 						<img src={me.avatarUrl} className="user_icon">
 						</img>
 					</div>

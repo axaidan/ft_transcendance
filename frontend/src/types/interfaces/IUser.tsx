@@ -1,3 +1,5 @@
+import { defaultWinrate, IWinrate } from "./IWinrate"
+
 export type IUser = {
 	id: number,
 	login: string,
@@ -17,6 +19,6 @@ export const DflUser: IUser = {
 	createdAt: "string",
 	updatedAt: "string",
 	twoFactorAuth: false,
-	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg"
+	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
 }
 

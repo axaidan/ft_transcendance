@@ -1,0 +1,94 @@
+.acc-body {
+	width: 100%;
+	height: 100%;
+	overflow: scroll;
+}
+
+#acc-title {
+	animation: fadeIn 3s;
+	font-family: 'Friz Quadrata Std Bold';
+	color: #785a28;
+	display: flex;
+	justify-content: center;
+	margin: 50px;
+	font-size: 90px;
+	text-shadow: 3px 1px #c8aa6d, 7px 2px #444;
+}
+
+.acc-video-div {
+	display: flex;
+	justify-content: center;
+}
+
+.acc-video {
+	width: 1000px;
+	height: auto;
+}
+
+#acc-faker {
+	display: flex;
+	margin-top: 20px;
+	margin-left: 50px;
+	width: 300px;
+	transition: 0.4s;
+	border-collapse: separate;
+	border: 1px solid white;
+	padding: 10px;
+	border-radius: 0% 20% 0% 20%;
+}
+
+#acc-faker:hover {
+	display: flex;
+	scale: 0.9;
+	border-radius: 0 0 0 0;
+	transition: 0.3s;
+	transition-delay: 0.1s;
+	border: 3px solid #785a28;
+}
+
+.acc-worlds {
+	display: flex;
+	width: 50%;
+	justify-content: center;
+}
+
+.acc-notes {
+	display: flex;
+}
+
+.acc-worlds a,
+.acc-notes a {
+	text-decoration: none;
+}
+
+.acc-faker-desc {
+	font-family: 'Friz Quadrata Std Bold';
+	margin-left: 50px;
+}
+
+.acc-esport {
+	margin-top: 10px;
+	display: flex;
+	color: turquoise;
+	font-size: small;
+	font-style: italic;
+}
+
+.acc-esport-title {
+	display: flex;
+	color: aliceblue;
+	font-size: x-large;
+}
+
+.acc-esport-desc {
+	display: flex;
+	color: aliceblue;
+	font-size: smaller;
+}
+
+.acc-esport-publish {
+	display: flex;
+	color: aliceblue;
+	font-size: x-small;
+	font-style: italic;
+}

@@ -1,0 +1,69 @@
+.signin-body {
+	display: flex;
+	background-image: url('../../assets/images/Signin/background-toast.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position-x: center;
+	height: 100vh;
+	width: 100vw;
+	justify-content: center;
+	align-items: center;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+.signin-box {
+	background-color: #091720;
+	display: flex;
+	border: 5px ridge #785a28;
+	width: 500px;
+	height: 250px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+
+.signin-buttons {
+	display: flex;
+	justify-content: center;
+}
+
+#signin-validate {
+	transition: 0.5s;
+	color: azure;
+	display: flex;
+	height: 50px;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	border: none;
+	background: none;
+	background-image: url('../../assets/images/Signin/button-lockin.png');
+	background-position-x: center;
+	background-size: 190px;
+	background-repeat: no-repeat;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+#signin-validate:hover {
+	transition: 0.5s;
+	background-image: url('../../assets/images/Signin/button-lockin-hover.png');
+}
+
+#signin-validate:active {
+	background-image: url('../../assets/images/Signin/button-lockin-click.png');
+}
+
+.signin-input {
+	font-family: 'Friz Quadrata Std Bold';
+	margin-bottom: 80px;
+}
+
+.signin-text {
+	display: flex;
+	font-size: larger;
+	color: #938f75;
+	margin-left: 100px;
+	margin-right: 100px;
+	margin-top: 40px;
+	margin-bottom: 50px;
+}

@@ -1,6 +1,7 @@
 .all_achiev {
 	display: flex;
 	flex-wrap: wrap;
+	margin-top: 100px;
 }
 
 .unlocked_achiev {
@@ -8,14 +9,16 @@
 	display: flex;
 	list-style: none;
 	background-color: #020912;
-	width: 250px;
-	border: 2px solid #16222a;
+	width: 300px;
+	border: 2px solid #785a28;
+	;
 	border-radius: 10%;
 	margin: 20px;
 	height: 100px;
 }
 
 .unlocked_achiev h3 {
+	margin-top: 10px;
 	color: green;
 }
 
@@ -28,8 +31,15 @@
 }
 
 .achiev_describe {
+	margin-top: 20px;
 	display: flex;
 	justify-content: center;
+	font-style: italic;
+	align-items: center;
+}
+
+.locked_achiev h3 {
+	margin-top: 10px;
 }
 
 .locked_achiev {
@@ -38,7 +48,7 @@
 	display: flex;
 	list-style: none;
 	background-color: #020912;
-	width: 250px;
+	width: 300px;
 	border: 2px solid gray;
 	border-radius: 10%;
 	margin: 20px;

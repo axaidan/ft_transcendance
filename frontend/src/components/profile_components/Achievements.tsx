@@ -17,19 +17,18 @@ export function Achievement() {
 	const [locked, setLocked] = useState([]);
 
 	useEffect(() => {
-		axios.get('/achiv/list_unlock')
+		axios.get('/achiv/list_unlock/', user.id)
 			.then((res) => setUnlocked(res.data));
 
-		axios.get('/achiv/list_lock')
+		axios.get('/achiv/list_lock', user.id)
 			.then((res) => setLocked(res.data));
 	}, [])
 
-	//let test: IconProp = 
 	return (
 		<div>
 			<ul className='all_achiev'>
-				{unlocked.map((achievment: IAchievment) => (
-					<div className='unlocked_achiev'>
+				{unlocked.map((achievment: IAchievment, index: number) => (
+					<div className='unlocked_achiev' key={index}>
 						<li >
 							<h3>
 								<FontAwesomeIcon icon={faTrophy} id='icon_unlocked' />
@@ -43,8 +42,8 @@ export function Achievement() {
 				))}
 				<br />
 				{
-					locked.map((achievment: IAchievment) => (
-						<div className='locked_achiev'>
+					locked.map((achievment: IAchievment, index: number) => (
+						<div className='locked_achiev' key={index}>
 							<li id='locked-bloc'>
 								<h3>
 									<FontAwesomeIcon icon={faPoo} id='icon_locked' />
