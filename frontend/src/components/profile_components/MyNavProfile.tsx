@@ -1,13 +1,15 @@
 // Extern:
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useForm, Resolver } from 'react-hook-form';
 
 //Assets
 import "../../styles/components/profile_components/MyNavProfile.css";
 
 // Intern:
-import { AxiosJwt } from '../../hooks';
-import { useForm, Resolver } from 'react-hook-form';
 import { FormValues } from '../../pages/Profile';
+import { AxiosJwt } from '../../hooks';
+
+//Context
 import { useContext } from 'react';
 import { SocketContext } from '../../context/UserSocket/Socket';
 

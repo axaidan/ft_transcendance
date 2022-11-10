@@ -1,10 +1,19 @@
+
+//EXTERN
 import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { AxiosResponse } from "axios";
+
+//CONTEXT
 import { UserCreateChat } from "../components";
-import { AxiosJwt } from '../hooks/AxiosJwt'
-import { IUser } from '../types/interfaces/IUser';
-import { DflWinrate, IWinrate, useWinrate } from '../hooks/useWinrate';
 import { SocketContext } from "../context";
+
+//CUSTOM HOOK
+import { AxiosJwt } from '../hooks/AxiosJwt'
+import { useWinrate } from '../hooks/useWinrate';
+
+//ASSET
+import { IUser } from '../types/interfaces/IUser';
 
 type LadderProps = {
 	user: IUser,
@@ -13,7 +22,15 @@ type LadderProps = {
 
 function LadderList({ user }: LadderProps) {
 
-	const { me } = useContext(SocketContext).SocketState;
+	const { me, blocks } = useContext(SocketContext).SocketState;
+	const wr = useWinrate(user.id);
+	const [isBlocked, setisBlocked] = useState(false);
+	const axios = AxiosJwt();
+
+	useEffect(() => {
+		axios.get('/relation/is_block/' + user.id)
+			.then((res: AxiosResponse<boolean>) => { setisBlocked(res.data) })
+	}, [blocks])
 
 	return (
 		<div className="ladder-user-div">
@@ -29,7 +46,7 @@ function LadderList({ user }: LadderProps) {
 				<button id='friend-redirect' />
 			</Link>
 			<div className="ladder-buttons">
-				{user.id === me.id ?
+				{user.id === me.id || isBlocked ?
 					<></> :
 					<UserCreateChat user={user}>
 						<button id='friend-chat' className="ladder-chat"></button>
@@ -47,6 +64,7 @@ export function Ladder() {
 
 	const [users, setUsers] = useState<IUser[]>([]);
 	const axios = AxiosJwt();
+
 
 	useEffect(() => {
 		axios.get('/user/all')

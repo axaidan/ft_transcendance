@@ -1,17 +1,17 @@
 *:not(canvas) {
-    margin: 0;
-    padding: 0;
-  }
+	margin: 0;
+	padding: 0;
+}
 
 #canvas {
-    width: 800px !important;
-    height: 300px !important;  
-    background: black !important;
-    border: .4rem solid white;
-    position: sticky;
-    transition-duration: 1s;
-    padding-top: 100px;
-    padding-bottom: 100px;
-    padding-left: 50px;
-    padding-right: 50px;
-  }
+	width: calc(100% - 120px);
+	height: 10%;
+	background: black !important;
+	border: .4rem solid white;
+	position: sticky;
+	transition-duration: 1s;
+	padding-top: 100px;
+	padding-bottom: 100px;
+	padding-left: 50px;
+	padding-right: 50px;
+}

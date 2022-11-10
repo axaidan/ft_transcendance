@@ -1,5 +1,4 @@
 // Extern:
-import React, { useContext, useState } from "react";
 import { useNavigate, Outlet } from 'react-router-dom'
 
 // Intern:
@@ -12,10 +11,7 @@ import bg_website from '../assets/videos/bg_website.webm'
 import { useAxios } from "../hooks/useAxios";
 import SocketContextComponent from "../context/UserSocket/Components";
 import { ChatSocketContextComponent, ESocketActionType, SocketContext } from "../context";
-import { Acceuil } from "./Acceuil";
-import { Profile } from "./Profile";
-import { Resolver, useForm } from "react-hook-form";
-import { AxiosJwt } from '../hooks/AxiosJwt';
+
 
 function LoadingHome() {
 	return (

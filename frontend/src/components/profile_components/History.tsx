@@ -1,11 +1,13 @@
 // Extern:
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation, useOutletContext, useParams, Outlet } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
+import { AxiosResponse } from "axios";
 
 // Intern:
 import { AxiosJwt } from '../../hooks/AxiosJwt'
-import { DflUser, IGame, IUser } from '../../types'
-import { AxiosResponse } from "axios";
+
+//Interfaces
+import { IGame, IUser } from '../../types'
 
 // Assets:
 import '../../styles/components/Historique.css'
@@ -67,7 +69,7 @@ export function History() {
 	return (
 		<div className='container-history'>
 			<div className="history-title">
-				{user.username} 'S RECENT GAMES (LAST 20 PLAYED)
+				{user.username} 'S RECENT GAMES
 			</div>
 			<ul id='history-list'>
 				{games.map((game: IGame, index: number) => (

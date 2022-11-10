@@ -1,20 +1,23 @@
 // Extern:
 import { AxiosResponse } from 'axios';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router';
-import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 
 // Intern:
 
 import "../styles/components/profile_components/OthNavProfile.css"
-import { useContext } from 'react';
 import { AxiosJwt } from '../hooks/AxiosJwt';
-import { DflUser, IUser } from '../types/interfaces/IUser';
 import { ESocketActionType, SocketContext } from '../context';
-import { DflRelationship, IRelationship } from '../types';
-import { IGame } from '../types/interfaces/IGame';
-import { DflWinrate, useWinrate } from '../hooks/useWinrate';
+
+//INTERFACES
+import { IUser } from '../types/interfaces/IUser';
+
+//CUSTOM HOOK
+import { useWinrate } from '../hooks/useWinrate';
 import { useUser } from '../hooks/useUser';
+
+//ASSET
 
 
 export function OtherProfile() {

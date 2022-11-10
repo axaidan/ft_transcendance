@@ -1,15 +1,21 @@
-import { useContext, useState, useEffect } from "react";
+//EXTERN
+import { useContext } from "react";
 import { Resolver, useForm } from "react-hook-form";
-import { ESocketActionType, SocketContext } from "../context";
-import { AxiosJwt } from "../hooks";
 import { FormValues } from "./Profile";
 import { useNavigate } from 'react-router-dom';
+
+//CONTEXT
+import { SocketContext } from "../context";
+
+//CUSTOM HOOK
+import { AxiosJwt } from "../hooks";
+
+//ASSET
 import '../styles/pages/Username.css'
 
 export function UsernameLogger() {
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
-	const [nick, setNick] = useState(false);
 	const navigate = useNavigate();
 
 	const ExistantUsername = async (value: string) => {

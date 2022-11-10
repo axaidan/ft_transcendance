@@ -1,6 +1,6 @@
+//ASSETS
 import '../styles/pages/Acceuil.css'
 import accueilbg from '../assets/videos/accueil-bg.webm'
-import { Link } from 'react-router-dom'
 
 export function Acceuil() {
 	return (

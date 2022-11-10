@@ -1,7 +1,12 @@
-import { IGame } from '../types/interfaces/IGame';
+//EXTERN
 import { useEffect, useState } from 'react';
-import { AxiosJwt } from './AxiosJwt';
 import { AxiosResponse } from 'axios';
+
+//INTERFACES
+import { IGame } from '../types/interfaces/IGame';
+
+//CUSTOM HOOK
+import { AxiosJwt } from './AxiosJwt';
 
 export interface IWinrate {
 	games: IGame[];

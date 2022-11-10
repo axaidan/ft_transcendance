@@ -8,12 +8,12 @@ import { AvatarService } from "./avatar.service";
 
 @Controller('avatar')
 export class AvatarController {
-	constructor (private avatarService: AvatarService) {};
+	constructor(private avatarService: AvatarService) { };
 
 	@Post('upload')
 	@UseGuards(JwtGuard)
 	@UseInterceptors(FileInterceptor('file'))
-	uploadImage(@GetUser('id') meId: number,@UploadedFile() file: Express.Multer.File) {
+	uploadImage(@GetUser('id') meId: number, @UploadedFile() file: Express.Multer.File) {
 		return this.avatarService.uploadImageToCloudinary(file, meId);
 	}
 
@@ -25,7 +25,7 @@ export class AvatarController {
 	}
 
 
-	@Get('list')	
+	@Get('list')
 	@UseGuards(JwtGuard)
 	list_avatar(@GetUser('id') meId: number) {
 		return this.avatarService.list_avatar(meId);
@@ -39,7 +39,7 @@ export class AvatarController {
 
 	@Post('update_avatar/:id')
 	@UseGuards(JwtGuard)
-	update_avatar(@GetUser('id') meId:number, @Param('id', ParseIntPipe) avatarId:number) {
+	update_avatar(@GetUser('id') meId: number, @Param('id', ParseIntPipe) avatarId: number) {
 		return this.avatarService.edit_avatar(meId, avatarId);
 	}
 
