@@ -11,6 +11,7 @@ import { IAvatar } from '../../types';
 
 //ASSETS
 import '../../styles/components/profile_components/Collection.css'
+import { Outlet } from 'react-router-dom';
 
 export function Collection() {
 

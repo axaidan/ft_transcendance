@@ -1,12 +1,13 @@
 .collection-body {
 	width: 100%;
+	height: 95%;
 	overflow: scroll;
 }
 
 .collection-title {
 	display: flex;
 	justify-content: center;
-	margin-top: 50px;
+	margin-top: 40px;
 	margin-bottom: 50px;
 	font-family: 'Friz Quadrata Std Bold';
 	font-size: xx-large;
@@ -14,6 +15,7 @@
 }
 
 .collection-avatar-list {
+	height: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	margin: 10px;
