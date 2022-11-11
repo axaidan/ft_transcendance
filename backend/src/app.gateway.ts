@@ -167,6 +167,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		let roomName: string = 'game' + lobbyId;
 		if (this.clientsMapRooms.has(roomName)) {
 			this.clientsMapRooms.get(roomName).add(meId);
+			this.clientsMap.get(meId).join(roomName);
 		}
 	}
 

@@ -5,8 +5,12 @@ import SocketContextComponent from '../context/UserSocket/Components';
 import { AxiosJwt } from '../hooks';
 import { useSocket } from '../hooks/useSocket';
 import { useRef } from 'react';
+import { Resolver, useForm } from 'react-hook-form';
+import { FormValues } from './Profile';
 
-
+type FormNumberValue = {
+	id: number,
+}
 
 export function Pong() {
 
@@ -397,6 +401,7 @@ export function Pong() {
 	}
 
 	function spec(id: number) {
+		console.log(`spec id: ${id}`)
 		axios.get('spec/' + id);
 	}
 	 
@@ -509,6 +514,30 @@ export function Pong() {
 
 	};
 
+	const resolver: Resolver<FormNumberValue> = async (values) => {
+
+
+		return {
+			values: values.id ? values : {},
+			errors: !values.id
+				? {
+					id: {
+						type: 'required',
+						message: 'Enter a new username or cancel.',
+					},
+				}
+				: {}
+		}
+	};
+
+
+const { register, handleSubmit, formState: { errors } } = useForm<FormNumberValue>({ resolver });
+
+const onSubmit = handleSubmit((data) => {
+	console.log(`go button avec id: ${data.id}`)
+axios.get('/lobby/spec/' + data.id.toString());
+});
+
 	return (
 		<div>
         <h1>Pong</h1>
@@ -526,9 +555,9 @@ export function Pong() {
 		<button onClick={rematch}> rematch  </button>
 		<button onClick={quiteLobby}> quite lobby </button>
 		
-		<form onSubmit={spec}>
-			<input type='number' placeholder='0'/>
-			<input type='submit' onSubmit={spec} />
+		<form onSubmit={onSubmit}>
+			<input  {...register("id")} type='number' placeholder='0'/>
+			<input type='submit' onSubmit={onSubmit} />
 		</form>
 		<button onClick={deleteLobby}> delete lobby</button>
         </main>
