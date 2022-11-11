@@ -38,10 +38,10 @@ export class lobbyController {
         dependence : userId
         return : lobbyId
     */
-    @Get('join')
+    @Get('join/:id')
 	@UseGuards(JwtGuard)
-    async joinLobby(@GetUser('id') Meid: number) {
-        return this.lobbyService.joinLobby(Meid);
+    async joinLobby(@GetUser('id') Meid: number, @Param('id', ParseIntPipe) mode: number) {
+        return this.lobbyService.joinLobby(Meid, mode);
     }
 
     /*
@@ -68,10 +68,16 @@ export class lobbyController {
     async inviteToLobby() {
     }
 
+	@Delete('leaveLobby')
+	@UseGuards(JwtGuard)
+	async quite(@GetUser('id') meId: number) {
+		this.lobbyService.leaveLobby(meId);
+	}
 
     @Delete('cleanAll') // dev part
     async cleanAll() {
         return this.lobbyService.cleanLobbyMap();
     }
+
 
 }

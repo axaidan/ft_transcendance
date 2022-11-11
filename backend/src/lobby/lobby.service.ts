@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { Socket } from "socket.io";
 import { AppGateway } from "src/app.gateway";
@@ -33,26 +33,49 @@ export class LobbyService {
 
 
     constructor(
+		@Inject(forwardRef(() => AppGateway))
         private socket: AppGateway
     ) {}
 
     lobbies = new Map<LobbyId, Lobby>();
     queue = new Array<number>(); // number =  UserId serait mieux
+    queueShortPad = new Array<number>(); // number =  UserId serait mieux
+    queueFastBall = new Array<number>(); // number =  UserId serait mieux
 
-    async joinLobby(meId: number) {
+    async joinLobby(meId: number, mode: number) {
         console.log('lobbyservice');
         if (await this.findUserInLobby(meId) === true) {
             console.log('tu es deja log; need to throw execption');
             return ;
         }
         console.log('user %d ,join queue ', meId);
-        this.joinQueue(meId);
-        if (this.queue.length < 2)
-            return ;
-        const u1 = this.queue.shift();
-        const u2 = this.queue.shift();
 
-        const lobbyId = await this.createLobby(u1, u2);
+        this.joinQueue(meId, mode);
+        let u1: number ;
+        let u2: number;
+		if (mode === 1) {
+  	    	if (this.queueShortPad.length < 2)
+  	        	return ;
+			u1 = this.queueShortPad.shift();
+			u2 = this.queueShortPad.shift();
+			this.getUsersOffQueues(u1, u2);
+		}
+		else if (mode === 2) {
+  	    	if (this.queueFastBall.length < 2)
+  	        	return ;
+			u1 = this.queueFastBall.shift();
+			u2 = this.queueFastBall.shift();
+			this.getUsersOffQueues(u1, u2);
+		}
+		else {
+  	    	if (this.queue.length < 2)
+  	        	return ;
+        	const u1 = this.queue.shift();
+        	const u2 = this.queue.shift();
+			this.getUsersOffQueues(u1, u2);
+		}
+
+        const lobbyId = await this.createLobby(u1, u2, mode);
 
             // lance une game
 
@@ -61,7 +84,7 @@ export class LobbyService {
         await this.socket.joinGameRoom(u2, lobbyId);
 
         var lobby = this.lobbies.get(lobbyId);
-        await this.socket.startGame(u1, u2, lobbyId);
+        await this.socket.startGame(u1, u2, lobbyId, mode);
 		
      //   await this.socket.exitGameRoom(u1, lobbyId)
      //   await this.socket.exitGameRoom(u2, lobbyId)
@@ -72,17 +95,59 @@ export class LobbyService {
 
     };
 
-    async joinQueue(userId: number) {
-        this.queue.push(userId);
+	getUsersOffQueues(u1: number, u2:number) {
+		var idx = this.queue.indexOf(u1);
+		var idx2 = this.queue.indexOf(u2);
+		if (idx > -1) {
+			this.queue.splice(idx, 1);
+		}
+		if (idx2 > -1) {
+			this.queue.splice(idx2, 1);
+		}
+
+		idx = this.queueShortPad.indexOf(u1);
+		idx2 = this.queueShortPad.indexOf(u2);
+		if (idx > -1) {
+			this.queueShortPad.splice(idx, 1);
+		}
+		if (idx2 > -1) {
+			this.queueShortPad.splice(idx2, 1);
+		}
+
+		idx = this.queueFastBall.indexOf(u1);
+		idx2 = this.queueFastBall.indexOf(u2);
+		if (idx > -1) {
+			this.queueFastBall.splice(idx, 1);
+		}
+		if (idx2 > -1) {
+			this.queueFastBall.splice(idx2, 1);
+		}
+	}
+
+    async joinQueue(userId: number, mode: number) {
+		if (mode === 1){
+        	this.queueShortPad.push(userId);
+			return this.queueShortPad;
+		}
+		else if (mode === 2) {
+        	this.queueFastBall.push(userId);
+			return this.queueFastBall;
+		}
+		else {
+    	    this.queue.push(userId);
+		}
+		return this.queue;
     }
 
-    async createLobby(userId1: number, userId2: number) {
+ 
+    async createLobby(userId1: number, userId2: number, mode: number) {
         console.log('create a lobby with usermenber %d, and %d', userId1, userId2);
         const lobby = new Lobby();
     lobby.PlayersId.push(userId1);
     lobby.PlayersId.push(userId2);
     lobby.PalettePlayer1 = userId1;
     lobby.PalettePlayer2 = userId2;
+	lobby.mode = mode;
 
     this.lobbies.set(lobby.LobbyId, lobby);
     console.log('id du lobby creer :', lobby.LobbyId);
@@ -108,6 +173,10 @@ export class LobbyService {
         for (const l of this.lobbies.values()) {
             var ret = l.PlayersId.find(e => e === userId);
             if (ret) {
+                return l.LobbyId;
+            }
+            var ret2 = l.ViewersId.find(e => e === userId);
+            if (ret2) {
                 return l.LobbyId;
             }
         }
@@ -173,6 +242,19 @@ export class LobbyService {
             lobby.ViewersId.splice(idx, 1);
         }
     }
+
+	async leaveLobby(meId: number) {
+		let lobbyId = await this.findUserInLobbies(meId);
+
+		if (lobbyId === undefined)
+			return ;
+		let lobby = this.lobbies.get(lobbyId);
+		if (lobby.PalettePlayer1 === meId || lobby.PalettePlayer2 === meId) {
+			console.log("LOBBY CLOSE");
+			this.clearLobby(lobbyId);
+		}
+		// exit viewer du lobby
+	}
 
    async clearLobby(lobbyId: number) {
     this.lobbies.delete(lobbyId);

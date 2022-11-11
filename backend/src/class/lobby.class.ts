@@ -9,6 +9,8 @@ export default class Lobby {
     
     PalettePlayer1: number;
     PalettePlayer2: number;
+
+	mode: number;
     /**
      *  mettre un match aussi
      *  
