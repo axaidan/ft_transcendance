@@ -1,0 +1,148 @@
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.friend-bloc {
+	display: flex;
+	width: 800px;
+	height: 80px;
+	border: 1px solid #16222a;
+	align-items: center;
+	background-color: #091720;
+	background-image: url('../../../assets/images/avatar-border.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-position-x: 27px;
+	background-size: 85px;
+	margin-left: 10vh;
+}
+
+.friend-bloc:hover {
+	transition: ease-in-out 0.2s;
+	box-shadow: inset 10px 0px 10px -10px white;
+}
+
+#friend-avatar {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	margin-left: 40px;
+}
+
+.friend-username {
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: x-large;
+	margin-left: 20px;
+	margin-right: 10px;
+}
+
+.friend-right-button {
+	display: flex;
+	margin-left: auto;
+	margin-right: 50px;
+}
+
+#friend-chat {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/chat-enabled.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+#friend-unfriend {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: none;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/btn_highlights_delete.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 45px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+#friend-blockit {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/othNavProfile/block_mask.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 35px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+#friend-redirect {
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/friends/person_mask.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	cursor: pointer;
+}
+
+.friend-friend-div {
+	margin-top: 50px;
+	margin-bottom: 25px;
+}
+
+.friend-friend-div h1 {
+	animation: fadeIn 1s;
+	margin-left: 15px;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	margin-bottom: 20px;
+}
+
+.friend-bloc button:active {
+	scale: 0.9;
+}
+
+#friend-unblock {
+	height: 45px;
+	width: 45px;
+	border-radius: 50%;
+	border-style: double;
+	border-color: #785a28;
+	background-color: #020912;
+	background-image: url('../../../assets/images/profile_component/red_x_mark.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+	margin-right: 20px;
+}
+
+.friend-block-div h1 {
+	animation: fadeIn 1s;
+	margin-left: 15px;
+	font-family: 'Friz Quadrata Std Bold';
+	text-transform: uppercase;
+	margin-top: 25px;
+	margin-bottom: 20px;
+}

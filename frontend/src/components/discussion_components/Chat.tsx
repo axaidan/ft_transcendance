@@ -49,7 +49,7 @@ export function Chat() {
 	const handleKeyDown = (e: any) => {
 		const input = document.getElementById('messages-input') as HTMLInputElement;
 		if (e.key === 'Enter') {
-			if (input.value.length != 0) {socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });}
+			if (input.value.length != 0) { socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value }); }
 			input.value = "";
 		}
 	}
@@ -67,7 +67,8 @@ export function Chat() {
 		);
 	}
 
-	const ChatNotAble = () => { return (
+	const ChatNotAble = () => {
+		return (
 			<>
 				<DiscussionCreate />
 				<div className='messages-container-search'>
@@ -76,7 +77,8 @@ export function Chat() {
 					<ChatSearchFriends />
 				</div>
 			</>
-	)}
+		)
+	}
 
 	return (
 		<div id={chat_display ? "chat-container-display" : "chat-container-none"}>

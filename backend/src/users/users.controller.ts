@@ -34,5 +34,16 @@ export class UserController {
 		return (this.userService.editUser(userId, dto));
 	}
 
+	@Get('is_user/:name')
+	isUser(@Param('name') userName: string) {
+		console.log('test');
+		return this.userService.isUser(userName);
+	}
+
+	@Get('get_user_by_name/:name')
+	getUserIdByName(@Param('name') userName: string) {
+		return this.userService.getUserIdByName(userName);
+	}
+
 }
 

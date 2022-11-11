@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { OnlineStatusDto } from './users/dto';
 
@@ -28,10 +28,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	// @UseGuards(JwtGuard)
 	handleConnection(client: Socket, ...args: any[]) {
-		this.logger.log(`CLIENT ${client.id} CONNECTED: app.gateway`);
-		// envoyer a tout les clients dans clientsMaps ton status
-
-		// recuperer le status de tout les clientsMaps 
+		 this.logger.log(`CLIENT ${client.id} CONNECTED: app.gateway`);
+		client.broadcast.emit('loginToClient', client.id);
 
 	}
 
@@ -260,6 +258,55 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			return roomName;
 		})
 		return null
+	}
+
+	startGame(userId1: number, userId2: number, lobbyId: number){
+		console.log('test emitions ')
+		console.log(`emit to game + ${lobbyId}`);
+        this.wss.to('game' + lobbyId).emit("startGame", {p1: userId1 , p2:userId2 , lobbyId:lobbyId, mode: 1});
+	}
+
+	@SubscribeMessage('printscore')
+	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body:string) {
+		const b: string[] = body.split(':');
+
+		console.log(`score edit: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
+/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
+			this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
+		}*/
+			this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
+	}
+
+	@SubscribeMessage('updateGame')
+	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body : string){
+		const b: string[] = body.toString().split(':');
+
+	//	console.log('test socket bacj')
+
+//		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
+		this.wss.to(b[4]).emit("updatePos", Number(b[0]), Number(b[1]) ,Number(b[2]) , Number(b[3]));
+	}
+
+	@SubscribeMessage('padUpdate')
+	async padUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+		
+		this.wss.to(b[0]).emit("padUpdat", Number(b[1]), Number(b[2]));
+	}
+
+	@SubscribeMessage('updateBall')
+	async ballUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+
+	//	console.log(b)
+		this.wss.to(b[0]).emit('updatBall', Number(b[1]), Number(b[2]), Number(b[3]), Number(b[4]));
+	}
+
+	@SubscribeMessage('end')
+	async end(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		const b: string[] = body.toString().split(':');
+
+		this.wss.to(b[0]).emit('end', parseInt(b[1]), parseInt(b[2]));
 	}
 
 }

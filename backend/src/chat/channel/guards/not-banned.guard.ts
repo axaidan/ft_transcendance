@@ -24,6 +24,6 @@ export class NotBannedGuard implements CanActivate {
         if (channelBan === null)
             return true;
         else
-            throw new ForbiddenException('you are BAAAAAAAAAAAAAANNED from this channel');
+            throw new ForbiddenException('GUARD - banned from channel');
     }
 }

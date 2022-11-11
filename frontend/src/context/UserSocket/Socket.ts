@@ -36,6 +36,7 @@ export enum ESocketActionType {
 	ADD_BLOCKS = 'add_new_block',
 	RM_BLOCKS = 'rm_new_block',
 	UP_STATUS = 'update_user_status',
+	UP_USERNAME = 'update_username',
 }
 
 export type TSocketContextActions = ESocketActionType.UP_SOKET |
@@ -49,9 +50,10 @@ export type TSocketContextActions = ESocketActionType.UP_SOKET |
 	ESocketActionType.RM_FRIENDS |
 	ESocketActionType.ADD_BLOCKS |
 	ESocketActionType.UP_STATUS |
-	ESocketActionType.RM_BLOCKS;
-
-export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | IStatus | IStatus[];
+	ESocketActionType.RM_BLOCKS |
+	ESocketActionType.UP_USERNAME;
+	
+export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | IStatus | IStatus[] | string;	
 
 export interface ISocketContextActions {
 	type: TSocketContextActions;
@@ -92,6 +94,8 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
 			if (user) { user.status = (action.payload as IStatus).status;}
 			if (friend) {  friend!.status = (action.payload as IStatus).status; }
 			console.log(user);
+		case ESocketActionType.UP_USERNAME:
+			state.me.username = (action.payload as string);
 			return { ...state }
 		default:
 			return { ...state };

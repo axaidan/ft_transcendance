@@ -1,5 +1,4 @@
 export * from './History'
-export * from './NavOption'
 export * from './MyNavProfile'
 export * from './OthNavProfile'
 export * from './Friends'

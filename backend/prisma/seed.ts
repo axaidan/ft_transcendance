@@ -76,6 +76,7 @@ async function main() {
 			login: 'mlormois',
 			username: 'Sergent',
 			avatarUrl: publicAvatarMlormois.url,
+
 		},
 	})
 
@@ -114,8 +115,8 @@ async function main() {
 		update: {},
 		create: {
 			login: 'wluong',
-			username: 'Migi',
 			avatarUrl: publicAvatarSmile.url,
+			email: 'wluong@student.42.fr',
 		},
 	})
 
@@ -378,7 +379,7 @@ async function main() {
 		where: { id: 3 },
 		update: {},
 		create: {
-			userId: 1,
+			userId: 5,
 			userIWatchId: 4,
 			relation: 1,
 		},
@@ -443,7 +444,7 @@ async function main() {
 
 
 	//	FAKE USERS SEED
-	
+
 	for (let i = 0; i < 10; i++) {
 		await prisma.user.upsert({
 			where: { login: `user${i}` },
@@ -457,42 +458,42 @@ async function main() {
 			}
 		});
 	}
-	
+
 
 	// --------------------------- //
 	//      RELATIONS SEED         //
 	// --------------------------- //
 
-/*
-
-	for (let i = 0; i < 10; i++) {
-		// FRIENDS OF mlormois
-		await prisma.relation.create({
-			data: {
-				userId: 1,
-				userIWatchId: 9 + i,
-				relation: 1,
-			}
-		});
-		// FRIENDS OF Axaidan
-		await prisma.relation.create({
-			data: {
-				userId: 2,
-				userIWatchId: 9 + i,
-				relation: 1,
-			}
-		});
-		if ( i != 8 ) {
+	/*
+	
+		for (let i = 0; i < 10; i++) {
+			// FRIENDS OF mlormois
 			await prisma.relation.create({
 				data: {
-					userId: 9,
-					userIWatchId: i + 1,
+					userId: 1,
+					userIWatchId: 9 + i,
 					relation: 1,
 				}
 			});
+			// FRIENDS OF Axaidan
+			await prisma.relation.create({
+				data: {
+					userId: 2,
+					userIWatchId: 9 + i,
+					relation: 1,
+				}
+			});
+			if ( i != 8 ) {
+				await prisma.relation.create({
+					data: {
+						userId: 9,
+						userIWatchId: i + 1,
+						relation: 1,
+					}
+				});
+			}
 		}
-	}
-	*/
+		*/
 
 	// --------------------------- //
 	//     DISCUSSION SEED         //

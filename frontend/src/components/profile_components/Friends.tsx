@@ -1,47 +1,109 @@
 // Extern:
-import { useEffect, useState } from "react"
-import { useOutletContext, Link } from "react-router-dom";
-import { AxiosResponse } from "axios";
+import { useContext } from "react"
+import { Link } from "react-router-dom";
 
 // Intern:
-import { IUser } from "../../types/interfaces/IUser"
+import { IUser } from '../../types/interfaces/IUser';
 import { AxiosJwt } from "../../hooks";
+import { ESocketActionType, SocketContext } from '../../context/UserSocket/Socket';
+import { UserCreateChat } from '../discussion_components/ChatUtils';
+
+//Asset
+import '../../styles/components/profile_components/Friends.css'
+import '../../styles/pages/Ladder.css'
+
+
+type FriendProps = {
+	friend: IUser;
+}
+
+
+function FriendList({ friend }: FriendProps) {
+	const axios = AxiosJwt();
+	const dispatch = useContext(SocketContext).SocketDispatch
+
+	const RemoveFriend = (cibleId: number) => {
+		axios.post('/relation/remove_friend/' + cibleId);
+		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+	}
+
+	const BlockFriend = (cibleId: number) => {
+		axios.post('/relation/block_user/' + cibleId);
+		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: friend });
+		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+		location.reload();
+	}
+
+	return (
+		<div className="friend-bloc">
+
+			<img src={friend.avatarUrl} id='friend-avatar' />
+			<div className="friend-username">
+				{friend.username}
+			</div>
+			<Link to={"/home/" + friend.id}>
+				<button id='friend-redirect'>
+				</button>
+			</Link>
+			<div className="friend-right-button">
+				<UserCreateChat user={friend}>
+					<button id='friend-chat'></button>
+				</UserCreateChat>
+				<button id='friend-unfriend' onClick={() => RemoveFriend(friend.id)}></button>
+				<button id='friend-blockit' onClick={() => BlockFriend(friend.id)}></button>
+			</div>
+		</div>
+	)
+}
+
+function BlockList({ friend }: FriendProps) {
+	const axios = AxiosJwt();
+	const dispatch = useContext(SocketContext).SocketDispatch
+
+	const IsFriend = async (cibleId: number): Promise<boolean> => {
+		return (await axios.get('/relation/is_friend/' + cibleId)).data;
+	}
+
+	const RemoveBlock = async (cibleId: number) => {
+		axios.post('/relation/unblock_user/' + cibleId)
+		dispatch({ type: ESocketActionType.RM_BLOCKS, payload: friend });
+		if (await IsFriend(cibleId) === true)
+			dispatch({ type: ESocketActionType.ADD_FRIENDS, payload: friend });
+		location.reload();
+	}
+
+	return (
+		<div className="friend-bloc">
+			<img src={friend.avatarUrl} id='friend-avatar' />
+			<div className="friend-username">
+				{friend.username}
+			</div>
+			<div className="friend-right-button">
+				<button id='friend-unblock' onClick={() => RemoveBlock(friend.id)} />
+			</div>
+		</div>
+	)
+}
+
 
 
 export function Friends() {
-	const axios = AxiosJwt();
-	const user: IUser = useOutletContext();
-	const [friends, setFriends] = useState<IUser[]>([]);
-	const [blocks, setBlocks] = useState<IUser[]>([]);
+	const { me, friends, blocks } = useContext(SocketContext).SocketState;
 
-	useEffect(() => {
-		// GET FRIENDS:
-		axios.get('/relation/list_friend')
-			.then((res: AxiosResponse<IUser[]>) => { setFriends(res.data) });
-		// GET BLOCKS:
-		axios.get('/relation/list_block')
-			.then((res: AxiosResponse<IUser[]>) => { setBlocks(res.data) });
-	}, [])
 
 	return (
-		<div>
-			<div> FRIEND PAGE of: {user.login}</div>
-
-			<h1>friend:</h1>
-			<ul>
-				{friends.map((friend: IUser, index) => (
-					<Link key={index} to={"/home/" + friend.id}>
-						<li>{friend.username}</li>
-					</Link>
+		<div className="friends-body">
+			<ul className="friend-friend-div">
+				<h1>{me.username}'s friendlist :</h1>
+				{friends.map((friend: IUser, index: number) => (
+					<FriendList key={index} friend={friend} />
 				))}
 			</ul>
 
-			<h1>Block:</h1>
-			<ul>
-				{blocks.map((block: IUser, index) => (
-					<Link key={index} to={"/home/" + block.id}>
-						<li>{block.username}</li>
-					</Link>
+			<ul className="friend-block-div">
+				<h1>{me.username}'s blocklist :</h1>
+				{blocks.map((block: IUser, index: number) => (
+					<BlockList key={index} friend={block} />
 				))}
 			</ul>
 		</div>

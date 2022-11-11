@@ -113,13 +113,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    userJoinedChannel(userId: number, chanId: number, username: string) {
-        this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
-            userId: userId,
-            chanId: chanId,
-            username: username,
-            // status: ,
-            // role: ,
+    userJoinedChannel(channelUser: ChannelUser) {
+        this.wss.to(`chan${channelUser.channelId}`).emit('userJoinedChannel', {
+            channelUser,
         });
     }
 
@@ -127,8 +123,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
             userId: userId,
             chanId: chanId,
-            // status: ,
-            // role: ,
         });
     }
 
@@ -137,9 +131,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if (this.clientsMap.has(channelUser.userId)) {
             const client: Socket = this.clientsMap.get(channelUser.userId);
             client.emit('invitedToChannel', {
-                chanId: channel.id,
-                name: channel.name, 
-                type: channel.type,
+                channel,
             });
         }
     }
@@ -199,6 +191,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ///////////////////
 
     channelUserMuted(channelMute: ChannelMute) {
+        this.logger.log(`MUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
         this.wss.to(`chan${channelMute.channelId}`).emit('channelUserMuted', {
             chanId: channelMute.channelId,
             userId: channelMute.userId,
@@ -206,6 +199,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     channelUserUnmuted(channelMute: ChannelMute) {
+        this.logger.log(`UNMUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
         this.wss.to(`chan${channelMute.channelId}`).emit('channelUserUnmuted', {
             chanId: channelMute.channelId,
             userId: channelMute.userId,

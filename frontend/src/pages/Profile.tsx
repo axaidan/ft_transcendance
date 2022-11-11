@@ -1,156 +1,211 @@
 // Extern:
-import React, { SyntheticEvent, useContext, useEffect, useRef, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 // Intern:
-import { IUser } from "../types";
+import { ESocketActionType, SocketContext } from "../context";
+
+//Hooks
+import { AxiosJwt } from '../hooks/AxiosJwt';
+import { useForm, Resolver } from 'react-hook-form'
+import { useWinrate } from "../hooks";
 
 // Assets:
 import '../styles/pages/Profile.css'
-import { AxiosJwt } from '../hooks/AxiosJwt';
-import axios from "axios";
-import { useCookies } from 'react-cookie';
-import { updateUser } from "../hooks";
-import { useForm } from '../hooks/UseForm';
-import { IAvatar } from '../types/interfaces/IAvatar';
-import { SocketContext } from "../context";
 
-type State = {
-	newUsername: string;
+export type FormValues = {
+	username: string;
 };
 
 export function Profile() {
 
+	const dispatch = useContext(SocketContext).SocketDispatch
 	const { me } = useContext(SocketContext).SocketState;
-
-	const [avatar, setAvatar] = useState('');
-	const [toggleEdit, setToggleEdit] = useState(false);
 	const axios = AxiosJwt();
+	const winrate = useWinrate(me.id);
 
-	const [cookies] = useCookies();
-	const jwtToken = cookies.access_token;
-	const [username, setUsername] = useState([user.username]);
+	const [toggleEdit, setToggleEdit] = useState(false);
 
-
-	const editUser = () => {
-		axios.patch('/user',
-			values,
-			{
-				headers: {
-					Authorization: jwtToken ? `Bearer ${jwtToken}` : '',
-					'Content-Type': 'application/json',
-					Accept: 'application/json',
-				},
-			},
-		).catch(function (error) {
-			if (error.response || error.request) {
-				console.log('this nickname is already taken');
-				return;
-			}
-			return;
-		})
-		toggleUserEdit();
-		location.reload();
+	const ExistantUsername = async (value: string) => {
+		return (await (await axios.get('/user/is_user/' + value)).data);
 	}
+
+	const regex = new RegExp('[`~@#$%&{};\'"<>.,/?:+=]');
+
+	const resolver: Resolver<FormValues> = async (values) => {
+
+
+		return {
+			values: values.username ? values : {},
+			errors: !values.username
+				? {
+					username: {
+						type: 'required',
+						message: 'Enter a new username or cancel.',
+					},
+				}
+				: {}
+					&&
+					(values.username.length < 3) ?
+					{
+						username: {
+							type: 'required',
+							message: 'You must have at least 3 characters.',
+						}
+					}
+					: {}
+						&&
+						(regex.test(values.username)) ?
+						{
+							username: {
+								type: 'required',
+								message: 'Bad expression (don\'t use: `~@#$%&{};\'"<>.,/?:+=)',
+							}
+						}
+						: {}
+							&&
+							await ExistantUsername(values.username) ?
+							{
+								username: {
+									type: 'required',
+									message: 'This username is already taken',
+								}
+							}
+							: {}
+		};
+	};
+
+
+	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
+
+	const onSubmit = handleSubmit((data) => {
+		axios.patch('/user', data)
+			.catch(function (error) {
+				if (error.response && error.request) {
+					console.log('this nickname is already taken');
+				}
+			})
+		toggleUserEdit();
+		dispatch({ type: ESocketActionType.UP_USERNAME, payload: data.username });
+	});
 
 	const toggleUserEdit = () => {
 		setToggleEdit(!toggleEdit);
 	}
 
-	const initialState = {
-		username: ''
-	};
-
-	const { onChange, onSubmit, values } = useForm(
-		editUser,
-		initialState
-	)
-
 	useEffect(() => {
-		axios.get('/avatar/list').then((res) => setAvatar(res.data));
-	}, []);
-
-	const avatar_link = (avatar: IAvatar): string => {
-		return avatar.url;
-	}
+		document.title = me.username + "'s profile";
+	}, [me]);
 
 	return (
-		<div className="user_body" >
-			<div className="left_side">
-				<div className="banner">
-					<div className="user_nickname">
-						<div className={toggleEdit ? "disabled" : "user-nick"}>
-							{user.username}
-							<button onClick={toggleUserEdit} className={toggleEdit === true ? "edit-up" : "no-edit"}>
+		<div className="user-body" >
+			<div className="user-left-side">
+				<div className="user-banner">
+					<div className="user-nickname">
+						<div className={toggleEdit ? "user-disabled" : "user-nick"}>
+							{me.username}
+							<button onClick={toggleUserEdit} className="user-no-edit">
 							</button>
 						</div>
-						<form onSubmit={onSubmit}>
-							<input className={toggleEdit ? "edit-input" : "disabled"} placeholder={user.username} onChange={onChange} name="username" />
-							<button onClick={editUser} className={toggleEdit ? "validate-edit" : "disabled"}>
-								Validate
-							</button>
+						<form onSubmit={onSubmit} className={toggleEdit ? "user-edit-input" : "user-disabled"}>
+							<div className="user-input-kit">
+								<input {...register("username")} placeholder={me.username} maxLength={15} id={errors.username ? 'user-inputbox-error' : 'user-input'} />
+								<div className="user-buttons">
+									<button onClick={onSubmit} id='user-validate' />
+									<button onClick={toggleUserEdit} id='user-cancel' />
+								</div>
+							</div>
+							{errors?.username && <p id='user-error-input'>{errors.username.message}</p>}
 						</form>
 					</div>
-					<div className="clan">
+					<div className="user-clan">
 						My clan
 					</div>
-					<div className="xp_bar"></div>
-					<div className="xp_fill"></div>
-					<div className="xp_nbr"></div>
-					<div className="xp_value">
+					<div className="user-xp-bar"></div>
+					<div className="user-xp-fill"></div>
+					<div className="user-xp-nbr"></div>
+					<div className="user-xp-value">
 						25
 					</div>
-					<div className="profile-icon-div">
+					<div className="user-profile-icon-div">
 
-						<img src={user.avatarUrl} id="profile_icon" />
+						<img src={me.avatarUrl} id="user-profile-icon" />
 					</div>
-					<div className="end-of-banner">
+					<div className="user-end-of-banner">
 					</div>
 				</div>
-				<div className="loot">
-					<div className="coffer">
+				<div className="user-loot">
+					<div className="user-coffer">
 						0
 					</div>
-					<div className="boost">
+					<div className="user-boost">
 						0
 					</div>
-					<div className="reroll">
+					<div className="user-reroll">
 						0
 					</div>
 				</div>
 			</div>
-			<div className="stats">
-				<div className="empty-space">
+			<div className="user-stats">
+				<div className="user-setting">
+					<div className="user-2auth">
+						<input type="checkbox" id='user-checkbox' onClick={(e: React.FormEvent<HTMLInputElement>) => {
+							axios.patch('/user',
+								{ twoFactorAuth: !me.twoFactorAuth })
+						}} defaultChecked={me.twoFactorAuth} />
+						<label id='user-checkbox-label'>
+							2F-Auth
+						</label>
+						<div id='user-2auth-description'>
+							Two-factor authentication is a security feature that helps protect your account and your password.
+							If you set up two-factor authentication, you'll receive a notification on your e-mail address
+							when someone tries logging into your account from a device we don't recognize.
+						</div>
+					</div>
+					<div className="user-email">
+						E-MAIL : {me.email}
+					</div>
 				</div>
-				<div className="lol-stats">
-					<div className="rank">
+				<div className="user-lol-stats">
+					<div className="user-rank">
 						<h3>Rank</h3>
-						<div className="txt">
+						<div className="user-txt">
 							unranked
 						</div>
 					</div>
-					<div className="honor">
+					<div className="user-honor">
 						<h3>Honor</h3>
-						<div className="txt">
+						<div className="user-txt">
 							none
 						</div>
 					</div>
-					<div className="champion">
+					<div className="user-champion">
 						<h3>Victories</h3>
-						<div className="txt">
-							No game yet
+						<div className="other-txt">
+							Victories : {winrate.victories}
+						</div>
+						<div className="other-txt">
+							Defeats : {winrate.defeats}
+						</div>
+						<div className="other-txt">
+							Draw : {winrate.draws}
+						</div>
+
+						<div className="other-txt">
+							<div className={winrate.winrate >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
+								Winrate: {winrate.winrate}%
+							</div>
 						</div>
 					</div>
-					<div className="trophee">
+					<div className="user-trophee">
 						<h3>Trophee</h3>
-						<div className="txt">
+						<div className="user-txt">
 							none
 						</div>
 					</div>
-					<div className="clash">
-						<div id='stats-column'>
+					<div className="user-clash">
+						<div id='user-stats-column'>
 							<h3>Banner</h3>
-							<div className="txt">
+							<div className="user-txt">
 								none
 							</div>
 						</div>

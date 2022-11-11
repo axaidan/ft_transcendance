@@ -1,0 +1,93 @@
+.collection-body {
+	width: 100%;
+	height: 95%;
+	overflow: scroll;
+}
+
+.collection-title {
+	display: flex;
+	justify-content: center;
+	margin-top: 40px;
+	margin-bottom: 50px;
+	font-family: 'Friz Quadrata Std Bold';
+	font-size: xx-large;
+	color: #938f75;
+}
+
+.collection-avatar-list {
+	height: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	margin: 10px;
+}
+
+#collection-current-avatar {
+	width: 300px;
+	height: 300px;
+	border: 2px solid white;
+	cursor: pointer;
+	box-shadow: 0px 0px 40px 1px white;
+}
+
+#collection-avatar-map {
+	width: 300px;
+	height: 300px;
+	border: 2px solid rgb(128, 128, 4);
+	cursor: pointer;
+}
+
+.collection-avatars {
+	margin: 20px;
+}
+
+.collection-upload {
+	width: 300px;
+	height: 300px;
+	margin: 20px;
+	justify-content: center;
+}
+
+.collection-inputFile {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(2, 9, 18, 0.7);
+	background-image: url('../../../assets/images/profile_component/icon_plus.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: 100px;
+	font-size: 0;
+	border: 2px solid turquoise;
+	cursor: pointer;
+}
+
+#fileInput {
+	display: none;
+}
+
+#collection-submit {
+	transition: 0.5s;
+	color: azure;
+	display: flex;
+	height: 50px;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+	border: none;
+	background: none;
+	background-image: url('../../../assets/images/Signin/button-lockin.png');
+	background-position-x: center;
+	background-size: 190px;
+	background-repeat: no-repeat;
+	font-family: 'Friz Quadrata Std Bold';
+
+}
+
+#collection-submit:hover {
+	transition: 0.5s;
+	background-image: url('../../../assets/images/Signin/button-lockin-hover.png');
+}
+
+#collection-submit:active {
+	background-image: url('../../../assets/images/Signin/button-lockin-click.png');
+}

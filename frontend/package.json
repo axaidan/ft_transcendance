@@ -18,6 +18,8 @@
 		"react": ">=16.8.0",
 		"react-cookie": "^4.1.1",
 		"react-dom": ">=16.8.0",
+		"react-responsive-canvas": "^1.0.2",
+		"react-hook-form": "^7.38.0",
 		"react-router-dom": "^6.4.2",
 		"socket.io-client": "^4.5.2"
 	},

@@ -19,21 +19,23 @@ export class AuthService {
 	async signin(login: string) {
 		let user = await this.prisma.user.findFirst({ where: { login: login } });
 
-		var findAvatar = await this.prisma.avatar.findFirst({where: {is_public: true}});
+		var findAvatar = await this.prisma.avatar.findFirst({ where: { is_public: true } });
 		if (!user) {
 			user = await this.prisma.user.create({
 				data: {
 					login: login,
-					username: login,
+					username: null,
 					email: login + '@student.42.fr',
 				}
 			});
 
 			if (findAvatar) {
-				let addAvatar = await this.prisma.user.update({where : {id: user.id},
+				let addAvatar = await this.prisma.user.update({
+					where: { id: user.id },
 					data: {
 						avatarUrl: findAvatar.url,
-					},});
+					},
+				});
 			}
 		}
 
