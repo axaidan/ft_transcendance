@@ -1,18 +1,13 @@
 
 .Chat-Option-Menu {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between ;
-    width: 50px;
-    height: 200px;
-    border: 1px solid #785a28 ;
-    right: 10px;
-    bottom: -100;
-	background-color: #06101d;
+	position: absolute;
+	right: 10px;
+	top: 40px;
+	width: 160px;
+	background-color: #16222a;
+	z-index: 1;
+	border: 1px solid #785a28;
     box-sizing: border-box;
-    z-index: 1;
 }
 
 .div1 {
@@ -21,25 +16,28 @@
     justify-content: center;
     box-sizing: border-box;
     width: 100%;
-    height: 50%;
+    height: 30px;
     background-color: #06101d;
-    transition: background-color  600ms linear, height 100ms linear;
+    transition: background-color  600ms linear;
 }
 
-.div1:hover {
+.div1:hover, .disc-btn-pannel:hover {
     cursor: pointer;
     background-color: #2d414f;
-    transition: background-color  200ms linear, height 100ms linear;
+    transition: background-color  200ms linear;
 }
 
-.div1:active {
-    height: 70%;
+.div1:active, .disc-btn-pannel:active {
     background-color: #5c451c;
-    transition: background-color 10ms linear, height 100ms linear;
-    background-image: url('../../../assets/images/nav-highlight.png');
-    background-position-x: center;
-    background-repeat: no-repeat;
-    background-size:  200% 100%;
-    background-position-y: 100% ;
+    transition: background-color 10ms linear;
 }
 
+.disc-btn-pannel {
+    transition: background-color  400ms linear;
+	background-color: #16222a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
+    height: 20px;
+}

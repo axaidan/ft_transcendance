@@ -66,42 +66,70 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		// ---------------------------- // 
 
 
+		
+		///////////////////
+		//  CHAN EVENTS  //
+		chatSocket.on('newChanToClient', (dto: {chan: IChannelSimple}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: dto.chan });
+		})
+		chatSocket.on('upChanOwner', (dto: {chan: IChannel}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_CHAN, payload: dto.chan });
+		})
+		chatSocket.on('channelDeleted', (dto: { chanId: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: dto.chanId });
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: dto.chanId });
+		})
 		chatSocket.on('chanMsgToClient', (chan: IChannelMessage) => {
 			console.log( 'chanMsgToClient',  chan );
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG_CHAN, payload: chan });
 		})
+		///////////////////
 
-		// LORS DE LA CREATION D'UN CHANNEL, EMIT A TOUS POUR AFFICHAGE DANS LA LISTE
-		chatSocket.on('newChanToClient', (dto: {chan: IChannelSimple}) => {
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: dto.chan });
-		})
 
-		chatSocket.on('upChanOwner', (dto: {chan: IChannel}) => {
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_CHAN, payload: dto.chan });
-		})
-
-		chatSocket.on('channelDeleted', (dto: { chanId: number }) => {
-			console.log("TENTATIVE DE SUPPRESSION")
-			ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: dto.chanId });
-			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: dto.chanId });
-		})
-
-		// CHANGE ROLE USER 
+		////////////////////
+		//  PATCH EVENTS  //
 		chatSocket.on('channelUserRoleEdited', (dto: IUserChannel) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.ROLE_CHAN, payload: dto });
 		})
+		////////////////////
 
-		// // LEAVE USER + BAN USER
+
+		///////////////////
+		//  USER EVENTS  //
 		chatSocket.on('userLeaveChannel', (chan: IUserChannel) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.RM_USER_CHAN, payload: chan });
 		})
-
-		// NEW USER TO CHANNEL
 		chatSocket.on('userJoinedChannel', (chan: { channelUser: IUserChannel}) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_USER_CHAN, payload: chan.channelUser });
 		})
+		chatSocket.on('invitedToChannel', (dto: {chan: IChannel}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_CHAN, payload: dto.chan });
+		})
+		///////////////////
 
 
+		//////////////////
+		//  BAN EVENTS  //
+		chatSocket.on('channelUserBanned', (dto: { chanId: number, userId: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.BAN_USER_CHAN, payload: dto });
+		})
+
+		chatSocket.on('channelUserUnbanned',  (dto: { chanId: number, userId: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UNBAN_USER_CHAN, payload: dto });
+		})
+		//////////////////
+
+
+		///////////////////
+		//  MUTE EVENTS  //
+		chatSocket.on('channelUserMuted', (dto: { chanId: number, userId: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.MUTE_USER_CHAN, payload: dto });
+		})
+
+		chatSocket.on('channelUserUnmuted',  (dto: { chanId: number, userId: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UNMUTE_USER_CHAN, payload: dto });
+		})
+		///////////////////
 
 
 

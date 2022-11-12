@@ -71,7 +71,7 @@ export function ChannelUserPannel({ mode, user }: ChannelUserPannelProps) {
 			{mode <= 0 ?
 				(role == 2 ? <ChannelUserPannelBtn title={"Grade Up"} logic={addAdminLogic} /> : <ChannelUserPannelBtn title={"Grade Down"} logic={rmAdminLogic} />)
 				: <></>}
-			{mode <= 1 ? <>
+			{mode <= 1 && role != 0 ? <>
 				<ChannelUserPannelBtn title={"Ban User"} logic={BanUserLogic} />
 				<ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic} />
 			</> : <></>}

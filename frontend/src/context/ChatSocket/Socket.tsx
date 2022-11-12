@@ -67,6 +67,13 @@ export enum EChatSocketActionType {
 	ROLE_CHAN = 'edit_role_user_channel',
 
 
+	BAN_USER_CHAN = 'ban_user_channel',
+	UNBAN_USER_CHAN = 'unban_user_channel',
+
+
+	MUTE_USER_CHAN = 'mute_user_channel',
+	UNMUTE_USER_CHAN = 'unmute_user_channel',
+
 	DISPLAY_CHAN = 'change_channel_display',
 	SETTING_CHAN = 'change_channel_settings_display',
 }
@@ -99,10 +106,16 @@ export type TChatSocketContextAction =
 	EChatSocketActionType.RM_USER_CHAN |
 	EChatSocketActionType.ROLE_CHAN |
 
+	EChatSocketActionType.BAN_USER_CHAN |
+	EChatSocketActionType.UNBAN_USER_CHAN |
+
+	EChatSocketActionType.MUTE_USER_CHAN |
+	EChatSocketActionType.UNMUTE_USER_CHAN |
+
 	EChatSocketActionType.DISPLAY_CHAN |
 	EChatSocketActionType.SETTING_CHAN;
 
-export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
+export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;

@@ -140,11 +140,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
 
-    invitedToChannel(channelUser: ChannelUser, channel: Channel) {
+    invitedToChannel(channelUser: ChannelUser, chan: Channel) {
         if (this.clientsMap.has(channelUser.userId)) {
             const client: Socket = this.clientsMap.get(channelUser.userId);
             client.emit('invitedToChannel', {
-                channel,
+                chan,
             });
         }
     }
