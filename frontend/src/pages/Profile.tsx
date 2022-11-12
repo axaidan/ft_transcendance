@@ -84,6 +84,7 @@ export function Profile() {
 					console.log('this nickname is already taken');
 				}
 			})
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 8 });
 		toggleUserEdit();
 		dispatch({ type: ESocketActionType.UP_USERNAME, payload: data.username });
 	});

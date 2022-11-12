@@ -45,6 +45,7 @@ export function OtherProfile() {
 		await axios.post('/relation/block_user/' + user.id);
 		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: user });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: user });
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 5 });
 		location.reload();
 	}
 

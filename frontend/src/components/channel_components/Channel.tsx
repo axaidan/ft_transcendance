@@ -264,6 +264,7 @@ export function ChannelInput() {
 export function ChannelSettings() {
 
 	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
+	const { me } = useContext(SocketContext).SocketState;
 
 	type ChannelEditForm = {
 		name?: string;
@@ -357,6 +358,7 @@ export function ChannelSettings() {
 
 	const onSubmitDelete = () => {
 		axios.delete('/channel/' + channels[index_channel].id);
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 11 });
 	};
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

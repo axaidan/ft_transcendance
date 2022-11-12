@@ -1,8 +1,19 @@
 //ASSETS
 import '../styles/pages/Acceuil.css'
 import accueilbg from '../assets/videos/accueil-bg.webm'
+import { useContext, useEffect } from 'react';
+import { AxiosJwt } from '../hooks/AxiosJwt';
+import { SocketContext } from '../context';
 
 export function Acceuil() {
+
+	const axios = AxiosJwt();
+	const { me } = useContext(SocketContext).SocketState;
+
+	useEffect(() => {
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 1 });
+	}, [])
+
 	return (
 		<div className='acc-body'>
 			<div id='acc-title'>The 13th season is coming !</div>

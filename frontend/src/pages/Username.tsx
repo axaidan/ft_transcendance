@@ -71,6 +71,7 @@ export function UsernameLogger() {
 	const onSubmit = handleSubmit(async (data) => {
 		await axios.patch('/user', data);
 		if (!me.username !== null) {
+			axios.post('/achiv/unlock', { userId: me.id, achivId: 8 });
 			navigate('/home/acceuil')
 		}
 	}

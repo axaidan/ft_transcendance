@@ -2,7 +2,7 @@
 import { useContext } from "react";
 import { Resolver, useForm } from "react-hook-form";
 
-import { ChatSocketContext } from "../context";
+import { ChatSocketContext, SocketContext } from "../context";
 
 import "../styles/pages/Channels.css"
 import { useState } from 'react';
@@ -39,6 +39,7 @@ export function ChannelFromCreate() {
 	const [typeForm, setTypeForm] = useState<string>("0");
 	const regex = new RegExp('[`~@#$%&{};\'"<>.,/?:+=]');
 	const axios = AxiosJwt();
+	const { me } = useContext(SocketContext).SocketState;
 
 	const resolver: Resolver<ChannelForm> = async (values) => {
 
@@ -111,6 +112,7 @@ export function ChannelFromCreate() {
 		if (data.hash !== '')
 			dto.hash = data.hash;
 		axios.post('/channel/', dto);
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 10 });
 	});
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

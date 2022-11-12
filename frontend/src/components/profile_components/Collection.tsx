@@ -28,6 +28,7 @@ export function Collection() {
 
 		await axios.postfile('/avatar/upload_public/', formData)
 			.then((res) => {
+				axios.post('/achiv/unlock', { userId: me.id, achivId: 9 });
 				location.reload();
 			})
 			.catch((error) => {

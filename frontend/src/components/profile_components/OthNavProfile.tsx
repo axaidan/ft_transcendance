@@ -27,12 +27,16 @@ export function OthNavProfile() {
 			<div className='othNavProfile-container'>
 				<p id='othNavProfile-title'>{othUser.username}</p>
 				<div className="othNavLinks">
-					<NavLink to={'/home/' + id} className='other-navlinks'>
-						Profile
-					</NavLink>
-					<NavLink to={'/home/' + id + '/history'} className='other-navlinks'>
-						Historique
-					</NavLink>
+					<div className="other-navlinks-div">
+						<NavLink to={'/home/' + id} className='other-navlinks'>
+							Profile
+						</NavLink>
+					</div>
+					<div className="other-navlinks-div">
+						<NavLink to={'/home/' + id + '/history'} className='other-navlinks'>
+							Historique
+						</NavLink>
+					</div>
 				</div>
 			</div>
 			<Outlet context={othUser} />
