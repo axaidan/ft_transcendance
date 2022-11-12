@@ -60,7 +60,6 @@
 	background-repeat: no-repeat;
 	background-size: 30px;
 	margin-right: 20px;
-	cursor: pointer;
 }
 
 #friend-unfriend {
@@ -75,7 +74,6 @@
 	background-repeat: no-repeat;
 	background-size: 45px;
 	margin-right: 20px;
-	cursor: pointer;
 }
 
 #friend-blockit {
@@ -90,7 +88,6 @@
 	background-repeat: no-repeat;
 	background-size: 35px;
 	margin-right: 20px;
-	cursor: pointer;
 }
 
 #friend-redirect {
@@ -104,7 +101,6 @@
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 30px;
-	cursor: pointer;
 }
 
 .friend-friend-div {

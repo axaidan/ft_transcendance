@@ -1,56 +1,280 @@
-
 #channel-page {
-    overflow: scroll;
-    overflow-x: hidden;
+	overflow: scroll;
+	overflow-x: hidden;
 
-    box-sizing: border-box;
-    width: 100%;
-    margin: 5px;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 5px;
 }
 
 #channel-page-froms {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: center;
-    box-sizing: border-box;
-    width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	align-items: center;
+	box-sizing: border-box;
+	width: 100%;
 }
 
-#channel-page-froms div {
-    width: 600px;
-    height: 500px;
-    background-color: rgb(22, 49, 55);
-    border: 1px solid beige;
-    margin: 10px;
-}
-
-#channel-page-form-create {
-
-}
-
+#channel-page-form-create,
 #channel-page-form-join {
-
+	width: 600px;
+	height: 500px;
+	background: linear-gradient(to left, rgba(2, 9, 18, 0.8) 0, rgba(9, 23, 32, 0.9) 50%, rgba(2, 9, 18, 0.8));
+	border: 3px solid #785a28;
+	margin: 10px;
 }
 
 #channel-public-list {
-    display: block;
-    flex-wrap: wrap;
-    justify-content: center;
+	display: block;
+	flex-wrap: wrap;
+	justify-content: center;
 }
 
 .channel-pp {
-    box-sizing: border-box;
-    
-    height: 50px;
-    
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-    margin: 10px;
-    padding-left: 30px;
-    padding-right: 30px;
-    
-    background-color: rgba(0, 255, 255, 0.246);
+	box-sizing: border-box;
+
+	height: 60px;
+
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	margin: 10px;
+	padding-left: 30px;
+	padding-right: 30px;
+
+	background: linear-gradient(to left, rgba(2, 9, 18, 0.5) 0, rgba(9, 23, 32, 0.5) 50%, rgba(2, 9, 18, 0.5));
+	border: 2px solid #16222a;
+}
+
+.channel-form-create-title {
+	display: flex;
+	font-size: xx-large;
+	font-family: 'Friz Quadrata Std Bold';
+	justify-content: center;
+	margin-top: 30px;
+	color: #938f75;
+	text-shadow: 1px 1px 4px #785a28;
+	margin-bottom: 30px;
+}
+
+.channel-input-div {
+	display: flex;
+	width: 100%;
+	justify-content: center;
+}
+
+#channel-create-input {
+	display: flex;
+	background-color: rgba(2, 9, 18);
+	border: #785a28;
+	border-style: outset;
+	height: 30px;
+	width: 250px;
+	padding-left: 50px;
+	color: white;
+	font-family: 'Friz Quadrata Std Bold';
+	background-image: url('../../assets/images/channel/icon-party-invite.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-size: 30px;
+	background-position-x: 10px;
+}
+
+#channel-create-error {
+	display: flex;
+	background-color: rgba(2, 9, 18);
+	border: red;
+	border-style: outset;
+	height: 30px;
+	width: 250px;
+	padding-left: 50px;
+	color: white;
+	font-family: 'Friz Quadrata Std Bold';
+	background-image: url('../../assets/images/channel/icon-exclamation.png');
+	background-repeat: no-repeat;
+	background-position-y: center;
+	background-size: 30px;
+	background-position-x: 10px;
+}
+
+#channel-create-input-error {
+	display: flex;
+	justify-content: center;
+	color: red;
+	font-size: small;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-top: 5px;
+}
+
+#create-channel-error-hash {
+	display: flex;
+	justify-content: center;
+	color: red;
+	font-size: small;
+	font-family: 'Friz Quadrata Std Bold';
+	margin-top: 5px;
+}
+
+#channel-create-input:focus,
+#channel-create-error:focus {
+	outline: none;
+}
+
+.channel-visibility-buttons {
+	margin-top: 30px;
+	display: flex;
+	justify-content: space-around;
+	margin-bottom: 30px;
+	font-family: 'Friz Quadrata Std Bold';
+	color: #938f75;
+}
+
+.channel-choose-pwd {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 10px;
+}
+
+.pwd-title {
+	font-family: 'Friz Quadrata Std Bold';
+	color: #938f75;
+	display: flex;
+	justify-content: center;
+	font-size: larger;
+	margin-bottom: 10px;
+}
+
+#channel-create-validate {
+	font-family: 'Marcellus SC', serif;
+	font-size: 15px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	padding: 5px 15px;
+	background: #1e2328;
+	color: #cdbe91;
+	box-shadow: inset 0 0 2px #000000;
+	border-image: linear-gradient(to bottom, #c8aa6d, #7a5c29);
+	border-image-slice: 1;
+	border-width: 2px;
+	text-transform: uppercase;
+}
+
+#channel-create-validate:hover {
+	text-shadow: 0 0 5px #ffffff80;
+	box-shadow: 0 0 8px 0 #ffffff50;
+	background: linear-gradient(to bottom, #1e2328, #433d2b);
+	transition: 0.1s;
+}
+
+#channel-create-validate:active {
+	text-shadow: none;
+	box-shadow: none;
+	color: #cdbe9130;
+}
+
+#channel-hash-input {
+	display: flex;
+	background-color: rgba(2, 9, 18);
+	border: #785a28;
+	border-style: solid;
+	height: 25px;
+	width: 200px;
+	color: white;
+	text-align: center;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+#channel-hash-input-error {
+	display: flex;
+	background-color: rgba(2, 9, 18);
+	border: red;
+	border-style: solid;
+	height: 25px;
+	width: 200px;
+	color: white;
+	text-align: center;
+	font-family: 'Friz Quadrata Std Bold';
+}
+
+#channel-hash-input:focus,
+#channel-hash-input-error:focus {
+	outline: none;
+}
+
+
+.channel-validation-button {
+	display: flex;
+	justify-content: center;
+	margin-top: 80px;
+}
+
+.channel-join-title {
+	animation: fadeIn 1s;
+	display: flex;
+	margin-left: 20px;
+	margin-top: 50px;
+	font-family: 'Friz Quadrata Std Bold';
+	color: #938f75;
+}
+
+#icon_unlocked {
+	color: #cdbe91;
+}
+
+#channel-disable {
+	display: none;
+}
+
+#channel-join-disabled {
+	display: none;
+}
+
+#channel-join-btn,
+#channel-join-protected-btn {
+	width: 45px;
+	height: 45px;
+	background-color: transparent;
+	border: none;
+	background-image: url('../../assets/images/channel/icon_open_party_join.png');
+	background-size: 45px;
+	margin-right: 10px;
+}
+
+#channel-join-btn:hover,
+#channel-join-protected-btn:hover {
+	background-image: url('../../assets/images/channel/icon_open_party_join_hover.png');
+}
+
+#channel-join-btn:active,
+#channel-join-protected-btn:active {
+	background-image: url('../../assets/images/channel/icon_open_party_join_click.png');
+}
+
+#channel-join-pwd-input {
+	display: flex;
+	height: 25px;
+	align-self: center;
+	margin-right: 20px;
+}
+
+#channel-join-cancel-btn {
+	height: 45px;
+	width: 45px;
+	border: 3px solid rgb(196, 150, 26);
+	border-radius: 50%;
+	background-color: #020912;
+	background-image: url('../../assets/images/profile_component/red_x_mark.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30px;
+}
+
+#channel-join-cancel-btn:hover {
+	border: 3px solid #cdbe91;
+}
+
+#channel-join-cancel-btn:active {
+	border: 3px solid #785a28;
 }

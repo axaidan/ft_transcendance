@@ -7,6 +7,19 @@
 	background-color: rgba(255, 255, 255, 0);
 }
 
+.container-page {
+	cursor: url("../../assets/images/hand1.png"), auto;
+}
+
+a,
+button {
+	cursor: url("../../assets/images/hand1_tco.png"), auto;
+}
+
+input {
+	cursor: url("../../assets/images/hand2.png"), auto;
+}
+
 .container-body {
 	color: aliceblue;
 	display: flex;

@@ -75,7 +75,7 @@ export function Profile() {
 	};
 
 
-	const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({ resolver });
+	const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({ resolver });
 
 	const onSubmit = handleSubmit((data) => {
 		axios.patch('/user', data)
@@ -91,6 +91,12 @@ export function Profile() {
 	const toggleUserEdit = () => {
 		setToggleEdit(!toggleEdit);
 	}
+
+	useEffect(() => {
+		reset({
+			username: ''
+		})
+	}, [toggleEdit])
 
 	useEffect(() => {
 		document.title = me.username + "'s profile";
