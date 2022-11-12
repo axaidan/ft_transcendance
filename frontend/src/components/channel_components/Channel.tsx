@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
-import { ChannelSocketContext, EChannelSocketActionType, IChannel, SocketContext } from "../../context";
+import { useContext, useState } from "react";
+import { ChatSocketContext, EChatSocketActionType, IChannel, SocketContext } from "../../context";
 
 import '../../styles/components/channel_components/Channel.css'
-import { DflChannel, DflUser, IUser } from "../../types";
+import { DflChannel, IUser } from "../../types";
 import { ChatUser, UserCreateChat } from "../discussion_components";
 
 
@@ -57,7 +57,7 @@ export function ChannelUserPannel({ mode, user }:ChannelUserPannelProps) {
 }
 
 export function ChannelUser() {
-	const { me } = useContext(ChannelSocketContext).ChannelSocketState;
+	const { me } = useContext(ChatSocketContext).ChatSocketState;
 	const [ display , setDisplay ] = useState(false);
 
 	return (
@@ -85,11 +85,11 @@ export function ChannelUserList() {
 
 interface ChannelOptionMenuProps { mode: number }
 const ChannelOptionMenu = ({ mode }:ChannelOptionMenuProps ) => {
-	const dispatch = useContext(ChannelSocketContext).ChannelSocketDispatch;
-	const { settings_display } = useContext(ChannelSocketContext).ChannelSocketState;
+	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
+	const { settings_display } = useContext(ChatSocketContext).ChatSocketState;
 
 	const ChannelSettingsLogic = () => {
-		dispatch({ type: EChannelSocketActionType.SETDISPLAY, payload: !settings_display})
+		dispatch({ type: EChatSocketActionType.SETTING_CHAN, payload: !settings_display})
 	}
 
 	const ChannelDeleteLogic = () => {
@@ -122,8 +122,8 @@ export const ChannelOptionMenuBtn = ({title, channel, logic}:ChannelOptionMenuBt
 }
 
 export function ChannelPannel() {
-	const dispatch = useContext(ChannelSocketContext).ChannelSocketDispatch;
-	function reduceChannel() { dispatch({ type: EChannelSocketActionType.DISPLAY, payload: false })}
+	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
+	function reduceChannel() { dispatch({ type: EChatSocketActionType.DISPLAY_CHAN, payload: false })}
 	const [ display, setDisplay ] = useState<boolean>(false)
 
 	return (
@@ -220,7 +220,7 @@ export function ChannelSettings() {
 }
 
 export function ChannelBody() {
-	const { settings_display } = useContext(ChannelSocketContext).ChannelSocketState;
+	const { settings_display } = useContext(ChatSocketContext).ChatSocketState;
 
 	return (
 		<div id="channel-body">
@@ -232,7 +232,7 @@ export function ChannelBody() {
 }
 
 export function Channel() {
-	const { channel_display } = useContext(ChannelSocketContext).ChannelSocketState;
+	const { channel_display } = useContext(ChatSocketContext).ChatSocketState;
 
 	return (
 		<div id={channel_display ? "channel-container-display" : "channel-container-none"}>

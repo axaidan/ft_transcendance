@@ -29,12 +29,17 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		// Save the socket in context //
 		ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
 		ChatSocketDispatch({ type: EChatSocketActionType.UP_UID, payload: me });
+		
 		// Start the envent listeners // 
-
 		axios.get('/discussion')
 		.then((res: AxiosResponse<IDiscussion[]>) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.GET_ALLDISC, payload: res.data});
-		})
+		});
+
+		axios.get('/channels/all')
+		.then((res: AxiosResponse<IDiscussion[]>) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.GET_CHAN, payload: res.data});
+		});	
 
 		StartListeners();
 		StartHandshake();
@@ -42,14 +47,15 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 	const StartListeners = () => {
 		chatSocket.on('discMsgToClient', (message: IMessage) => {
-			console.info('J\'ai recu un nouveau message.');
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG, payload: message });
 		});
 
 		chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
-		    console.info('J\'ai recu une nouvelle discussion.');
 			ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
 		})
+
+
+
 	};
 
 	const StartHandshake = () => {

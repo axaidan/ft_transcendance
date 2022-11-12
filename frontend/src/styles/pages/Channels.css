@@ -1,0 +1,56 @@
+
+#channel-page {
+    overflow: scroll;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+    width: 100%;
+    margin: 5px;
+}
+
+#channel-page-froms {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#channel-page-froms div {
+    width: 600px;
+    height: 500px;
+    background-color: rgb(22, 49, 55);
+    border: 1px solid beige;
+    margin: 10px;
+}
+
+#channel-page-form-create {
+
+}
+
+#channel-page-form-join {
+
+}
+
+#channel-public-list {
+    display: block;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.channel-pp {
+    box-sizing: border-box;
+    
+    height: 50px;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    margin: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    
+    background-color: rgba(0, 255, 255, 0.246);
+}

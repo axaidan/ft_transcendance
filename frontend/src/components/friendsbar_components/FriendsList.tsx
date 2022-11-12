@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 // Intern:
 import { Contact } from ".";
 import { IDiscussion, IUser } from "../../types";
-import { ChatSocketContext, ESocketActionType, IStatus, SocketContext } from "../../context";
+import { ChatSocketContext, ESocketActionType, IChannel, IStatus, SocketContext } from "../../context";
 import { UserCreateChat } from "../discussion_components";
 
 // Assets:
@@ -36,6 +36,30 @@ const UserListCategorie: React.FunctionComponent<UserListCategorieProps> = ({ us
 	);
 }
 
+interface ChannelListCategorieProps { channels: IChannel[], title: string};
+const ChannelListCategorie: React.FunctionComponent<ChannelListCategorieProps> = ({ channels, title }) => {
+
+	const [active, setActive] = useState<boolean>(true);
+	const activeCategorie = () => { setActive(!active) };
+
+	return (
+		<div>
+			<div id='title-container' onClick={() => activeCategorie()}>
+				<div id={'triangle-categories' + (active ? '-active' : '')} />
+				<p id="title-categories">{title}</p>
+			</div>
+			{active ? channels.map((chan, index) => {
+				return (
+					<div key={index} ><p>{chan.name}</p></div>
+
+					// <UserCreateChat key={index} user={user}>
+					// 	<Contact user={user} />
+					// </UserCreateChat>
+				)
+			}) : <></>}
+		</div>
+	);
+}
 
 export function othUserChat() {
 	const { me, allDiscussions } = useContext(ChatSocketContext).ChatSocketState;
@@ -55,6 +79,7 @@ export function othUserChat() {
 
 export function FriendsList() {
 	const { users, friends } = useContext(SocketContext).SocketState;
+	const { allChannels } = useContext(ChatSocketContext).ChatSocketState;
 
 	const userOnline = () => {
 		return friends.filter((friend) => {
@@ -72,7 +97,7 @@ export function FriendsList() {
 	
 	return (
 		<ul id='contact-list'>
-			<UserListCategorie users={[]} title="CHANNELS" counter={false} />
+			<ChannelListCategorie channels={allChannels} title="CHANNELS" />
 			<UserListCategorie users={userOnline()} title="ONLINE" counter={true} />
 			<UserListCategorie users={userOffline()} title="OFFLINE" counter={true} />
 			<UserListCategorie users={othUserChat()} title="OTHER" counter={true} />
