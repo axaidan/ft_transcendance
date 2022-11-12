@@ -66,6 +66,11 @@ export function Navbar() {
 						profile
 					</NavLink>
 				</li>
+				<div className="EB-logo">
+					<div className="EB-amount">
+						1000
+					</div>
+				</div>
 				<li className={splitLocation[1] === "" ? "items_active" : "items"} id='ladder'>
 					<NavLink to='/home/ladder'>
 						Ladder

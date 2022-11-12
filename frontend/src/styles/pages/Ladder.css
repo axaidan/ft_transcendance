@@ -61,6 +61,7 @@
 }
 
 .ladder-user-div:hover {
+	transition: 0.2s;
 	box-shadow: inset 0px 0px 50px -25px white;
 }
 

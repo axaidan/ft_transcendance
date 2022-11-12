@@ -25,7 +25,8 @@ export function Achievement() {
 	}, [])
 
 	return (
-		<div>
+		<div className='achiv-body'>
+			<div className='collection-title'>ACHIEVEMENTS</div>
 			<ul className='all_achiev'>
 				{unlocked.map((achievment: IAchievment, index: number) => (
 					<div className='unlocked_achiev' key={index}>
