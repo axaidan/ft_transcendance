@@ -126,7 +126,7 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			state.index_active = state.discussion.findIndex( disc => disc.id == (action.payload as IDiscussion).id );
 			return { ...state };
 		case EChatSocketActionType.RM_DISC:
-			return { ...state, discussion: state.discussion.filter((did) => did.id !== (action.payload as number)) };
+			return { ...state, discussion: state.discussion.filter(did => did.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_CURR:
 			const newIndex = action.payload as number;
 			return { ...state, index_active: newIndex };
@@ -150,10 +150,13 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			return { ...state };
 		case EChatSocketActionType.RM_CHAN:
 			// PROTECTION SI QQ DELETE UN CHAN ACTIF
-			if ( state.index_channel == state.channels.findIndex((chan) => chan.id == (action.payload as number))) {
+			if ( state.index_channel == state.channels.findIndex(chan => chan.id == (action.payload as number))) {
 				state.index_channel = -1;
 			}
-			return { ...state, channels: state.channels.filter((chan) => chan.id !== (action.payload as number)) };
+			console.log(state.channels);
+			state.channels = state.channels.filter((chan) => {return chan.id !== (action.payload as number)});
+			console.log(state.channels);
+			return { ...state };
 		case EChatSocketActionType.GET_ACHAN:
 			state.allChannels = (action.payload as IChannelSimple[]);
 			console.log("ALL CHAN " , action.payload);
@@ -162,11 +165,12 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			state.allChannels.push(action.payload as IChannelSimple);
 			return {...state};
 		case EChatSocketActionType.RM_ACHAN:
-			return { ...state, allChannels: state.allChannels.filter((chan) => chan.id !== (action.payload as number)) };
+			state.allChannels = state.allChannels.filter(chan => { return (chan.id !== (action.payload as number))});
+			return { ...state };
 		case EChatSocketActionType.UP_I_CHAN:
 			return { ...state, index_channel: action.payload as number };
 		case EChatSocketActionType.NEW_MSG_CHAN:
-			index = state.channels.findIndex(chan => chan.id == (action.payload as IChannelMessage).channelId)
+			index = state.channels.findIndex(chan => chan.id == (action.payload as IChannelMessage).chanId)
 			if (index != -1) { state.channels[index].messages.push(action.payload as IChannelMessage); }
 			return { ...state };
 
@@ -174,15 +178,15 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.NEW_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
+			console.log( state.channels[index].users )
 			state.channels[index].users.push( (action.payload as IUserChannel) );
+			console.log( state.channels[index].users )
 			return { ...state };
 
 		case EChatSocketActionType.RM_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
-			console.log(state.channels[index].users)
 			state.channels[index].users = state.channels[index].users.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
-			console.log(state.channels[index].users)
 			return { ...state };
 
 		case EChatSocketActionType.ROLE_CHAN:
@@ -192,7 +196,8 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			if (index == -1 ) {return { ...state };}
 			userChannel = state.channels[index].users.find((user) => { return user.userId == (action.payload as IUserChannel).userId })!;
 			userChannel.role = (action.payload as IUserChannel).role;
-			return { ...state };	
+			return { ...state };
+
 		case EChatSocketActionType.DISPLAY_CHAN:
 			return { ...state, channel_display: action.payload as boolean };
 		case EChatSocketActionType.SETTING_CHAN:

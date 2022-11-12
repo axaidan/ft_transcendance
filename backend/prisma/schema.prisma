@@ -126,7 +126,7 @@ model Channel {
 }
 
 model ChannelUser {
-	@@id([channelId, userId])
+	@@id([chanId, userId])
 
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
@@ -134,42 +134,42 @@ model ChannelUser {
 	// status			Int
 	role			Int
 	userId			Int
-	channelId		Int
+	chanId		Int
 	// statusTime		DateTime?
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
-	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [chanId], references: [id], onDelete: Cascade)
 
 	@@map("channelUser")
 }
 
 model ChannelBan {
-	@@id([channelId, userId])
+	@@id([chanId, userId])
 
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
 	userId			Int
-	channelId		Int
+	chanId		Int
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
-	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [chanId], references: [id], onDelete: Cascade)
 
 	@@map("channelBan")
 }
 
 model ChannelMute {
-	@@id([channelId, userId])
+	@@id([chanId, userId])
 
 	createdAt		DateTime @default(now())
 	updatedAt		DateTime @updatedAt
 
 	userId			Int
-	channelId		Int
+	chanId		Int
 	muteExpires		DateTime
 
 	user			User	@relation(fields: [userId], references: [id], onDelete: Cascade)
-	channel			Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+	channel			Channel	@relation(fields: [chanId], references: [id], onDelete: Cascade)
 
 	@@map("channelMute")
 }
@@ -179,11 +179,11 @@ model ChannelMessage {
 	id			Int	@id	@default(autoincrement())
     createAt	DateTime @default(now())
 
-	channelId	Int
+	chanId	Int
 	userId		Int
 	
 	user		User	@relation(fields: [userId], references: [id], onDelete: Cascade)
-	channnel	Channel	@relation(fields: [channelId], references: [id], onDelete: Cascade)
+	channnel	Channel	@relation(fields: [chanId], references: [id], onDelete: Cascade)
 
 	text		String
 

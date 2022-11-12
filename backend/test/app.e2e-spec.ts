@@ -92,7 +92,7 @@ describe('App e2e', () => {
 			const channelUser = await prisma.channelUser.create({
 				data: {
 					userId: userArr[i].id,
-					channelId: chanArr[0].id,
+					chanId: chanArr[0].id,
 					role: EChannelStatus.NORMAL,
 				}
 			});
@@ -101,7 +101,7 @@ describe('App e2e', () => {
 		const dummyChanUser = await prisma.channelUser.create({
 			data: {
 				userId: dummyUser.id,
-				channelId: chanArr[1].id,
+				chanId: chanArr[1].id,
 				role: 0,
 			}
 		});

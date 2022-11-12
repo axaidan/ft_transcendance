@@ -205,7 +205,7 @@ export class ChannelService {
         }
         const channelUser = await this.channelUserService.create({
             userId: currentUserId,
-            channelId: chanId,
+            chanId: chanId,
             role: EChannelRoles.NORMAL,
         });
         this.setUserProperties(currentUserId, channel, {
@@ -227,7 +227,7 @@ export class ChannelService {
     //         if (nextOwner === null)
     //             await this.delete(chanId);
     //     }
-    //     await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
+    //     await this.channelUserService.delete(channelUser.userId, channelUser.chanId);
     //     this.setUserProperties(userId, channel, {
     //         role: channelUser.role,
     //         joined: false,
@@ -236,11 +236,11 @@ export class ChannelService {
     //     return channel;
     // }
 
-    async findOne(channelId: number)
+    async findOne(chanId: number)
         : Promise<Channel> {
         const channel: Channel = await this.prisma.channel.findUnique({
             where: {
-                id: channelId,
+                id: chanId,
             },
         });
         return channel;
@@ -280,7 +280,7 @@ export class ChannelService {
         if (channelBan !== null)
             throw new ForbiddenException('user banned from channel');
         const channelUser = await this.channelUserService.create({
-            channelId: chanId,
+            chanId: chanId,
             userId: userId,
             role: EChannelRoles.NORMAL,
         });
@@ -296,7 +296,7 @@ export class ChannelService {
         const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         if (channelUser.role !== EChannelRoles.NORMAL)
             throw new ForbiddenException('cannot ban admin or owner');
-        await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
+        await this.channelUserService.delete(channelUser.userId, channelUser.chanId);
         const channelBan = await this.channelBanService.create(dto);
         return channelBan;
     }

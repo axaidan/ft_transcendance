@@ -160,7 +160,7 @@ export class ChatController {
     // INVITE USER
     @Post('channel/:chanId/user/:userId')
     @UseGuards(TargetChannelExists)
-    // @ChannelRoles('admin')
+    @ChannelRoles('admin')
     async inviteUserToChannel(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,
@@ -174,7 +174,7 @@ export class ChatController {
     // EDIT ChannelUser'S role
     @Patch('channel/:chanId/user/:userId/:role')
     @UseGuards(TargetChannelExists, TargetChannelUserJoined)
-    // @ChannelRoles('owner')
+    @ChannelRoles('owner')
     async editChannelUserRole(
         @GetUser('id') currentUserId: number,
         @Param('chanId', ParseIntPipe) chanId: number,

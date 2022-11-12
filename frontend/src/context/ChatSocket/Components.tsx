@@ -72,13 +72,18 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		})
 
 		// LORS DE LA CREATION D'UN CHANNEL, EMIT A TOUS POUR AFFICHAGE DANS LA LISTE
-		chatSocket.on('newChanToClient', (chan: IChannelSimple) => {
-			ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: chan });
+		chatSocket.on('newChanToClient', (dto: {chan: IChannelSimple}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: dto.chan });
 		})
 
-		chatSocket.on('channelDeleted', (chanId: number) => {
-			ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: chanId });
-			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: chanId });
+		chatSocket.on('upChanOwner', (dto: {chan: IChannel}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_CHAN, payload: dto.chan });
+		})
+
+		chatSocket.on('channelDeleted', (dto: { chanId: number }) => {
+			console.log("TENTATIVE DE SUPPRESSION")
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: dto.chanId });
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: dto.chanId });
 		})
 
 		// CHANGE ROLE USER 
@@ -87,13 +92,13 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		})
 
 		// // LEAVE USER + BAN USER
-		// chatSocket.on('removeUserChanToClient', (chan: IChannelSimple) => {
-		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: chan });
-		// })
+		chatSocket.on('userLeaveChannel', (chan: IUserChannel) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_USER_CHAN, payload: chan });
+		})
 
 		// NEW USER TO CHANNEL
-		chatSocket.on('userJoinedChannel', (chan: IUserChannel) => {
-			ChatSocketDispatch({ type: EChatSocketActionType.RM_USER_CHAN, payload: chan });
+		chatSocket.on('userJoinedChannel', (chan: { channelUser: IUserChannel}) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.NEW_USER_CHAN, payload: chan.channelUser });
 		})
 
 

@@ -109,21 +109,34 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channelUsers: ChannelUser[] =
             await this.channelUserService.getAllJoinedChannelUsers(userId);
         for (const channelUser of channelUsers) {
-            this.joinChannelRoom(userId, channelUser.channelId);
+            this.joinChannelRoom(userId, channelUser.chanId);
         }
     }
 
-    userJoinedChannel(channelUser: ChannelUser) {
-        this.wss.to(`chan${channelUser.channelId}`).emit('userJoinedChannel', {
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+    // TU DOIS ME REVOYER UN DTO QUI CORRESPOND A LA STRUCTURE. chanId != chanId, j'ai besoin du USER COMPLET! 
+    userJoinedChannel(channelUser: any) {
+        this.wss.to(`chan${channelUser.chanId}`).emit('userJoinedChannel', {
             channelUser,
         });
     }
 
     userLeftChannel(userId: number, chanId: number) {
-        this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
+        this.wss.to(`chan${chanId}`).emit('userLeaveChannel', {
             userId: userId,
             chanId: chanId,
         });
+    }
+
+    newChannelToClient( chan: Channel) {
+        this.wss.emit('newChanToClient', {
+            chan,
+        });
+    }
+
+    addChannelToOwner( uid: number, chan: Channel ) {
+        const client: Socket = this.clientsMap.get(uid)!;
+        client.emit('upChanOwner', { chan });
     }
 
 
@@ -161,9 +174,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     channelUserRoleEdited(channelUser: ChannelUser) {
-        this.wss.to(`chan${channelUser.channelId}`).emit('channelUserRoleEdited', {
+        this.wss.to(`chan${channelUser.chanId}`).emit('channelUserRoleEdited', {
             userId: channelUser.userId,
-            chanId: channelUser.channelId,
+            chanId: channelUser.chanId,
             role: channelUser.role,
         });
     }
@@ -173,15 +186,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     //////////////////
 
     channelUserBanned(channelBan: ChannelBan) {
-        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserBanned', {
-            chanId: channelBan.channelId,
+        this.wss.to(`chan${channelBan.chanId}`).emit('channelUserBanned', {
+            chanId: channelBan.chanId,
             userId: channelBan.userId,
         });
     }
 
     channelUserUnbanned(channelBan: ChannelBan) {
-        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserUnbanned', {
-            chanId: channelBan.channelId,
+        this.wss.to(`chan${channelBan.chanId}`).emit('channelUserUnbanned', {
+            chanId: channelBan.chanId,
             userId: channelBan.userId,
         });
     }
@@ -191,17 +204,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ///////////////////
 
     channelUserMuted(channelMute: ChannelMute) {
-        this.logger.log(`MUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
-        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserMuted', {
-            chanId: channelMute.channelId,
+        this.logger.log(`MUTED EVENT USER${channelMute.userId} CHAN${channelMute.chanId}`);
+        this.wss.to(`chan${channelMute.chanId}`).emit('channelUserMuted', {
+            chanId: channelMute.chanId,
             userId: channelMute.userId,
         });
     }
 
     channelUserUnmuted(channelMute: ChannelMute) {
-        this.logger.log(`UNMUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
-        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserUnmuted', {
-            chanId: channelMute.channelId,
+        this.logger.log(`UNMUTED EVENT USER${channelMute.userId} CHAN${channelMute.chanId}`);
+        this.wss.to(`chan${channelMute.chanId}`).emit('channelUserUnmuted', {
+            chanId: channelMute.chanId,
             userId: channelMute.userId,
         });
     }

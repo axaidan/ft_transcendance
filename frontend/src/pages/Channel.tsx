@@ -1,14 +1,12 @@
 
-import { ChangeEvent, PropsWithChildren, useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Resolver, useForm } from "react-hook-form";
 
 import { ChatSocketContext } from "../context";
 
 import "../styles/pages/Channels.css"
-import { FormValues } from "./Profile";
 import { useState } from 'react';
 import { AxiosJwt } from '../hooks/AxiosJwt';
-import { IChannel } from '../context/ChatSocket/Socket';
 import { IChannelSimple } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
@@ -114,7 +112,6 @@ export function ChannelFromCreate() {
 		if (data.hash !== '')
 			dto.hash = data.hash;
 		axios.post('/channel/', dto);
-		location.reload();
 	});
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,13 +238,11 @@ export function ChannelPublic({ chan }: ChannelPublicProps) {
 	const onSubmit = handleSubmit((data) => {
 		axios.post('/channel/' + chan.id + '/join', data)
 		setPwd(false);
-		location.reload()
 	});
 
 	const Join = () => {
 		axios.post('/channel/' + chan.id + '/join')
 		setPwd(false);
-		location.reload();
 	};
 
 	return (

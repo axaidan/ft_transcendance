@@ -16,7 +16,7 @@ export class ChannelMuteService {
     : Promise<ChannelMute>
     {
         const channelMute = await this.prisma.channelMute.findUnique({
-            where: { channelId_userId: { channelId: chanId, userId: userId } },
+            where: { chanId_userId: { chanId: chanId, userId: userId } },
         });
         return channelMute;
     }
@@ -29,7 +29,7 @@ export class ChannelMuteService {
             const expires = new Date(now.setMinutes(now.getMinutes() + 5));
             const channelMute = await this.prisma.channelMute.create({
                 data: {
-                    channelId: chanId,
+                    chanId: chanId,
                     userId: userId,
                     muteExpires: expires,
                 },
@@ -51,7 +51,7 @@ export class ChannelMuteService {
     {
         try {
             const channelMute = await this.prisma.channelMute.delete({
-                where: { channelId_userId: { channelId: chanId, userId: userId } },
+                where: { chanId_userId: { chanId: chanId, userId: userId } },
             });
             return channelMute;
         } catch (e) {
@@ -65,12 +65,12 @@ export class ChannelMuteService {
     : Promise<ChannelMute>
     {
         const oldChannelMute = await this.prisma.channelMute.findUnique({
-            where: { channelId_userId: { channelId: chanId, userId: userId } },
+            where: { chanId_userId: { chanId: chanId, userId: userId } },
         });
         const expires = new Date(oldChannelMute.muteExpires);
         expires.setMinutes(expires.getMinutes() + 5);
         const channelMute = await this.prisma.channelMute.update({
-            where: { channelId_userId : { channelId: chanId, userId: userId } },
+            where: { chanId_userId : { chanId: chanId, userId: userId } },
             data: { muteExpires: expires },
         });
         return channelMute;

@@ -18,7 +18,7 @@ export class ChannelMessageService {
         const channelMessage = await this.prisma.channelMessage.create({
             data: {
                 userId: currentUserId,
-                channelId: chanId,
+                chanId: chanId,
                 text: text,
             },
         });

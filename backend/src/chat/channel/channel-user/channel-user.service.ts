@@ -18,7 +18,7 @@ export class ChannelUserService {
             const channelUser: ChannelUser = await this.prisma.channelUser.create({
                 data: {
                     userId: dto.userId,
-                    channelId: dto.channelId,
+                    chanId: dto.chanId,
                     // status: dto.status,
                     role: dto.role,
                 },
@@ -37,7 +37,7 @@ export class ChannelUserService {
     : Promise<void>
     {
         await this.prisma.channelUser.delete({
-            where: { channelId_userId: { channelId: chanId, userId: userId } },
+            where: { chanId_userId: { chanId: chanId, userId: userId } },
         });
     }
 
@@ -54,7 +54,7 @@ export class ChannelUserService {
     : Promise<ChannelUser>
     {
         channelUser = await this.prisma.channelUser.update({
-            where: { channelId_userId: { channelId: channelUser.channelId, userId: channelUser.userId } },
+            where: { chanId_userId: { chanId: channelUser.chanId, userId: channelUser.userId } },
             data: { role: role },
         });
         return channelUser;
@@ -64,7 +64,7 @@ export class ChannelUserService {
     : Promise<ChannelUser>
     {
         const channelUser: ChannelUser = await this.prisma.channelUser.findUnique({
-            where: { channelId_userId: { channelId: chanId, userId: userId } },
+            where: { chanId_userId: { chanId: chanId, userId: userId } },
             include: { user : { select: { username: true } } },
         });
         return channelUser;
@@ -74,13 +74,13 @@ export class ChannelUserService {
     : Promise<ChannelUser>
     {
         let nextOwner = await this.prisma.channelUser.findFirst({
-            where: { channelId: channel.id, role: EChannelRoles.ADMIN },
+            where: { chanId: channel.id, role: EChannelRoles.ADMIN },
             orderBy: { updatedAt: 'asc' },
         });
         if (nextOwner !== null)
             return nextOwner;
         nextOwner = await this.prisma.channelUser.findFirst({
-            where: { channelId: channel.id },
+            where: { chanId: channel.id },
             orderBy: { createdAt: 'asc' },
         });
         return nextOwner;

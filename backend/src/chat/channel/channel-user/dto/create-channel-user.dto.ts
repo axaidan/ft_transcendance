@@ -7,7 +7,7 @@ export class CreateChannelUserDto {
     userId: number;
 
     @IsInt()
-    channelId: number;
+    chanId: number;
 
     // @IsInt()
     // status: number;

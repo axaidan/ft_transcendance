@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Discussion, Channel, ChannelUser, ChannelMute, ChannelBan, User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/users/users.service';
 import { ChannelBanDto } from './channel/channel-ban/dto';
 import { ChannelMuteService } from './channel/channel-mute/channel-mute.service';
@@ -22,6 +23,7 @@ export class ChatService {
         private channelService: ChannelService,
         private channelUserService: ChannelUserService,
         private channelMuteService: ChannelMuteService,
+        private prisma: PrismaService, // POUR ALLER CHERCHER LES INFOS DONT J'AI BESOIN
         private userService: UserService,
     ) {}
 
@@ -117,6 +119,11 @@ export class ChatService {
     : Promise<Channel>
     {
         const channel: Channel = await this.channelService.create(currentUserId, dto);
+
+        const monChannel = await this.channelService.getWusersWMessages(currentUserId, channel.id);
+
+        this.chatGateway.newChannelToClient(channel) // ICI JE DIS A TOUT LE MONDE QUE LE CHAN EXISTE
+        this.chatGateway.addChannelToOwner( currentUserId, monChannel );
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
     }
@@ -133,7 +140,18 @@ export class ChatService {
         const channelMute = await this.channelMuteService.findOne(currentUserId, channel.id);
         channelUser[`mute`] = channelMute;
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
-        this.chatGateway.userJoinedChannel(channelUser);
+
+        // JE VAIS CHERCHER MES INFO
+        const NEWUSER = await  this.prisma.channelUser.findFirst({
+            where: {
+                AND: [{ userId: currentUserId}, {chanId: chanId}],
+            },
+            include: {
+                user: true,
+            }
+        })
+
+        this.chatGateway.userJoinedChannel(NEWUSER);
         return channel;
     }
 
@@ -154,7 +172,7 @@ export class ChatService {
             else
                 this.chatGateway.channelUserRoleEdited(nextOwner);
         }
-        await this.channelUserService.delete(channelUser.userId, channelUser.channelId);
+        await this.channelUserService.delete(channelUser.userId, channelUser.chanId);
         this.channelService.setUserProperties(currentUserId, channel, {
             role: channelUser.role,
             joined: false,
@@ -220,9 +238,9 @@ export class ChatService {
         const channelUser = await this.channelService.inviteUser(currentUserId, chanId, userId);
         const channelMute = await this.channelMuteService.findOne(userId, chanId);
         channelUser[`mute`] = channelMute;
-        this.chatGateway.joinChannelRoom(channelUser.userId, channelUser.channelId);
+        this.chatGateway.joinChannelRoom(channelUser.userId, channelUser.chanId);
         this.chatGateway.userJoinedChannel(channelUser);
-        const channel = await this.channelService.findOne(channelUser.channelId);
+        const channel = await this.channelService.findOne(channelUser.chanId);
         this.chatGateway.invitedToChannel(channelUser, channel);
         return channelUser;
     }
@@ -235,7 +253,7 @@ export class ChatService {
     : Promise<ChannelBan>
     {
         const channelBan = await this.channelService.banChannelUser(dto);
-        this.chatGateway.leaveChannelRoom(channelBan.userId, channelBan.channelId);
+        this.chatGateway.leaveChannelRoom(channelBan.userId, channelBan.chanId);
         this.chatGateway.channelUserBanned(channelBan);
         return channelBan;
     }
@@ -288,8 +306,8 @@ export class ChatService {
         // this.logger.log('running muteExpirationCheck');
         const expiredChannelMutes: ChannelMute[] = await this.channelMuteService.allExpired();
         for (const channelMute of expiredChannelMutes) {
-            await this.channelMuteService.delete(channelMute.userId, channelMute.channelId);
-            this.logger.log(`channelMute expired detected : userId: \t${channelMute.userId}\tchannelId: ${channelMute.channelId}`);
+            await this.channelMuteService.delete(channelMute.userId, channelMute.chanId);
+            this.logger.log(`channelMute expired detected : userId: \t${channelMute.userId}\tchanId: ${channelMute.chanId}`);
             this.chatGateway.channelUserUnmuted(channelMute);
         }
     };
