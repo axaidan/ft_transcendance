@@ -1,37 +1,7 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { DflUser, IDiscussion, IMessage, IUser } from "../../types";
+import { DflUser, IChannel, IChannelMessage, IChannelSimple, IDiscussion, IMessage, IUser, IUserChannel } from "../../types";
 
-
-
-export interface IChannelMessage {
-	id: number;
-	createdAt: Date;
-	text: string;
-	user: IUser;
-    channelsId: number;
-}
-
-export interface IUserChannel {
-	id: number;
-	user: IUser;
-    role: number;
-}
-
-export interface IChannel {
-    name: string;
-    users: IUserChannel[];
-    messages: IChannelMessage[];
-    notif: number;
-    id: number;
-}
-
-export const dflChannel = {
-    name: 'string',
-    users: [],
-    messages: [],
-    notif: 0,
-}
 
 export interface IChatSocketContextState {
 	socket: Socket | undefined;
@@ -45,7 +15,7 @@ export interface IChatSocketContextState {
 
 	// CHANNELS 
 	channels: IChannel[];
-	allChannels: IChannel[];
+	allChannels: IChannelSimple[];
 	index_channel: number;
 	channel_display: boolean;
 	settings_display: boolean;
@@ -81,11 +51,22 @@ export enum EChatSocketActionType {
 	GET_ALLDISC = 'get_all_discussion',
 
 	// CHANNELS
+	GET_CHAN = 'get_channels',
 	UP_CHAN = 'add_channel',
 	RM_CHAN = 'remove_channel',
-	GET_CHAN = 'get_channels',
+
+	GET_ACHAN = 'get_all_channels',
+	UP_ACHAN = 'new_all_channels',
+	RM_ACHAN = 'rm_one_all_channels',
+
 	UP_I_CHAN = 'update_index_channel',
 	NEW_MSG_CHAN = 'receive_channel_message',
+
+	NEW_USER_CHAN = 'new_user_channel',
+	RM_USER_CHAN = 'remove_user_channel',
+	ROLE_CHAN = 'edit_role_user_channel',
+
+
 	DISPLAY_CHAN = 'change_channel_display',
 	SETTING_CHAN = 'change_channel_settings_display',
 }
@@ -105,13 +86,23 @@ export type TChatSocketContextAction =
 	EChatSocketActionType.UP_CHAN |
 	EChatSocketActionType.RM_CHAN |
 	EChatSocketActionType.GET_CHAN |
+
+	EChatSocketActionType.UP_ACHAN |
+	EChatSocketActionType.RM_ACHAN |
+	EChatSocketActionType.GET_ACHAN |
+
 	EChatSocketActionType.UP_I_CHAN |
+
 	EChatSocketActionType.NEW_MSG_CHAN |
+
+	EChatSocketActionType.NEW_USER_CHAN |
+	EChatSocketActionType.RM_USER_CHAN |
+	EChatSocketActionType.ROLE_CHAN |
+
 	EChatSocketActionType.DISPLAY_CHAN |
 	EChatSocketActionType.SETTING_CHAN;
 
-
-export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IMessage | IDiscussion | IUser | IChannel[] | IChannelMessage | IChannel | boolean;
+export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;
@@ -122,6 +113,7 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 	console.log(`ChatContext - Action: ${action.type} - Payload : `, action.payload);
 
 	let index: number;
+	let userChannel: IUserChannel;
 
 	switch (action.type) {
 		case EChatSocketActionType.UP_SOKET:
@@ -148,30 +140,63 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			state.allDiscussions = (action.payload as IDiscussion[]);
 			return {...state};
 
-
+		case EChatSocketActionType.GET_CHAN:
+			console.log("MY CHAN " , action.payload);
+			state.channels = (action.payload as IChannel[]);
+			return {...state};
 		case EChatSocketActionType.UP_CHAN:
-			state.allChannels.push(action.payload as IChannel);
 			state.channels.push(action.payload as IChannel);
 			state.index_channel = state.channels.findIndex( disc => disc.id == (action.payload as IChannel).id );
 			return { ...state };
-		case EChatSocketActionType.RM_DISC:
-			return { ...state, channels: state.channels.filter((did) => did.id !== (action.payload as number)) };
-		case EChatSocketActionType.GET_CHAN:
-				state.allChannels = (action.payload as IChannel[]);
-				console.log("all channels: " , state.allChannels);
-				return {...state};
+		case EChatSocketActionType.RM_CHAN:
+			// PROTECTION SI QQ DELETE UN CHAN ACTIF
+			if ( state.index_channel == state.channels.findIndex((chan) => chan.id == (action.payload as number))) {
+				state.index_channel = -1;
+			}
+			return { ...state, channels: state.channels.filter((chan) => chan.id !== (action.payload as number)) };
+		case EChatSocketActionType.GET_ACHAN:
+			state.allChannels = (action.payload as IChannelSimple[]);
+			console.log("ALL CHAN " , action.payload);
+			return {...state};
+		case EChatSocketActionType.UP_ACHAN:
+			state.allChannels.push(action.payload as IChannelSimple);
+			return {...state};
+		case EChatSocketActionType.RM_ACHAN:
+			return { ...state, allChannels: state.allChannels.filter((chan) => chan.id !== (action.payload as number)) };
 		case EChatSocketActionType.UP_I_CHAN:
 			return { ...state, index_channel: action.payload as number };
-		case EChatSocketActionType.DISPLAY_CHAN:
-			return { ...state, channel_display: action.payload as boolean };
 		case EChatSocketActionType.NEW_MSG_CHAN:
-			index = state.channels.findIndex(disc => disc.id == (action.payload as IChannelMessage).channelsId)
+			index = state.channels.findIndex(chan => chan.id == (action.payload as IChannelMessage).channelId)
 			if (index != -1) { state.channels[index].messages.push(action.payload as IChannelMessage); }
 			return { ...state };
+
+
+		case EChatSocketActionType.NEW_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			state.channels[index].users.push( (action.payload as IUserChannel) );
+			return { ...state };
+
+		case EChatSocketActionType.RM_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			console.log(state.channels[index].users)
+			state.channels[index].users = state.channels[index].users.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
+			console.log(state.channels[index].users)
+			return { ...state };
+
+		case EChatSocketActionType.ROLE_CHAN:
+			index = state.channels.findIndex(chan => {
+				return ( chan.id == (action.payload as IUserChannel).chanId)
+			})
+			if (index == -1 ) {return { ...state };}
+			userChannel = state.channels[index].users.find((user) => { return user.userId == (action.payload as IUserChannel).userId })!;
+			userChannel.role = (action.payload as IUserChannel).role;
+			return { ...state };	
+		case EChatSocketActionType.DISPLAY_CHAN:
+			return { ...state, channel_display: action.payload as boolean };
 		case EChatSocketActionType.SETTING_CHAN:
 			return { ...state, settings_display: (action.payload as boolean) };
-
-
 		default:
 			return { ...state };
 	}

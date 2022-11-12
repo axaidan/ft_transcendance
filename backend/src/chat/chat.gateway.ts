@@ -262,13 +262,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         dto: ChannelMessageDto
     )
     {
-        const channelMute = this.channelMuteService.findOne(dto.userId, dto.chanId);
-        if (channelMute !== null) {
-            this.logger.log(`IN CHAN ${dto.chanId} RECEIVED MSG FROM MUTED USER ${dto.userId}`);
-            throw new WsException('you are muted in this channel');
-        }
+
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+        // CA INDIQUE QUE JE SUIS MUTE DANS TOUT LES CAS! 
+
+        // const channelMute = this.channelMuteService.findOne(dto.userId, dto.chanId);
+        // if (channelMute !== null) {
+        //     this.logger.log(`IN CHAN ${dto.chanId} RECEIVED MSG FROM MUTED USER ${dto.userId}`);
+        //     throw new WsException('you are muted in this channel');
+        // }
         this.logger.log(`IN CHAN ${dto.chanId} RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         const message = await this.channelMessageService.create(dto.userId, dto.chanId, dto.text);
+
         this.wss.to(`chan${dto.chanId}`).emit('chanMsgToClient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'chan${dto.chanId}'`);
     }

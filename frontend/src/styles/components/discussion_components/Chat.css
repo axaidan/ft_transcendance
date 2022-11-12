@@ -225,6 +225,13 @@
 	color: gray;
 }
 
+#messages-careful2 {
+	margin: 10px 35px 10px 35px;
+	font-size: 1em;
+	color: gray;
+}
+
+
 .messages-container {
 	position: relative;
 	display: grid;

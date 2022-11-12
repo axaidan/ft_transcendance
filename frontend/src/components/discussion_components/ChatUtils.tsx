@@ -4,7 +4,7 @@ import { PropsWithChildren, useContext, useEffect, useState } from "react";
 // Intern:
 import { ChatSocketContext, EChatSocketActionType } from "../../context";
 import { AxiosJwt } from "../../hooks";
-import { IDiscussion, IUser } from "../../types";
+import { IChannel, IDiscussion, IUser } from "../../types";
 
 export interface DiscLinkUserProps extends PropsWithChildren { index: number }
 export const DiscLinkUser: React.FunctionComponent<DiscLinkUserProps> = ({ children, index }) => {
@@ -55,3 +55,4 @@ export const UserCreateChat: React.FunctionComponent<UserCreateChatProps> = ({ c
 		</div>
 	);
 }
+

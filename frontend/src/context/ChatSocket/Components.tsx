@@ -6,7 +6,7 @@ import { PropsWithChildren, useContext, useEffect, useReducer, useState } from "
 import { ChatSocketContextProvider, ChatSocketReducer, dflChatSocketContextState, EChatSocketActionType } from ".";
 import { AxiosJwt } from "../../hooks";
 import { useSocket } from "../../hooks/useSocket";
-import { IDiscussion, IMessage } from "../../types";
+import { IChannel, IChannelMessage, IChannelSimple, IDiscussion, IMessage, IUserChannel } from "../../types";
 import { SocketContext  } from "../UserSocket";
 
 export interface IChatSocketContextComponentProps extends PropsWithChildren {}
@@ -37,7 +37,14 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		});
 
 		axios.get('/channels/all')
-		.then((res: AxiosResponse<IDiscussion[]>) => {
+		.then((res: AxiosResponse<IChannelSimple[]>) => {
+			console.log("ALL CHAN ", res.data);
+			ChatSocketDispatch({ type: EChatSocketActionType.GET_ACHAN, payload: res.data});
+		});	
+
+		axios.get('/channels')
+		.then((res: AxiosResponse<IChannel[]>) => {
+			console.log("MY CHAN " , res.data);
 			ChatSocketDispatch({ type: EChatSocketActionType.GET_CHAN, payload: res.data});
 		});	
 
@@ -53,6 +60,44 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		chatSocket.on('newDiscToClient', (disc: IDiscussion) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.UP_DISC, payload: disc });
 		})
+
+		// ---------------------------- // 
+		//           CHANNELS           // 
+		// ---------------------------- // 
+
+
+		chatSocket.on('chanMsgToClient', (chan: IChannelMessage) => {
+			console.log( 'chanMsgToClient',  chan );
+			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG_CHAN, payload: chan });
+		})
+
+		// LORS DE LA CREATION D'UN CHANNEL, EMIT A TOUS POUR AFFICHAGE DANS LA LISTE
+		chatSocket.on('newChanToClient', (chan: IChannelSimple) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: chan });
+		})
+
+		chatSocket.on('channelDeleted', (chanId: number) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: chanId });
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: chanId });
+		})
+
+		// CHANGE ROLE USER 
+		chatSocket.on('channelUserRoleEdited', (dto: IUserChannel) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.ROLE_CHAN, payload: dto });
+		})
+
+		// // LEAVE USER + BAN USER
+		// chatSocket.on('removeUserChanToClient', (chan: IChannelSimple) => {
+		// 	ChatSocketDispatch({ type: EChatSocketActionType.UP_ACHAN, payload: chan });
+		// })
+
+		// NEW USER TO CHANNEL
+		chatSocket.on('userJoinedChannel', (chan: IUserChannel) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.RM_USER_CHAN, payload: chan });
+		})
+
+
+
 
 
 

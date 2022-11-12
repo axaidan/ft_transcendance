@@ -103,6 +103,12 @@ export class ChannelService {
                     some: { userId: userId }
                 },
             },
+            include: {
+                users: { include: { user : true } },
+                bans: { include: { user : { select: { username: true } } } },
+                mutes: { include: { user : { select: { username: true } } } },
+                messages : { include: { user : { select: { username: true } } } },
+            },
         });
         for (const channel of channelArr) {
             const channelUser = await this.channelUserService.findOne(userId, channel.id);

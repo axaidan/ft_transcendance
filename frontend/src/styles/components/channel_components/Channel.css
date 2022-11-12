@@ -1,7 +1,7 @@
 #channel-container-display {
 	position: absolute;
 	display: grid;
-	grid-template-columns: 2fr 5fr;
+	grid-template-columns: 2.5fr 5fr;
 	grid-column: auto;
 	bottom: 0;
 	left: -601px;
@@ -137,4 +137,20 @@
 #channel-message-body {
 	overflow: scroll;
 	overflow-x: hidden;
+}
+
+.channel-list-elem {
+	box-sizing: border-box;
+ 	background-color: rgba(148, 148, 160, 0.124);
+	height: 40px;
+	padding: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+    transition: background-color  600ms linear;
+}
+
+.channel-list-elem:hover {
+    background-color: #2d414f;
+    transition: background-color  200ms linear;
 }

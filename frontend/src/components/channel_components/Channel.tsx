@@ -1,16 +1,16 @@
 import { useContext, useState } from "react";
-import { ChatSocketContext, EChatSocketActionType, IChannel, SocketContext } from "../../context";
+import { useNavigate } from "react-router-dom";
+import { ChatSocketContext, EChatSocketActionType, SocketContext } from "../../context";
+import { AxiosJwt } from "../../hooks";
 
 import '../../styles/components/channel_components/Channel.css'
-import { DflChannel, IUser } from "../../types";
+import { DflChannel, IUser, IUserChannel, IChannel, IChannelMessage } from "../../types";
 import { ChatUser, UserCreateChat } from "../discussion_components";
 
 
 
 export interface ChannelUserPannelBtnProps { title: string, logic: () => void }
 export function ChannelUserPannelBtn({title, logic}:ChannelUserPannelBtnProps ) {
-	
-	// console.log(user)
 	return (
 		<div className="channel-user-pannel-btn" onClick={() => logic()!}>
 			<p>{title}</p>
@@ -18,37 +18,62 @@ export function ChannelUserPannelBtn({title, logic}:ChannelUserPannelBtnProps ) 
 	)
 }
 
-export interface ChannelUserPannelProps { mode:number, user:IUser }
+export interface ChannelUserPannelProps { mode:number, user: IUserChannel }
 export function ChannelUserPannel({ mode, user }:ChannelUserPannelProps) {
 
-	const sendMessageLogic = () => {} // Fait grace 
-	
-	const goToProfileLogic = () => {
-		console.log('LOGIC POUR GO TO PROFILE ' + user.login)	
+	const { index_channel, channels } = useContext(ChatSocketContext).ChatSocketState;
+	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
+
+	const curr_channel = channels[index_channel];
+	const navigate = useNavigate();
+	const axios = AxiosJwt();
+
+	const sendMessageLogic = () => {
+		dispatch({ type: EChatSocketActionType.DISPLAY_CHAN, payload: false})
 	}
-	
-	const addAdminLogic = () => {
-		console.log('LOGIC POUR ADD TO ADMIN ' + user.login)	
+
+	const goToProfileLogic = () => {
+		navigate('/home/' + user.user.id)
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+	const addAdminLogic = async () => {
+		await axios.patch('/channel/' + curr_channel.id + '/user/' + user.userId + '/1')
+	}
+
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+	const rmAdminLogic = async () => {
+		await axios.patch('/channel/' + curr_channel.id + '/user/' + user.userId + '/2')	
 	}
 
 	const BanUserLogic = () => {
-		console.log('LOGIC POUR BAN USER ' + user.login)	
+		console.log('LOGIC POUR BAN USER ' + user.user.login)	
 	}
 	
+	// const unBanUserLogic = () => {
+	// 	console.log('LOGIC POUR UNBAN USER ' + user.user.login)	
+	// }
+
 	const MuteUserLogic = () => {
-		console.log('LOGIC POUR MUTE USER ' + user.login)	
+		console.log('LOGIC POUR MUTE USER ' + user.user.login)	
 	}
 
+	// const unMuteUserLogic = () => {
+	// 	console.log('LOGIC POUR UNMUTE USER ' + user.user.login)	
+	// }
+
+	const role = user.role;
+
 	return (
-		<div id="channel-user-pannel" className="red">
-			{ mode <= 0 ? 
-				<ChannelUserPannelBtn title={"Add Admin"} logic={addAdminLogic}/>
+		<div id="channel-user-pannel">
+			{ mode <= 0 ?
+				(role == 2 ? <ChannelUserPannelBtn title={"Grade Up"} logic={addAdminLogic}/> : <ChannelUserPannelBtn title={"Grade Down"} logic={rmAdminLogic}/>) 
 			: <></>}
 			{ mode <= 1 ? <>
 				<ChannelUserPannelBtn title={"Ban User"} logic={BanUserLogic}/>
 				<ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic}/>
 			</> : <></>}
-			<UserCreateChat user={user}>
+			<UserCreateChat user={user.user}>
 				<ChannelUserPannelBtn title={"Send Message"} logic={sendMessageLogic}/>
 			</UserCreateChat>
 			<ChannelUserPannelBtn title={"Goto Profile"} logic={goToProfileLogic}/>
@@ -56,29 +81,38 @@ export function ChannelUserPannel({ mode, user }:ChannelUserPannelProps) {
 	)
 }
 
-export function ChannelUser() {
-	const { me } = useContext(ChatSocketContext).ChatSocketState;
+export interface ChannelUserProps { user: IUserChannel }
+export function ChannelUser( { user }:ChannelUserProps ) {
 	const [ display , setDisplay ] = useState(false);
+	const { index_channel, channels, me } = useContext(ChatSocketContext).ChatSocketState;
 
+	const getRoleTitle = () : string => {
+		return ( user.role == 0 ? "#Owner" : user.role == 1 ? "#Admin" : "#Member" );
+	}
+
+	function getMyRole() {
+		const role: number | undefined = channels[index_channel].users.find((user) => { return user.userId == me.id })?.role
+		return role;
+	}
+	
 	return (
 		<div className="channel-user-box">
-			<div className="channel-user" onClick={() => setDisplay(!display)}>
-				<ChatUser user={me} msg={"#Owner"}/>
+			<div className="channel-user" onClick={() => { if (me.id != user.userId) setDisplay(!display)}}>
+				<ChatUser user={user.user} msg={getRoleTitle()}/>
 			</div>
-			{ display ? <ChannelUserPannel mode={0} user={me} /> : <></>}
+			{ display ? <ChannelUserPannel mode={getMyRole()!} user={user} /> : <></>}
 		</div>
 	)
 }
 
-export function ChannelUserList() {
-	// ICI JE RECUPERE LA LIST DES USER DUN CHANNEL
 
+export interface ChannelUserListProps { users: IUserChannel[] }
+export function ChannelUserList({ users }:ChannelUserListProps ) {
 	return (
 		<div>
-			<ChannelUser />
-			<ChannelUser />
-			<ChannelUser />
-			<ChannelUser />
+		{ users.map( (user, index) => {
+			return <ChannelUser key={index} user={user} />
+		})}
 		</div>
 	)
 }
@@ -86,34 +120,39 @@ export function ChannelUserList() {
 interface ChannelOptionMenuProps { mode: number }
 const ChannelOptionMenu = ({ mode }:ChannelOptionMenuProps ) => {
 	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
-	const { settings_display } = useContext(ChatSocketContext).ChatSocketState;
+	const { settings_display, channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
+	const axios = AxiosJwt()
+	const curr_channel = channels[index_channel];
 
 	const ChannelSettingsLogic = () => {
 		dispatch({ type: EChatSocketActionType.SETTING_CHAN, payload: !settings_display})
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
 	const ChannelDeleteLogic = () => {
 		console.log('LOGIC POUR ERASE CHANNEL ');	
+		axios.delete('/channel/' + curr_channel.id);
 	}
 	
 	const ChannelLeaveLogic = () => {
-		console.log('LOGIC POUR LEAVE CHANNEL ');	
+		axios.post('/channel/' + curr_channel.id + '/leave');
+		dispatch({ type: EChatSocketActionType.RM_CHAN, payload: curr_channel.id});
 	}
 
 	return (
 		<div id="channel-option-menu">
 			{ !mode ? <>
-				<ChannelOptionMenuBtn title="Settings" channel={null} logic={ChannelSettingsLogic}/>
-				<ChannelOptionMenuBtn title="Delete" channel={null} logic={ChannelDeleteLogic}/>
-			</> : 
-				<ChannelOptionMenuBtn title="Leave" channel={null} logic={ChannelLeaveLogic}/>
+				<ChannelOptionMenuBtn title="Settings" logic={ChannelSettingsLogic}/>
+				<ChannelOptionMenuBtn title="Delete" logic={ChannelDeleteLogic}/>
+			</> :
+				<ChannelOptionMenuBtn title="Leave" logic={ChannelLeaveLogic}/>
 			}
 		</div>
 	);
 }
 
-export interface ChannelOptionMenuBtnProps { title: string, channel: IChannel | null, logic: () => void }
-export const ChannelOptionMenuBtn = ({title, channel, logic}:ChannelOptionMenuBtnProps ) => {
+export interface ChannelOptionMenuBtnProps { title: string, logic: () => void }
+export const ChannelOptionMenuBtn = ({title, logic}:ChannelOptionMenuBtnProps ) => {
 	return (
 		<div className="channel-user-pannel-btn" onClick={() => logic()}>
 			<p>{title}</p>
@@ -124,13 +163,19 @@ export const ChannelOptionMenuBtn = ({title, channel, logic}:ChannelOptionMenuBt
 export function ChannelPannel() {
 	const dispatch = useContext(ChatSocketContext).ChatSocketDispatch;
 	function reduceChannel() { dispatch({ type: EChatSocketActionType.DISPLAY_CHAN, payload: false })}
+	const { index_channel, channels, me } = useContext(ChatSocketContext).ChatSocketState;
 	const [ display, setDisplay ] = useState<boolean>(false)
+
+	function getMyRole() {
+		const role: number | undefined = channels[index_channel].users.find((user) => { return user.userId == me.id })?.role
+		return role;
+	}
 
 	return (
 		<div id="channel-option">
 			<button id='btn-messages-reduction' onClick={() => reduceChannel()} />
 			<button id='btn-messages-panel' onClick={() => {setDisplay(!display)} } />
-			{ display ? <ChannelOptionMenu mode={0}/> : <></> }
+			{ display ? <ChannelOptionMenu mode={getMyRole()!}/> : <></> }
 		</div>
 	)
 }
@@ -153,33 +198,37 @@ export function ChannelTitle( {title}:ChannelTitleProps ) {
 	)
 }
 
-export function ChannelHeader() {
+export function ChannelHeader({chan}:ChannelBodyProps) {
 
 	// IL ME FAUT ICI LE NOM DU CHANNEL POUR LE TITRE
 	// IL ME FAUT AUSSI POUR LE PANNEL: ID ? 
 
 	return (
 		<div id="channel-header">
-			<ChannelTitle title="Channel"/>
+			<ChannelTitle title={chan.name.toUpperCase()}/>
 			<ChannelPannel />
 		</div>
 	)
 }
 
-export function ChannelMessages() {
+export interface ChannelMessagesProps { messages: IChannelMessage[]}
+export function ChannelMessages({ messages }:ChannelMessagesProps) {
 
 	// var lastUserId: number = 0;
 
 	const { me } = useContext(SocketContext).SocketState;
-	const message_side = () => { return ((me.id != 0 ? "left" : "right")); }
+	
+	interface ChanMessageProps { message: IChannelMessage }
+	const ChanMessage = ({ message }: ChanMessageProps) => {
 
-	const ChanMessage = () => {
+		const message_side = () => { return ((me.id !=  message.userId ? "left" : "right")); }
+		
 		return (
 			<div className="chan-mess">
-				{ me.id != 0 ? <p className="chan-mess-owner">{me.username}</p> : <></>}
+				{ me.id != message.userId ? <p className="chan-mess-owner">{message.user.username}</p> : <></>}
 				<div className={"message-" + message_side()}>
 					<div id={"triangle-" + message_side()}></div>
-					<p>awdawd</p>
+					<p>{message.text}</p>
 				</div>
 			</div>
 		)
@@ -187,26 +236,26 @@ export function ChannelMessages() {
 
 	return (
 		<div id="channel-message-body">
-			<ChanMessage />
-			<ChanMessage />
-			<ChanMessage />
-			<ChanMessage />
+			<p id='messages-careful2'>N'oubliez pas que notre equipe transendence ne vous demandera jamais votre mot de passe pour vous aider.</p>
+			{ messages.map( (message, index) => {
+				return <ChanMessage key={index} message={message}/>
+			}) }
 		</div>
 	)
 }
 
 export function ChannelInput() {
+	const { socket, channels, index_channel, me } = useContext(ChatSocketContext).ChatSocketState;
 
 	const handleKeyDown = (e: any) => {
-		// const input = document.getElementById('messages-input') as HTMLInputElement;
-		// if (e.key === 'Enter') {
-		// 	if (input.value.length != 0) {socket!.emit('discMsgToServer', { discId: discussion[index_active].id, userId: me.id, text: input.value });}
-		// 	input.value = "";
-		// }
-	} 										
-
+		const input = document.getElementById('channel-input') as HTMLInputElement;
+		if (e.key === 'Enter') {
+			if (input.value.length != 0) {socket!.emit('chanMsgToServer', { chanId: channels[index_channel].id, userId: me.id, text: input.value });}
+			input.value = "";
+		}
+	}
 	return (
-		<input id="messages-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
+		<input id="channel-input" placeholder='Tapez votre message ici...' onKeyDown={handleKeyDown} />
 	)
 }
 
@@ -219,25 +268,30 @@ export function ChannelSettings() {
 	)
 }
 
-export function ChannelBody() {
+export interface ChannelBodyProps { chan: IChannel }
+export function ChannelBody({chan}:ChannelBodyProps) {
 	const { settings_display } = useContext(ChatSocketContext).ChatSocketState;
 
 	return (
 		<div id="channel-body">
-			<ChannelHeader />
-			{ settings_display ? <ChannelSettings />	: <ChannelMessages /> }
+			<ChannelHeader chan={chan}/>
+			{ settings_display ? <ChannelSettings />	: <ChannelMessages messages={chan.messages}/> }
 			{ settings_display ? <></>					: <ChannelInput /> }
 		</div>
 	)
 }
 
 export function Channel() {
-	const { channel_display } = useContext(ChatSocketContext).ChatSocketState;
+	const { channel_display, index_channel, channels } = useContext(ChatSocketContext).ChatSocketState;
+
+	if (index_channel < 0) return <></>
+	const chan: IChannel | undefined = channels.at(index_channel);
+	if (chan == undefined ) return <></>
 
 	return (
 		<div id={channel_display ? "channel-container-display" : "channel-container-none"}>
-			<ChannelUserList />
-			<ChannelBody />
+			<ChannelUserList users={chan.users}/>
+			<ChannelBody chan={chan} />
 		</div>
 	)
 }

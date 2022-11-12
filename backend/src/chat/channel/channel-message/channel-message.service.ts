@@ -22,7 +22,19 @@ export class ChannelMessageService {
                 text: text,
             },
         });
-        return channelMessage;
+
+        /// J'AI BESOIN DU user.username
+
+
+        const messageMax = await this.prisma.channelMessage.findFirst({
+            where: { id: channelMessage.id },
+            include: {
+                user: true,
+            }
+        })
+
+
+        return messageMax;
     }
 
 }
