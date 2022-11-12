@@ -15,7 +15,7 @@ export class ChannelBanService {
     : Promise<ChannelBan>
     {
         const channelBan = await this.prisma.channelBan.findUnique({
-            where: { channelId_userId: { channelId: chanId, userId: userId } },
+            where: { chanId_userId: { chanId: chanId, userId: userId } },
         })
         return channelBan;
     }
@@ -26,7 +26,7 @@ export class ChannelBanService {
         try {
             const channelBan = await this.prisma.channelBan.create({
                 data: {
-                    channelId: dto.chanId,
+                    chanId: dto.chanId,
                     userId: dto.userId,
                 }
             });
@@ -45,7 +45,7 @@ export class ChannelBanService {
     {
         try {
             const channelBan = await this.prisma.channelBan.delete({
-                where: { channelId_userId: { channelId: dto.chanId, userId: dto.userId } },
+                where: { chanId_userId: { chanId: dto.chanId, userId: dto.userId } },
             });
             return channelBan;
         } catch (e) {

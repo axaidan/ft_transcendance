@@ -18,11 +18,23 @@ export class ChannelMessageService {
         const channelMessage = await this.prisma.channelMessage.create({
             data: {
                 userId: currentUserId,
-                channelId: chanId,
+                chanId: chanId,
                 text: text,
             },
         });
-        return channelMessage;
+
+        /// J'AI BESOIN DU user.username
+
+
+        const messageMax = await this.prisma.channelMessage.findFirst({
+            where: { id: channelMessage.id },
+            include: {
+                user: true,
+            }
+        })
+
+
+        return messageMax;
     }
 
 }

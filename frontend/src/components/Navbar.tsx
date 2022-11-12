@@ -1,14 +1,14 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useEffect } from 'react';
 import { IUser } from "../types";
 import { AxiosJwt } from "../hooks/AxiosJwt";
 import '../styles/components/Navbar.css'
-import { useContext } from 'react';
 import { SocketContext } from '../context/UserSocket/Socket';
 
 export function Navbar() {
 
+	const { socket } = useContext(SocketContext).SocketState;
 	const { me } = useContext(SocketContext).SocketState;
 	const request = AxiosJwt();
 	const [toggleMenu, setToggleMenu] = useState(false);
@@ -21,10 +21,10 @@ export function Navbar() {
 
 	const toggleUserStatus = () => {
 		setToggleStatus(!toggleStatus);
+		socket!.emit('ChangeStatusToServer', { userId: me.id, status: (toggleStatus ? 1 : 0) })
 	}
 
 	useEffect(() => {
-
 		const changeWidth = () => {
 			setLargeur(window.innerWidth);
 			if (window.innerWidth > 700) {
@@ -93,17 +93,17 @@ export function Navbar() {
 					</div>
 					<div className="nav_user_info">
 						<div className="nickname">
-							{me.username}
+							{ me.username }
 						</div>
 						<div className={toggleStatus === true ? "online" : "absent"}>
-							<button onClick={toggleUserStatus} className={toggleStatus === true ? "btn_online" : "btn_abs"}>
+							<button onClick={toggleUserStatus} className={ toggleStatus === true ? "btn_online" : "btn_abs" }>
 								◉
 							</button>
-							{toggleStatus === true ? 'online' : "absent"}
+							{ toggleStatus === true ? 'online' : "absent" }
 						</div>
 					</div>
 				</div>
-			</ul >
+			</ul>
 		</div>
 
 

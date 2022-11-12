@@ -7,111 +7,117 @@ import { useSocket } from "../../hooks/useSocket";
 import { IUser } from "../../types";
 import { AxiosJwt } from "../../hooks";
 import { AxiosResponse } from "axios";
+import { IStatus } from ".";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
-    user: IUser;
+	user: IUser;
 }
 
 const SocketContextComponent: React.FunctionComponent<ISocketContextComponentProps> = ({ children, user }) => {
-    const [ SocketState, SocketDispatch ] = useReducer( SocketReducer, defaultSocketContextState );
-    const [ loadingSocket, setLoading ] = useState(true);
+	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
+	const [loadingSocket, setLoading] = useState(true);
 	const axios = AxiosJwt();
-    
-    const socket = useSocket('localhost:3000', {
-        reconnectionAttempts: 5,
-        reconnectionDelay: 5000,
-        autoConnect: false,
-    })
 
-    useEffect(() => {
-        if (user.id != 0)
-        {
-            socket.connect();
-            SocketDispatch({type: ESocketActionType.UP_SOKET, payload: socket });
-            SocketDispatch({type: ESocketActionType.UP_UID, payload: user });
-            // GET FRIENDS:
-            axios.get('/relation/list_friend')
-            .then((res: AxiosResponse<IUser[]>) => { 
-                SocketDispatch({type: ESocketActionType.GET_FRIENDS, payload: res.data }); 
-            });
-            // // GET BLOCKS:
-            axios.get('/relation/list_block')
-            .then((res: AxiosResponse<IUser[]>) => {
-                SocketDispatch({type: ESocketActionType.GET_BLOCKS, payload: res.data }); 
-            });
-            StartListeners();
-            StartHandshake();
-        }
-    }, [user])
+	const socket = useSocket('localhost:3000', {
+		reconnectionAttempts: 5,
+		reconnectionDelay: 5000,
+		autoConnect: false,
+	})
 
-    const StartListeners = () => {
+	useEffect(() => {
+		if (user.id != 0) {
+			socket.connect();
+			SocketDispatch({ type: ESocketActionType.UP_SOKET, payload: socket });
+			SocketDispatch({ type: ESocketActionType.UP_UID, payload: user });
+			// GET FRIENDS:
+			axios.get('/relation/list_friend')
+				.then((res: AxiosResponse<IUser[]>) => {
+					SocketDispatch({ type: ESocketActionType.GET_FRIENDS, payload: res.data });
+				});
+			// // GET BLOCKS:
+			axios.get('/relation/list_block')
+				.then((res: AxiosResponse<IUser[]>) => {
+					SocketDispatch({ type: ESocketActionType.GET_BLOCKS, payload: res.data });
+				});
+			StartListeners();
+			StartHandshake();
+		}
+	}, [user])
 
-        /** User Connected Event */
-        socket.on('loginToClient', (uid: number) => {
-            console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid});
-        })
+	const StartListeners = () => {
 
-        /** User Disconnect Event */
-        socket.on('logoutToClient', (uid: number) => {
-            console.info('User connected, new user list received.');
-            SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid});
-        })
+		/** User Connected Event */
+		socket.on('loginToClient', (uid: IStatus) => {
+			console.info('User connected, new user list received.');
+			SocketDispatch({ type: ESocketActionType.UP_USERS, payload: uid });
 
-        socket.on('getOnlineUsersToClient', ( onlineUsers: number[]) => {
-            console.log('Users: ' + onlineUsers);
-            SocketDispatch({ type: ESocketActionType.GET_USERS, payload: onlineUsers});
-        })
+		})
 
-        /* ---- GESTION DE L'ACTUALISATION DYNAMIQUE DES LIST D'AMIS ---- */
-        socket.on('addFriendToClient', ( newFriend: IUser ) => {
-            console.log('New friend: ', newFriend.username, "was added");
-            SocketDispatch({ type: ESocketActionType.ADD_FRIENDS, payload: newFriend});
-        })
-        socket.on('removeFriendToClient', ( rmFriend: IUser ) => {
-            console.log('New friend: ', rmFriend.username, "was removed");
-            SocketDispatch({ type: ESocketActionType.RM_FRIENDS, payload: rmFriend});
-        })
-        socket.on('addBlockToClient', ( newBlock: IUser ) => {
-            console.log('New Block: ', newBlock.username, "was added");
-            SocketDispatch({ type: ESocketActionType.ADD_BLOCKS, payload: newBlock});
-        })
-        socket.on('removeBlockToClient', ( rmBlock: IUser ) => {
-            console.log('Remove block: ', rmBlock.username, "was removed");
-            SocketDispatch({ type: ESocketActionType.RM_BLOCKS, payload: rmBlock});
-        })
+		/** User Disconnect Event */
+		socket.on('logoutToClient', (uid: number) => {
+			console.info('User connected, new user list received.');
+			SocketDispatch({ type: ESocketActionType.RM_USER, payload: uid });
+		})
 
-        // /** Reconnect event **/
-        // socket.io.on('reconnect', (attempt) => {
-        //     console.info('Reconnected on attempt: ' + attempt);
-        // });
+		socket.on('getOnlineUsersToClient', (onlineUsers: IStatus[]) => {
+			console.log('Users: ' + onlineUsers);
+			SocketDispatch({ type: ESocketActionType.GET_USERS, payload: onlineUsers });
+		})
 
-        // /** Reconnect attempt event **/
-        // socket.io.on('reconnect_attempt', (attempt) => {
-        //     console.info('Reconnection attempt: ' + attempt);
-        // });
+		socket.on('ChangeStatusToClient', (userStatus: IStatus) => {
+			console.log('Users Status: ', userStatus);
+			SocketDispatch({ type: ESocketActionType.UP_STATUS, payload: userStatus })
+		})
 
-        // socket.io.on('reconnect_failed', () => {
-        //     console.info('Reconnection failure');
-        // });
-    };
+		/* ---- GESTION DE L'ACTUALISATION DYNAMIQUE DES LIST D'AMIS ---- */
+		socket.on('addFriendToClient', (newFriend: IUser) => {
+			console.log('New friend: ', newFriend.username, "was added");
+			SocketDispatch({ type: ESocketActionType.ADD_FRIENDS, payload: newFriend });
+		})
+		socket.on('removeFriendToClient', (rmFriend: IUser) => {
+			console.log('New friend: ', rmFriend.username, "was removed");
+			SocketDispatch({ type: ESocketActionType.RM_FRIENDS, payload: rmFriend });
+		})
+		socket.on('addBlockToClient', (newBlock: IUser) => {
+			console.log('New Block: ', newBlock.username, "was added");
+			SocketDispatch({ type: ESocketActionType.ADD_BLOCKS, payload: newBlock });
+		})
+		socket.on('removeBlockToClient', (rmBlock: IUser) => {
+			console.log('Remove block: ', rmBlock.username, "was removed");
+			SocketDispatch({ type: ESocketActionType.RM_BLOCKS, payload: rmBlock });
+		})
 
-    const StartHandshake = () => {
-        console.info('Sending handshake to server ...');
-		
+		// /** Reconnect event **/
+		// socket.io.on('reconnect', (attempt) => {
+		//     console.info('Reconnected on attempt: ' + attempt);
+		// });
+
+		// /** Reconnect attempt event **/
+		// socket.io.on('reconnect_attempt', (attempt) => {
+		//     console.info('Reconnection attempt: ' + attempt);
+		// });
+
+		// socket.io.on('reconnect_failed', () => {
+		//     console.info('Reconnection failure');
+		// });
+	};
+
+	const StartHandshake = () => {
+		console.info('Sending handshake to server ...');
+
 		socket.emit('getOnlineUsersToServer');
 		socket.emit('loginToServer', user.id);
 
 		// Fin de l'ecan d'affichage d'erreur
-        setLoading( false );
+		setLoading(false);
 
-    };
+	};
 
-    if (loadingSocket  ) return <p>Loading socket IO ... </p>;
+	if (loadingSocket) return <p>Loading socket IO ... </p>;
 
-    return <SocketContextProvider value={{ SocketState, SocketDispatch }}>
-        { children }
-    </SocketContextProvider>;
+	return <SocketContextProvider value={{ SocketState, SocketDispatch }}>
+		{children}
+	</SocketContextProvider>;
 }
 
 export default SocketContextComponent;
