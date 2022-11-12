@@ -14,7 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 
 
-type ChannelForm = {
+export type ChannelForm = {
 	name: string;
 	type: string;
 	hash?: string;
@@ -38,7 +38,7 @@ type ChannelPassword = {
 
 export function ChannelFromCreate() {
 
-	const [typeForm, setTypeForm] = useState<string>("");
+	const [typeForm, setTypeForm] = useState<string>("0");
 	const regex = new RegExp('[`~@#$%&{};\'"<>.,/?:+=]');
 	const axios = AxiosJwt();
 
@@ -107,7 +107,6 @@ export function ChannelFromCreate() {
 	const { register, handleSubmit, reset, formState: { errors } } = useForm<ChannelForm>({ resolver });
 
 	const onSubmit = handleSubmit((data) => {
-		console.log(data);
 		const dto = DflCreateChannel;
 		dto.name += data.name;
 		dto.type += parseInt(data.type);
@@ -135,25 +134,25 @@ export function ChannelFromCreate() {
 			<form onSubmit={onSubmit}>
 				<div className="channel-form-create-kit">
 					<div className="channel-input-div">
-						<input {...register("name")} placeholder="Channel's name..." maxLength={20} id={errors.name ? 'channel-create-error' : 'channel-create-input'} />
+						<input {...register("name")} placeholder="Channel's name..." maxLength={20} className={errors.name ? 'channel-create-error' : 'channel-create-input'} />
 					</div>
 					{errors?.name && <p id='channel-create-input-error'>{errors.name.message}</p>}
 					<div className="channel-visibility-buttons">
 						<div>
 							<label>
-								<input {...register("type")} type="radio" id="channel-create-public" value="0" onChange={handleChange} checked={typeForm === "0"} maxLength={20} />
+								<input {...register("type")} type="radio" className="channel-create-public" value="0" onChange={handleChange} checked={typeForm === "0"} maxLength={20} />
 								Public
 							</label>
 						</div>
 						<div>
 							<label>
-								<input {...register("type")} type="radio" id="channel-create-protected" value="2" onChange={handleChange} checked={typeForm === "2"} maxLength={20} />
+								<input {...register("type")} type="radio" className="channel-create-protected" value="2" onChange={handleChange} checked={typeForm === "2"} maxLength={20} />
 								Protected
 							</label>
 						</div>
 						<div>
 							<label>
-								<input {...register("type")} type="radio" id="channel-create-private" value="1" onChange={handleChange} checked={typeForm === "1"} maxLength={20} />
+								<input {...register("type")} type="radio" className="channel-create-private" value="1" onChange={handleChange} checked={typeForm === "1"} maxLength={20} />
 								Private
 							</label>
 						</div>
@@ -165,21 +164,21 @@ export function ChannelFromCreate() {
 									Choose your password :
 								</div>
 								<div className="channel-choose-pwd">
-									<input {...register("hash")} placeholder="Password..." maxLength={15} type="password" id={errors.hash ? 'channel-hash-input-error' : 'channel-hash-input'} />
+									<input {...register("hash")} placeholder="Password..." maxLength={15} type="password" className={errors.hash ? 'channel-hash-input-error' : 'channel-hash-input'} />
 								</div>
 								{errors?.hash && <p id='create-channel-error-hash'>{errors.hash.message}</p>}
 								<div className="pwd-title">
 									Confirm your password :
 								</div>
 								<div className="channel-choose-pwd">
-									<input {...register("confirmhash")} placeholder="Confirm Password..." maxLength={15} type="password" id={errors.confirmhash ? 'channel-hash-input-error' : 'channel-hash-input'} />
+									<input {...register("confirmhash")} placeholder="Confirm Password..." maxLength={15} type="password" className={errors.confirmhash ? 'channel-hash-input-error' : 'channel-hash-input'} />
 								</div>
 								{errors?.confirmhash && <p id='create-channel-error-hash'>{errors.confirmhash.message}</p>}
 							</div>
 							: <></>
 					}
 					<div className="channel-validation-button">
-						<button onClick={onSubmit} id='channel-create-validate'>Create</button>
+						<button onClick={onSubmit} className='channel-create-validate'>Create</button>
 					</div>
 				</div>
 			</form>
