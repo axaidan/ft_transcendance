@@ -263,7 +263,7 @@ export function ChannelInput() {
 
 export function ChannelSettings() {
 
-	const { socket, channels, index_channel, me } = useContext(ChatSocketContext).ChatSocketState;
+	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
 
 	type ChannelEditForm = {
 		name?: string;
@@ -353,12 +353,10 @@ export function ChannelSettings() {
 			dto.hash = pwd;
 		console.log(dto);
 		axios.patch('/channel/' + channels[index_channel].id, dto);
-		location.reload();
 	});
 
 	const onSubmitDelete = () => {
 		axios.delete('/channel/' + channels[index_channel].id);
-		location.reload();
 	};
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

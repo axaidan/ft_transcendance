@@ -141,7 +141,6 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			return {...state};
 
 		case EChatSocketActionType.GET_CHAN:
-			console.log("MY CHAN " , action.payload);
 			state.channels = (action.payload as IChannel[]);
 			return {...state};
 		case EChatSocketActionType.UP_CHAN:
@@ -149,17 +148,13 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			state.index_channel = state.channels.findIndex( disc => disc.id == (action.payload as IChannel).id );
 			return { ...state };
 		case EChatSocketActionType.RM_CHAN:
-			// PROTECTION SI QQ DELETE UN CHAN ACTIF
 			if ( state.index_channel == state.channels.findIndex(chan => chan.id == (action.payload as number))) {
 				state.index_channel = -1;
 			}
-			console.log(state.channels);
 			state.channels = state.channels.filter((chan) => {return chan.id !== (action.payload as number)});
-			console.log(state.channels);
 			return { ...state };
 		case EChatSocketActionType.GET_ACHAN:
 			state.allChannels = (action.payload as IChannelSimple[]);
-			console.log("ALL CHAN " , action.payload);
 			return {...state};
 		case EChatSocketActionType.UP_ACHAN:
 			state.allChannels.push(action.payload as IChannelSimple);
@@ -178,9 +173,7 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.NEW_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
-			console.log( state.channels[index].users )
 			state.channels[index].users.push( (action.payload as IUserChannel) );
-			console.log( state.channels[index].users )
 			return { ...state };
 
 		case EChatSocketActionType.RM_USER_CHAN:
