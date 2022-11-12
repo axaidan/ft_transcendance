@@ -130,7 +130,7 @@ export function Profile() {
 					<div className="user-xp-fill"></div>
 					<div className="user-xp-nbr"></div>
 					<div className="user-xp-value">
-						25
+						{me.id}
 					</div>
 					<div className="user-profile-icon-div">
 

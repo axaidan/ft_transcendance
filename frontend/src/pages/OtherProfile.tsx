@@ -95,7 +95,7 @@ export function OtherProfile() {
 					<div className="other-xp-fill"></div>
 					<div className="other-xp-nbr"></div>
 					<div className="other-xp-value">
-						25
+						{othUser.id}
 					</div>
 					<div className="other-profile-icon-div">
 						<img src={othUser.avatarUrl} id="other-profile-icon" />

@@ -32,8 +32,9 @@
 #collection-avatar-map {
 	width: 300px;
 	height: 300px;
-	border: 2px solid rgb(128, 128, 4);
-	cursor: pointer;
+	border: 2px solid green;
+	border-image: linear-gradient(to top, #c8aa6d, #7a5c29);
+	border-image-slice: 1;
 }
 
 .collection-avatars {

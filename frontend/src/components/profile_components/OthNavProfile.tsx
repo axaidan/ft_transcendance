@@ -33,9 +33,6 @@ export function OthNavProfile() {
 					<NavLink to={'/home/' + id + '/history'} className='other-navlinks'>
 						Historique
 					</NavLink>
-					<NavLink to={'/home/' + id + '/achievement'} className='other-navlinks'>
-						Achievements
-					</NavLink>
 				</div>
 			</div>
 			<Outlet context={othUser} />

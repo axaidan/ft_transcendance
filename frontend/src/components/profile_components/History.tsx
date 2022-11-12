@@ -71,11 +71,15 @@ export function History() {
 			<div className="history-title">
 				{user.username} 'S RECENT GAMES
 			</div>
-			<ul id='history-list'>
-				{games.map((game: IGame, index: number) => (
-					<Game key={index} game={game} />
-				))}
-			</ul>
+			{
+				games.length === 0 ? <div>No game yet.</div>
+					:
+					<ul id='history-list'>
+						{games.map((game: IGame, index: number) => (
+							<Game key={index} game={game} />
+						))}
+					</ul>
+			}
 		</div >
 	)
 }
