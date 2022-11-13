@@ -3,19 +3,36 @@
     display: flex;
     justify-content:left;
     font-size: 1.1em;
-    margin: 10px;
     border: 0px;
 	font-family: 'Friz Quadrata Std';
+	background-color: #00000000;
+    transition: background-color 600ms linear;
+    box-sizing: border-box;
+    height: 55px;
+    
 }
+
+.contact-container:hover {
+    background-color: #6f79817a;
+    transition: background-color 50ms linear;
+}
+
 
 .contact-info {
     position: relative;
+    left: -8px;
     padding-top: 8px;
 }
 
 .contact-name {
     margin-left: 11px;
 }
+
+
+.contact-container:hover p {
+    color: rgb(173, 173, 173);
+}
+
 
 .contact-status {
     position: absolute;
@@ -45,6 +62,7 @@
     padding-top: 5px;
 	width: 40px;
 	height: 40px;
+    margin-left: 20px;
 	border-radius: 50% 50%;
 }
 

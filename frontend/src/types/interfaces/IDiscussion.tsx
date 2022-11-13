@@ -19,7 +19,7 @@ export type IDiscussion = {
 }
 
 export const dflDiscussion = {
-	discId: 0,
+	// discId: 0,
 	user1: DflUser,
 	user1Id: 0,
 	user2: DflUser,

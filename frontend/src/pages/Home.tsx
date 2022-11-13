@@ -21,8 +21,6 @@ function LoadingHome() {
 	)
 }
 
-
-
 export function Home() {
 	const navigate = useNavigate();
 	const [loading, user, error] = useAxios<IUser>({ method: 'GET', url: '/user/me' });

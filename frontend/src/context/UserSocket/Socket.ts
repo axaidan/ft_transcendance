@@ -2,10 +2,15 @@ import { createContext } from "react";
 import { Socket } from "socket.io-client";
 import { DflUser, IUser } from "../../types";
 
+export interface IStatus {
+	userId: number;
+	status: number;
+}
+
 export interface ISocketContextState {
 	socket: Socket | undefined;
 	me: IUser;
-	users: number[];
+	users: IStatus[];
 	friends: IUser[];
 	blocks: IUser[];
 }
@@ -30,6 +35,7 @@ export enum ESocketActionType {
 	RM_FRIENDS = 'rm_new_friend',
 	ADD_BLOCKS = 'add_new_block',
 	RM_BLOCKS = 'rm_new_block',
+	UP_STATUS = 'update_user_status',
 	UP_USERNAME = 'update_username',
 }
 
@@ -43,10 +49,11 @@ export type TSocketContextActions = ESocketActionType.UP_SOKET |
 	ESocketActionType.ADD_FRIENDS |
 	ESocketActionType.RM_FRIENDS |
 	ESocketActionType.ADD_BLOCKS |
+	ESocketActionType.UP_STATUS |
 	ESocketActionType.RM_BLOCKS |
 	ESocketActionType.UP_USERNAME;
-
-export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | string;
+	
+export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | IStatus | IStatus[] | string;	
 
 export interface ISocketContextActions {
 	type: TSocketContextActions;
@@ -54,7 +61,9 @@ export interface ISocketContextActions {
 }
 
 export const SocketReducer = (state: ISocketContextState, action: ISocketContextActions) => {
-	// console.log( `Message Receive - Action: ${action.type} - Payload : `, action.payload );
+	console.log(`Message Receive - Action: ${action.type} - Payload : `, action.payload);
+	let user: IStatus | undefined;
+	let friend: IUser | undefined;
 
 	switch (action.type) {
 		case ESocketActionType.UP_SOKET:
@@ -62,11 +71,11 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
 		case ESocketActionType.UP_UID:
 			return { ...state, me: action.payload as IUser };
 		case ESocketActionType.GET_USERS:
-			return { ...state, users: action.payload as number[] };
+			return { ...state, users: action.payload as IStatus[] };
 		case ESocketActionType.UP_USERS:
-			return { ...state, users: [...state.users, action.payload as number] };
+			return { ...state, users: [...state.users, action.payload as IStatus] };
 		case ESocketActionType.RM_USER:
-			return { ...state, users: state.users.filter((uid) => uid !== (action.payload as number)) };
+			return { ...state, users: state.users.filter((uid) => uid.userId !== (action.payload as number)) };
 		case ESocketActionType.GET_FRIENDS:
 			return { ...state, friends: action.payload as IUser[] };
 		case ESocketActionType.ADD_FRIENDS:
@@ -79,6 +88,12 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
 			return { ...state, blocks: [...state.blocks, action.payload as IUser] };
 		case ESocketActionType.RM_BLOCKS:
 			return { ...state, blocks: state.blocks.filter((user) => user !== (action.payload as IUser)) };
+		case ESocketActionType.UP_STATUS:
+			user = state.users.find((friend) => { return friend.userId == (action.payload as IStatus).userId })
+			friend = state.friends.find((friend) => { return friend.id == (action.payload as IStatus).userId })
+			if (user) { user.status = (action.payload as IStatus).status;}
+			if (friend) {  friend!.status = (action.payload as IStatus).status; }
+			return {...state };
 		case ESocketActionType.UP_USERNAME:
 			state.me.username = (action.payload as string);
 			return { ...state }

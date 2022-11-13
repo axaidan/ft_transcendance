@@ -40,7 +40,7 @@ export function DiscussionNav() {
 	return (
 		<div className='discussion-container'>
 			{discussion?.map((disc: IDiscussion, index) => (
-				<DiscLinkUser index={index} >
+				<DiscLinkUser key={index} index={index} >
 					<DiscUser user={othUser(disc)} active={(index_active == index)} msg={disc.messages} did={disc.id}/>
 				</DiscLinkUser>
 			)).reverse()}

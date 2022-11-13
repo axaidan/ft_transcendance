@@ -1,4 +1,3 @@
-import { defaultWinrate, IWinrate } from "./IWinrate"
 
 export type IUser = {
 	id: number,
@@ -9,6 +8,7 @@ export type IUser = {
 	updatedAt: string
 	twoFactorAuth: boolean,
 	avatarUrl: string,
+	status: number,
 }
 
 export const DflUser: IUser = {
@@ -20,5 +20,18 @@ export const DflUser: IUser = {
 	updatedAt: "string",
 	twoFactorAuth: false,
 	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
+	status: 4,
+}
+
+export const DflChannel: IUser = {
+	id: 0,
+	login: "username",
+	username: "Channel",
+	email: "string",
+	createdAt: "string",
+	updatedAt: "string",
+	twoFactorAuth: false,
+	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
+	status: 4,
 }
 

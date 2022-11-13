@@ -11,6 +11,7 @@ import { ChannelMuteService } from './channel/channel-mute/channel-mute.service'
 import { ChannelUserService } from './channel/channel-user/channel-user.service';
 import { DiscussionService } from './discussion/discussion.service';
 import { DiscussionDto } from './discussion/dto/discussion.dto';
+import { DiscussionWithUsers } from './discussion/types';
 
 @WebSocketGateway({ cors: '*:*', namespace: 'chatNs' })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -74,9 +75,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    newDisc(dto: DiscussionDto) {
-        const roomName: string = 'disc' + dto.id;
-        this.wss.to(roomName).emit('newDiscToClient', dto);
+    newDisc(discussion: DiscussionWithUsers) {
+        const roomName: string = 'disc' + discussion.id;
+        this.wss.to(roomName).emit('newDiscToClient', discussion);
     }
 
     //////////////////////
@@ -108,21 +109,34 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         const channelUsers: ChannelUser[] =
             await this.channelUserService.getAllJoinedChannelUsers(userId);
         for (const channelUser of channelUsers) {
-            this.joinChannelRoom(userId, channelUser.channelId);
+            this.joinChannelRoom(userId, channelUser.chanId);
         }
     }
 
-    userJoinedChannel(channelUser: ChannelUser) {
-        this.wss.to(`chan${channelUser.channelId}`).emit('userJoinedChannel', {
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+    // TU DOIS ME REVOYER UN DTO QUI CORRESPOND A LA STRUCTURE. chanId != chanId, j'ai besoin du USER COMPLET! 
+    userJoinedChannel(channelUser: any) {
+        this.wss.to(`chan${channelUser.chanId}`).emit('userJoinedChannel', {
             channelUser,
         });
     }
 
     userLeftChannel(userId: number, chanId: number) {
-        this.wss.to(`chan${chanId}`).emit('userJoinedChannel', {
+        this.wss.to(`chan${chanId}`).emit('userLeaveChannel', {
             userId: userId,
             chanId: chanId,
         });
+    }
+
+    newChannelToClient( chan: Channel) {
+        this.wss.emit('newChanToClient', {
+            chan,
+        });
+    }
+
+    addChannelToOwner( uid: number, chan: Channel ) {
+        const client: Socket = this.clientsMap.get(uid)!;
+        client.emit('upChanOwner', { chan });
     }
 
 
@@ -160,9 +174,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     channelUserRoleEdited(channelUser: ChannelUser) {
-        this.wss.to(`chan${channelUser.channelId}`).emit('channelUserRoleEdited', {
+        this.wss.to(`chan${channelUser.chanId}`).emit('channelUserRoleEdited', {
             userId: channelUser.userId,
-            chanId: channelUser.channelId,
+            chanId: channelUser.chanId,
             role: channelUser.role,
         });
     }
@@ -172,15 +186,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     //////////////////
 
     channelUserBanned(channelBan: ChannelBan) {
-        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserBanned', {
-            chanId: channelBan.channelId,
+        this.wss.to(`chan${channelBan.chanId}`).emit('channelUserBanned', {
+            chanId: channelBan.chanId,
             userId: channelBan.userId,
         });
     }
 
     channelUserUnbanned(channelBan: ChannelBan) {
-        this.wss.to(`chan${channelBan.channelId}`).emit('channelUserUnbanned', {
-            chanId: channelBan.channelId,
+        this.wss.to(`chan${channelBan.chanId}`).emit('channelUserUnbanned', {
+            chanId: channelBan.chanId,
             userId: channelBan.userId,
         });
     }
@@ -190,17 +204,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     ///////////////////
 
     channelUserMuted(channelMute: ChannelMute) {
-        this.logger.log(`MUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
-        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserMuted', {
-            chanId: channelMute.channelId,
+        this.logger.log(`MUTED EVENT USER${channelMute.userId} CHAN${channelMute.chanId}`);
+        this.wss.to(`chan${channelMute.chanId}`).emit('channelUserMuted', {
+            chanId: channelMute.chanId,
             userId: channelMute.userId,
         });
     }
 
     channelUserUnmuted(channelMute: ChannelMute) {
-        this.logger.log(`UNMUTED EVENT USER${channelMute.userId} CHAN${channelMute.channelId}`);
-        this.wss.to(`chan${channelMute.channelId}`).emit('channelUserUnmuted', {
-            chanId: channelMute.channelId,
+        this.logger.log(`UNMUTED EVENT USER${channelMute.userId} CHAN${channelMute.chanId}`);
+        this.wss.to(`chan${channelMute.chanId}`).emit('channelUserUnmuted', {
+            chanId: channelMute.chanId,
             userId: channelMute.userId,
         });
     }
@@ -261,13 +275,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         dto: ChannelMessageDto
     )
     {
-        const channelMute = this.channelMuteService.findOne(dto.userId, dto.chanId);
-        if (channelMute !== null) {
-            this.logger.log(`IN CHAN ${dto.chanId} RECEIVED MSG FROM MUTED USER ${dto.userId}`);
-            throw new WsException('you are muted in this channel');
-        }
+
+	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
+        // CA INDIQUE QUE JE SUIS MUTE DANS TOUT LES CAS! 
+
+        // const channelMute = this.channelMuteService.findOne(dto.userId, dto.chanId);
+        // if (channelMute !== null) {
+        //     this.logger.log(`IN CHAN ${dto.chanId} RECEIVED MSG FROM MUTED USER ${dto.userId}`);
+        //     throw new WsException('you are muted in this channel');
+        // }
         this.logger.log(`IN CHAN ${dto.chanId} RECEIVED\t'${dto.text.substring(0, 10)}' FROM USER ${dto.userId}`);
         const message = await this.channelMessageService.create(dto.userId, dto.chanId, dto.text);
+
         this.wss.to(`chan${dto.chanId}`).emit('chanMsgToClient', message);
         this.logger.log(`EMITTED\t'${dto.text.substring(0, 10)}' TO ROOM 'chan${dto.chanId}'`);
     }

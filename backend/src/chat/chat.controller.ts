@@ -182,7 +182,7 @@ export class ChatController {
         @Param('role', ParseIntPipe) role: number,
     )
         : Promise<ChannelUser> {
-        if (role < EChannelRoles.NORMAL || role > EChannelRoles.OWNER)
+        if (role > EChannelRoles.NORMAL || role < EChannelRoles.OWNER)
             throw new BadRequestException('role must as: 0 <= role <= 2');
         const channelUser = await this.chatService.editChannelUserRole(currentUserId, {
             chanId: chanId,
