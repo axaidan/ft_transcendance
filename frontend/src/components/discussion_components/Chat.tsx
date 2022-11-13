@@ -31,7 +31,7 @@ export function ChatBody() {
 	useEffect(() => {
 		let element = document.getElementById("messages-body");
 		element!.scrollTop = element!.scrollHeight;
-	})
+	}, [])
 
 	return (
 		<div id='messages-body'>

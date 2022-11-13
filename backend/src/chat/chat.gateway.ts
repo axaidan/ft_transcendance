@@ -151,7 +151,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     channelNameEdited(channel: Channel) {
         this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
-        this.wss.to(`chan${channel.id}`).emit('channelNameEdited', {
+        this.wss.emit('channelNameEdited', {
             chanId: channel.id,
             name: channel.name,
         });
@@ -159,7 +159,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     channelTypeEdited(channel: Channel) {
         this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
-        this.wss.to(`chan${channel.id}`).emit('channelTypeEdited', {
+        this.wss.emit('channelTypeEdited', {
             chanId: channel.id,
             type: channel.type,
         });

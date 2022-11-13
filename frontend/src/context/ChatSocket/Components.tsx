@@ -88,6 +88,15 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 		////////////////////
 		//  PATCH EVENTS  //
+		chatSocket.on('channelTypeEdited', (dto: { chanId: number, type: number }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.EDIT_TYPE_CHAN, payload: dto });
+			if ( dto.type != 0)
+				ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: dto.chanId });
+
+		})
+		chatSocket.on('channelNameEdited', (dto: { chanId: number, name: string }) => {
+			ChatSocketDispatch({ type: EChatSocketActionType.EDIT_NAME_CHAN, payload: dto });
+		})
 		chatSocket.on('channelUserRoleEdited', (dto: IUserChannel) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.ROLE_CHAN, payload: dto });
 		})
@@ -112,6 +121,8 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 		//  BAN EVENTS  //
 		chatSocket.on('channelUserBanned', (dto: { chanId: number, userId: number }) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.BAN_USER_CHAN, payload: dto });
+			if ( dto.userId == me.id)
+				ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: dto.chanId });
 		})
 
 		chatSocket.on('channelUserUnbanned',  (dto: { chanId: number, userId: number }) => {

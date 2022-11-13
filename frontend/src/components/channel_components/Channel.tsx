@@ -38,33 +38,39 @@ export function ChannelUserPannel({ mode, user }: ChannelUserPannelProps) {
 		navigate('/home/' + user.user.id)
 	}
 
-	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
 	const addAdminLogic = async () => {
 		await axios.patch('/channel/' + curr_channel.id + '/user/' + user.userId + '/1')
 	}
 
-	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
 	const rmAdminLogic = async () => {
 		await axios.patch('/channel/' + curr_channel.id + '/user/' + user.userId + '/2')
 	}
 
-	const BanUserLogic = () => {
-		console.log('LOGIC POUR BAN USER ' + user.user.login)
+	const BanUserLogic = async () => {
+		await axios.post('/channel/' + curr_channel.id + '/user/' + user.userId + '/ban')
+		console.log('Ban de: ' + user.user.login)
 	}
 
-	// const unBanUserLogic = () => {
-	// 	console.log('LOGIC POUR UNBAN USER ' + user.user.login)	
-	// }
-
-	const MuteUserLogic = () => {
-		console.log('LOGIC POUR MUTE USER ' + user.user.login)
+	const MuteUserLogic = async () => {
+		await axios.post('/channel/' + curr_channel.id + '/user/' + user.userId + '/mute')
+		console.log('Mute de: ' + user.user.login)
 	}
 
-	// const unMuteUserLogic = () => {
-	// 	console.log('LOGIC POUR UNMUTE USER ' + user.user.login)	
-	// }
+	const unMuteUserLogic = async () => {
+		await axios.delete('/channel/' + curr_channel.id + '/user/' + user.userId + '/mute')
+		console.log('UnMute de: ' + user.user.login)
+	}
 
 	const role = user.role;
+
+	function userIsMuted() {
+		if (channels[index_channel].mutes.find((elem) => elem.userId == user.userId) != undefined) {
+			return true;
+		}
+		return false;
+	}
+
+	const isMuted = userIsMuted()
 
 	return (
 		<div id="channel-user-pannel">
@@ -73,7 +79,7 @@ export function ChannelUserPannel({ mode, user }: ChannelUserPannelProps) {
 				: <></>}
 			{mode <= 1 && role != 0 ? <>
 				<ChannelUserPannelBtn title={"Ban User"} logic={BanUserLogic} />
-				<ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic} />
+				{isMuted ?  <ChannelUserPannelBtn title={"unMute User"} logic={unMuteUserLogic}/> : <ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic} />}
 			</> : <></>}
 			<UserCreateChat user={user.user}>
 				<ChannelUserPannelBtn title={"Send Message"} logic={sendMessageLogic} />
@@ -130,9 +136,7 @@ const ChannelOptionMenu = ({ mode }: ChannelOptionMenuProps) => {
 		dispatch({ type: EChatSocketActionType.SETTING_CHAN, payload: !settings_display })
 	}
 
-	// ----------------------------------------------------------------------------------------------------------------------- PROBLEME
 	const ChannelDeleteLogic = () => {
-		console.log('LOGIC POUR ERASE CHANNEL ');
 		axios.delete('/channel/' + curr_channel.id);
 	}
 
@@ -201,10 +205,6 @@ export function ChannelTitle({ title }: ChannelTitleProps) {
 }
 
 export function ChannelHeader({ chan }: ChannelBodyProps) {
-
-	// IL ME FAUT ICI LE NOM DU CHANNEL POUR LE TITRE
-	// IL ME FAUT AUSSI POUR LE PANNEL: ID ? 
-
 	return (
 		<div id="channel-header">
 			<ChannelTitle title={chan.name.toUpperCase()} />
@@ -249,10 +249,17 @@ export function ChannelMessages({ messages }: ChannelMessagesProps) {
 export function ChannelInput() {
 	const { socket, channels, index_channel, me } = useContext(ChatSocketContext).ChatSocketState;
 
+	function userIsMuted() {
+		if (channels[index_channel].mutes.find((elem) => elem.userId == me.id) != undefined) {
+			return true;
+		}
+		return false;
+	}
+
 	const handleKeyDown = (e: any) => {
 		const input = document.getElementById('channel-input') as HTMLInputElement;
 		if (e.key === 'Enter') {
-			if (input.value.length != 0) { socket!.emit('chanMsgToServer', { chanId: channels[index_channel].id, userId: me.id, text: input.value }); }
+			if (input.value.length != 0 && userIsMuted() == false) { socket!.emit('chanMsgToServer', { chanId: channels[index_channel].id, userId: me.id, text: input.value }); }
 			input.value = "";
 		}
 	}
@@ -263,13 +270,37 @@ export function ChannelInput() {
 
 export function BanListHandler() {
 	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
+	const axios = AxiosJwt();
+	const curr_channel = channels[index_channel]
+	const banList = curr_channel.bans;
 
-	const banList = channels[index_channel].bans;
+	type BanUserProps = { user: {userId: number, chanId: number, user: {username: string}}}
+	const BanUser = ({user}:BanUserProps) => {
 
-	console.log(banList);
+		const unBanUserLogic = async () => {
+			await axios.delete('/channel/' + curr_channel.id + '/user/' + user.userId + '/ban')
+		}
+
+		return (
+			<div className="channel-setting-user-ban">
+				<p>{ user.userId }</p>
+				<button onClick={() => unBanUserLogic()}>unban</button>
+			</div>
+		)
+
+	}
 
 	return (
-		<></>
+		<div>
+			<h2>BanList:</h2>
+			<div id="channel-setting-ban-list">
+				{ banList.map(((user, index) => {
+					return (
+						< BanUser user={user} key={index} />
+						)
+					}))}
+			</div>
+		</div>
 	)
 }
 
@@ -353,7 +384,7 @@ export function ChannelSettings() {
 	};
 
 
-	const { register, handleSubmit, reset, formState: { errors } } = useForm<ChannelEditForm>({ resolver });
+	const { register, handleSubmit, formState: { errors } } = useForm<ChannelEditForm>({ resolver });
 
 	const onSubmit = handleSubmit((data) => {
 		console.log(data);
