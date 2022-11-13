@@ -174,366 +174,413 @@ export function Pong() {
 					//		clearDataGame();
 				}
 			}
+		} else {
+
+			// Increase speed and change direction
+			if (BALL_ACCELERATE)
+				game.ball.speed.x *= -1.2;
+			else
+				game.ball.speed.x *= -1;
+			changeDirection(player.y);
+			socket!.emit('updateBall', game.roomName + ':' + (game.ball.x / canvas.width) + ':' + (game.ball.y / canvas.height) + ':' + (game.ball.speed.x / canvas.width) + ':' + (game.ball.speed.y / canvas.height))
+
+
 		}
-	} else {
-
-		// Increase speed and change direction
-		if (BALL_ACCELERATE)
-			game.ball.speed.x *= -1.2;
-		else
-			game.ball.speed.x *= -1;
-		changeDirection(player.y);
-		socket!.emit('updateBall', game.roomName + ':' + (game.ball.x / canvas.width) + ':' + (game.ball.y / canvas.height) + ':' + (game.ball.speed.x / canvas.width) + ':' + (game.ball.speed.y / canvas.height))
-
-
 	}
-}
 
-function changeDirection(playerPosition: number) {
-	// Ball bounce
-	var impact = game.ball.y - playerPosition - PLAYER_HEIGHT / 2;
-	var ratio = 100 / (PLAYER_HEIGHT / 2);
-	game.ball.speed.y = Math.round(impact * ratio / 10);
-	if (Math.abs(game.ball.speed.x) < 0.1) {
-		let sign = 1;
-		if (game.ball.speed.x < 0)
-			sign = -1;
-		game.ball.speed.x = 0.2 * sign;
+	function changeDirection(playerPosition: number) {
+		// Ball bounce
+		var impact = game.ball.y - playerPosition - PLAYER_HEIGHT / 2;
+		var ratio = 100 / (PLAYER_HEIGHT / 2);
+		game.ball.speed.y = Math.round(impact * ratio / 10);
+		if (Math.abs(game.ball.speed.x) < 0.1) {
+			let sign = 1;
+			if (game.ball.speed.x < 0)
+				sign = -1;
+			game.ball.speed.x = 0.2 * sign;
+		}
 	}
-}
 
 
 
-function draw() {
-	// Draw Canvas
-	if (!game)
-		console.log('no game');
-	if (canvas) {
-		let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
+	async function draw() {
+		// Draw Canvas
+		if (!game)
+			console.log('no game');
+		if (canvas) {
+			let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
 
-		if (context) {
-			if (game.mode === 2) {
-				PLAYER_HEIGHT = canvas.height / 3;
-				PLAYER_WIDTH = canvas.width / 100;
-				BALL_HEIGHT = canvas.height / 25;
-				BALL_SPEED = canvas.width / 50;
+			if (context) {
+				if (game.mode === 2) {
+					PLAYER_HEIGHT = canvas.height / 3;
+					PLAYER_WIDTH = canvas.width / 100;
+					BALL_HEIGHT = canvas.height / 25;
+					BALL_SPEED = canvas.width / 50;
+				}
+				else if (game.mode === 1) {
+					PLAYER_HEIGHT = canvas.height / 5;
+					PLAYER_WIDTH = canvas.width / 100;
+					BALL_HEIGHT = canvas.height / 12;
+					BALL_SPEED = canvas.width / 250;
+
+				}
+				else {
+					PLAYER_HEIGHT = canvas.height / 3;
+					PLAYER_WIDTH = canvas.width / 100;
+					BALL_HEIGHT = canvas.height / 12;
+					BALL_SPEED = canvas.width / 250;
+
+				}
+
+				context.fillStyle = 'black';
+				context.fillRect(0, 0, canvas.width, canvas.height);
+				// Draw middle line
+				context.strokeStyle = 'white';
+				context.beginPath();
+				context.moveTo(canvas.width / 2, 1);
+				context.lineTo(canvas.width / 2, canvas.height - 1);
+				context.stroke();
+
+
+				context.fillStyle = 'white';
+				context.fillRect(0, game.player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+				context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
+				context.beginPath();
+				context.fillStyle = 'red';
+				context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
+				context.fill();
+
 			}
-			else if (game.mode === 1) {
-				PLAYER_HEIGHT = canvas.height / 5;
-				PLAYER_WIDTH = canvas.width / 100;
-				BALL_HEIGHT = canvas.height / 12;
-				BALL_SPEED = canvas.width / 250;
 
+		}
+	}
+
+	function handleResize() {
+		canvas.height = window.innerHeight - 100;
+		canvas.width = window.innerWidth - 270;
+
+		PLAYER_HEIGHT = canvas.height / 3;
+		PLAYER_WIDTH = canvas.width / 100;
+		BALL_HEIGHT = canvas.height / 12;
+		//draw();
+	}
+
+	function stop() {
+
+		//		cancelAnimationFrame(anim);
+
+		game.ball.x = canvas.width / 2 - BALL_HEIGHT / 2;
+		game.ball.y = canvas.height / 2 - BALL_HEIGHT / 2;
+		game.player.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
+		game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
+
+		game.ball.speed.x = 0;
+		game.ball.speed.y = 0;
+
+		//	cancelAnimationFrame(anim);
+
+		// sortir clean le lobby, cut le stream/d
+
+	}
+	function initScreen() {
+		if (canvas) {
+			game = {
+				player: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+					player: 0,
+				},
+				player2: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+					player: 0,
+				},
+				ball: {
+					x: canvas.width / 2 - BALL_HEIGHT / 2,
+					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					speed: {
+						x: 0,
+						y: 0,
+					}
+				},
+				roomName: '0',
+				mode: 0,
+				rematch1: 0,
+				rematch2: 0,
+			}
+			draw();
+		}
+	}
+
+	function topinitParty(playerId1: number, playerId2: number, lobbyId: number, mode: number) {
+		console.log("go jonny go go")
+		vstop = 0;
+		if (canvas) {
+			console.log(`init game: user1, user2 ${playerId1} - ${playerId2} lobbyId ${lobbyId}`)
+			game = {
+				player: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+					player: playerId1,
+
+				},
+				player2: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+					player: playerId2
+				},
+				ball: {
+					x: canvas.width / 2 - BALL_HEIGHT / 2,
+					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					speed: {
+						x: 1,
+						y: 1,
+					}
+				},
+				roomName: 'game' + lobbyId.toString(),
+				mode: mode,
+				rematch1: 0,
+				rematch2: 0,
+			}
+			console.log(`game after init: ${game}`)
+			document.querySelector('#player-score').textContent = "0";
+			document.querySelector('#player2-score').textContent = "0";
+			draw();
+		}
+		else {
+			console.log('ya pas conva')
+		}
+	}
+	function initParty() {
+
+		if (canvas) {
+			game = {
+				player: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+
+				},
+				player2: {
+					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					score: 0,
+				},
+				ball: {
+					x: canvas.width / 2 - BALL_HEIGHT / 2,
+					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					speed: {
+						x: 2,
+						y: 2,
+					}
+				},
+
+				rematch1: 0,
+				rematch2: 0,
+
+			}
+			draw();
+		}
+	}
+
+	async function play() {
+		await draw();
+		await ballMove();
+		anim = requestAnimationFrame(play);
+	}
+
+	function restore() {
+		console.log("restore button clic")
+		initParty();
+		play();
+
+	}
+
+	function getIntoLobby() {
+		axios.get('/lobby/join/0');
+	}
+
+	function getIntoLobbyShortPad() {
+		axios.get('/lobby/join/1');
+	}
+
+	function getIntoLobbyFastBall() {
+		axios.get('/lobby/join/2');
+	}
+
+	function rematch() {
+
+		if (game)
+			socket!.emit('rematch', game.roomName + ':' + me.id)
+	}
+
+	function spec(id: number) {
+		console.log(`spec id: ${id}`)
+		axios.get('spec/' + id);
+	}
+
+	function startRematch() {
+		topinitParty(game.player.player, game.player2.player, Number(game.roomName.substring(4)), game.mode);
+	}
+
+	function quiteLobby() {
+		// emit pour quite la room au joueur
+		console.log(`quite lobby -game: ${game}`)
+		if (game !== undefined) {
+			if (me.id === game.player.player || me.id === game.player2.player) {
+				//emit stop emit all
+				console.log(`meId ${me.id} is in emit to close lobby`)
+				stop();
+				socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
 			}
 			else {
-				PLAYER_HEIGHT = canvas.height / 3;
-				PLAYER_WIDTH = canvas.width / 100;
-				BALL_HEIGHT = canvas.height / 12;
-				BALL_SPEED = canvas.width / 250;
-
-			}
-
-			context.fillStyle = 'black';
-			context.fillRect(0, 0, canvas.width, canvas.height);
-			// Draw middle line
-			context.strokeStyle = 'white';
-			context.beginPath();
-			context.moveTo(canvas.width / 2, 1);
-			context.lineTo(canvas.width / 2, canvas.height - 1);
-			context.stroke();
-
-
-			context.fillStyle = 'white';
-			context.fillRect(0, game.player.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-			context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-			context.beginPath();
-			context.fillStyle = 'red';
-			context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
-			context.fill();
-
-		}
-
-	}
-}
-
-function handleResize() {
-	canvas.height = window.innerHeight - 100;
-	canvas.width = window.innerWidth - 270;
-
-	PLAYER_HEIGHT = canvas.height / 3;
-	PLAYER_WIDTH = canvas.width / 100;
-	BALL_HEIGHT = canvas.height / 12;
-	//draw();
-}
-
-function stop() {
-
-	cancelAnimationFrame(anim);
-
-	game.ball.x = canvas.width / 2 - BALL_HEIGHT / 2;
-	game.ball.y = canvas.height / 2 - BALL_HEIGHT / 2;
-	game.player.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
-	game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
-
-	game.ball.speed.x = 0;
-	game.ball.speed.y = 0;
-
-	//	cancelAnimationFrame(anim);
-
-
-}
-function initScreen() {
-	if (canvas) {
-		game = {
-			player: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-				player: 0,
-			},
-			player2: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-				player: 0,
-			},
-			ball: {
-				x: canvas.width / 2 - BALL_HEIGHT / 2,
-				y: canvas.height / 2 - BALL_HEIGHT / 2,
-				speed: {
-					x: 0,
-					y: 0,
-				}
-			},
-			roomName: '0',
-			mode: 0,
-			rematch1: 0,
-			rematch2: 0,
-		}
-		draw();
-	}
-	draw();
-}
-}
-
-function topinitParty(playerId1: number, playerId2: number, lobbyId: number, mode: number) {
-	console.log("go jonny go go")
-	vstop = 0;
-	if (canvas) {
-		console.log(`init game: user1, user2 ${playerId1} - ${playerId2} lobbyId ${lobbyId}`)
-		game = {
-			player: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-				player: playerId1,
-
-			},
-			player2: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-				player: playerId2
-			},
-			ball: {
-				x: canvas.width / 2 - BALL_HEIGHT / 2,
-				y: canvas.height / 2 - BALL_HEIGHT / 2,
-				speed: {
-					x: 1,
-					y: 1,
-				}
-			},
-			roomName: 'game' + lobbyId.toString(),
-			mode: mode,
-			rematch1: 0,
-			rematch2: 0,
-		}
-		console.log(`game after init: ${game}`)
-		document.querySelector('#player-score').textContent = "0";
-		document.querySelector('#player2-score').textContent = "0";
-		draw();
-	}
-	else {
-		console.log('ya pas conva')
-	}
-}
-function initParty() {
-
-	if (canvas) {
-		game = {
-			player: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-
-			},
-			player2: {
-				y: canvas.height / 2 - PLAYER_HEIGHT / 2,
-				score: 0,
-			},
-			ball: {
-				x: canvas.width / 2 - BALL_HEIGHT / 2,
-				y: canvas.height / 2 - BALL_HEIGHT / 2,
-				speed: {
-					x: 2,
-					y: 2,
-				}
+				console.log(`meId ${me.id} is in emit to leave lobby`)
+				socket!.emit('leaveRoom', me.id);
+				//stop emite at me
 			}
 		}
-		draw();
+		axios.delete('/lobby/leaveLobby')
 	}
-}
 
-function play() {
-	draw();
-	ballMove();
-	anim = requestAnimationFrame(play);
-}
-}
+	function deleteOneLobby() {
+		axios.delete('/lobby/')
+	}
 
-async function play() {
-	await draw();
-	await ballMove();
-	anim = requestAnimationFrame(play);
-}
+	function deleteLobby() {
+		axios.delete('/lobby/cleanAll')
+	}
 
-function restore() {
-	console.log("restore button clic")
-	initParty();
-	play();
-
-}
-
-function getIntoLobby() {
-	axios.get('/lobby/join/0');
-}
-
-function getIntoLobbyShortPad() {
-	axios.get('/lobby/join/1');
-}
-
-function getIntoLobbyFastBall() {
-	axios.get('/lobby/join/2');
-}
-
-function rematch() {
-
-	if (game)
-		socket!.emit('rematch', game.roomName + ':' + me.id)
-}
-
-function spec(id: number) {
-	console.log(`spec id: ${id}`)
-	axios.get('spec/' + id);
-}
-
-function deleteLobby() {
-	axios.delete('/lobby/cleanAll')
-}
-
-useEffect(() => {
-	let isMounted = true;
-	window.addEventListener("resize", handleResize);
-	canvas = document.getElementById('canvas');
-	initScreen();
-	//	initParty();
-	play();
-	canvas.addEventListener('mousemove', playerMove);
-	StartListeners();
-}, []);
+	useEffect(() => {
+		let isMounted = true;
+		window.addEventListener("resize", handleResize);
+		canvas = document.getElementById('canvas');
+		initScreen();
+		play();
+		canvas.addEventListener('mousemove', playerMove);
+		StartListeners();
+	}, []);
 
 
 
 
-const StartListeners = () => {
+	const StartListeners = () => {
 
-	socket!.on("startGame", (...arg) => {
-		console.log('game start')
-		game.player.player = arg[0].p1;
-		game.player2.player = arg[0].p2;
-		game.roomName = arg[0].lobbyId;
-		game.mode = arg[0].mode;
-		topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
-	});
+		socket!.on("startGame", (...arg) => {
+			console.log('game start')
+			game.player.player = arg[0].p1;
+			game.player2.player = arg[0].p2;
+			game.roomName = arg[0].lobbyId;
+			game.mode = arg[0].mode;
+			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
+		});
 
-	socket!.on("updatePos", (...arg) => {
-		game.player.y = arg[0] * canvas.height;
-		game.player2.y = arg[1] * canvas.height;
-		game.ball.x = arg[2] * canvas.width;
-		game.ball.y = arg[3] * canvas.height;
-	});
+		socket!.on("updatePos", (...arg) => {
+			game.player.y = arg[0] * canvas.height;
+			game.player2.y = arg[1] * canvas.height;
+			game.ball.x = arg[2] * canvas.width;
+			game.ball.y = arg[3] * canvas.height;
+		});
 
-	socket!.on("updateScore", (...arg) => {
-		game.player.score = arg[0];
-		game.player2.score = arg[1];
-		document.querySelector('#player-score')!.textContent = game.player.score.toString();
-		document.querySelector('#player2-score')!.textContent = game.player2.score.toString();
-	});
+		socket!.on("updateScore", (...arg) => {
+			game.player.score = arg[0];
+			game.player2.score = arg[1];
+			document.querySelector('#player-score')!.textContent = game.player.score.toString();
+			document.querySelector('#player2-score')!.textContent = game.player2.score.toString();
+		});
 
-	socket!.on("padUpdat", (...arg) => {
-		game.player.y = arg[0] * canvas.height;
-		game.player2.y = arg[1] * canvas.height;
-	});
+		socket!.on("padUpdat", (...arg) => {
+			game.player.y = arg[0] * canvas.height;
+			game.player2.y = arg[1] * canvas.height;
+		});
 
-	socket!.on("updatBall", (...arg) => {
-		game.ball.x = arg[0];
-		game.ball.x *= canvas.width;
-		game.ball.y = arg[1];
-		game.ball.y *= canvas.height;
-		//	console.log(`canvas width height ${canvas.width}, ${canvas.height}`)
-		game.ball.speed.x = arg[2] * canvas.width;
-		game.ball.speed.y = arg[3] * canvas.height;
-	});
+		socket!.on("updatBall", (...arg) => {
+			game.ball.x = arg[0];
+			game.ball.x *= canvas.width;
+			game.ball.y = arg[1];
+			game.ball.y *= canvas.height;
+			//	console.log(`canvas width height ${canvas.width}, ${canvas.height}`)
+			game.ball.speed.x = arg[2] * canvas.width;
+			game.ball.speed.y = arg[3] * canvas.height;
+		});
 
-	socket!.on('end', (...arg) => {
-		game.player.score = arg[0];
-		game.player2.score = arg[1];
-		//	stop();
-	})
+		socket!.on('endgame', (...arg) => {
+			console.log('here we end game, arg:', me.id, arg)
+			console.log(arg)
+			game.player.score = arg[0];
+			game.player2.score = arg[1];
+			//	stop();
+		})
 
-	socket!.on('rematch', (...arg) => {
-		console.log('start rematch');
-		if (game.player.player === arg[0]) {
-			game.rematch1 = 1;
+		socket!.on('rematch', (...arg) => {
+			console.log('start rematch');
+			if (game.player.player === arg[0]) {
+				game.rematch1 = 1;
+			}
+			else if (game.player2.player === arg[0]) {
+				game.rematch2 = 1;
+			}
+			if (game.rematch1 === 1 && game.rematch2 === 1) {
+				startRematch();
+			}
+		})
+
+		socket!.on('stop', (...arg) => {
+			vstop = 1;
+			stop();
+		})
+
+		socket!.on('reload', (...arg) => {
+			console.log('relard de la page en cours')
+		})
+
+	};
+
+	const resolver: Resolver<FormNumberValue> = async (values) => {
+
+
+		return {
+			values: values.id ? values : {},
+			errors: !values.id
+				? {
+					id: {
+						type: 'required',
+						message: 'Enter a new username or cancel.',
+					},
+				}
+				: {}
 		}
-		else if (game.player2.player === arg[0]) {
-			game.rematch2 = 1;
-		}
-		if (game.rematch1 === 1 && game.rematch2 === 1) {
-			startRematch();
-		}
-	})
+	};
 
-	socket!.on('stop', (...arg) => {
-		vstop = 1;
-		stop();
-	})
 
-	socket!.on('reload', (...arg) => {
-		console.log('relard de la page en cours')
-	})
+	const { register, handleSubmit, formState: { errors } } = useForm<FormNumberValue>({ resolver });
 
-};
+	const onSubmit = handleSubmit((data) => {
+		console.log(`go button avec id: ${data.id}`)
+		axios.get('/lobby/spec/' + data.id.toString());
+	});
 
-return (
-	<div>
-		<h1>Pong</h1>
-		<main>
-			<p className="canvas-score" id="scores">
-				<em className="canvas-score" id="joueur1"></em>
-				<em className="canvas-score" id="player-score">0</em> - <em id="joueur2"></em>
-				<em className="canvas-score" id="player2-score">0</em></p>
-			<canvas id={'canvas'} />
-			<button onClick={restore}> restore </button>
-			<button onClick={initParty}> initParty</button>
-			<button onClick={getIntoLobby}> Queue Normal Game</button>
-			<button onClick={getIntoLobbyShortPad}> Queue Short Pad Game</button>
-			<button onClick={getIntoLobbyFastBall}> Queue Fast Ball Game</button>
-			<button onClick={rematch}> rematch  </button>
-			<button onClick={quiteLobby}> quite lobby </button>
+	return (
+		<div>
+			<h1>Pong</h1>
+			<main>
+				<p className="canvas-score" id="scores">
+					<em className="canvas-score" id="joueur1"></em>
+					<em className="canvas-score" id="player-score">0</em> - <em id="joueur2"></em>
+					<em className="canvas-score" id="player2-score">0</em></p>
+				<canvas id={'canvas'} />
+				<button onClick={restore}> restore </button>
+				<button onClick={initParty}> initParty</button>
+				<button onClick={getIntoLobby}> Queue Normal Game</button>
+				<button onClick={getIntoLobbyShortPad}> Queue Short Pad Game</button>
+				<button onClick={getIntoLobbyFastBall}> Queue Fast Ball Game</button>
+				<button onClick={rematch}> rematch  </button>
+				<button onClick={quiteLobby}> quite lobby </button>
 
-			<form onSubmit={onSubmit}>
-				<input  {...register("id")} type='number' placeholder='0' />
-				<input type='submit' onSubmit={onSubmit} />
-			</form>
-			<button onClick={deleteLobby}> delete lobby</button>
-		</main>
-		<p>Jeu a mettre ici</p>
-	</div>
-)
+				<form onSubmit={onSubmit}>
+					<input  {...register("id")} type='number' placeholder='0' />
+					<input type='submit' onSubmit={onSubmit} />
+				</form>
+				<button onClick={deleteLobby}> delete lobby</button>
+			</main>
+			<p>Jeu a mettre ici</p>
+		</div>
+	)
 }
