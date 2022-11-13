@@ -68,7 +68,7 @@ export function Navbar() {
 				</li>
 				<div className="EB-logo">
 					<div className="EB-amount">
-						1000
+						{me.ranking}
 					</div>
 				</div>
 				<li className={splitLocation[1] === "" ? "items_active" : "items"} id='ladder'>
@@ -93,13 +93,13 @@ export function Navbar() {
 					</div>
 					<div className="nav_user_info">
 						<div className="nickname">
-							{ me.username }
+							{me.username}
 						</div>
 						<div className={toggleStatus === true ? "online" : "absent"}>
-							<button onClick={toggleUserStatus} className={ toggleStatus === true ? "btn_online" : "btn_abs" }>
+							<button onClick={toggleUserStatus} className={toggleStatus === true ? "btn_online" : "btn_abs"}>
 								◉
 							</button>
-							{ toggleStatus === true ? 'online' : "absent" }
+							{toggleStatus === true ? 'online' : "absent"}
 						</div>
 					</div>
 				</div>

@@ -427,12 +427,12 @@ export function ChannelSettings() {
 						<div className="channel-apply-settings">
 							<button onClick={onSubmit} className='channel-create-validate'>Apply modifications</button>
 						</div>
-						<div className="channel-delete-settings">
-							<button onClick={onSubmitDelete} id='channel-delete-validate'>DELETE</button>
-						</div>
 					</div>
 				</div>
 			</form>
+			<div className="channel-delete-settings">
+				<button onClick={onSubmitDelete} id='channel-delete-validate'>DELETE</button>
+			</div>
 		</div>
 	)
 }

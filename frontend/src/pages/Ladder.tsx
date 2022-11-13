@@ -10,7 +10,6 @@ import { SocketContext } from "../context";
 
 //CUSTOM HOOK
 import { AxiosJwt } from '../hooks/AxiosJwt'
-import { useWinrate } from '../hooks/useWinrate';
 
 //ASSET
 import { IUser } from '../types/interfaces/IUser';
@@ -23,7 +22,6 @@ type LadderProps = {
 function LadderList({ user }: LadderProps) {
 
 	const { me, blocks } = useContext(SocketContext).SocketState;
-	const wr = useWinrate(user.id);
 	const [isBlocked, setisBlocked] = useState(false);
 	const axios = AxiosJwt();
 
@@ -54,7 +52,7 @@ function LadderList({ user }: LadderProps) {
 				}
 			</div>
 			<div className="ladder-stats">
-				Rank: {user.id}
+				Rank points: {user.ranking}
 			</div>
 		</div>
 	);
@@ -72,7 +70,7 @@ export function Ladder() {
 	}, []);
 
 	const SortUsersByWinrate = (users: IUser[]): IUser[] => {
-		const usersSorted = users.sort((user1: IUser, user2: IUser) => user1.id - user2.id)
+		const usersSorted = users.sort((user1: IUser, user2: IUser) => user2.ranking - user1.ranking)
 		return usersSorted;
 	};
 

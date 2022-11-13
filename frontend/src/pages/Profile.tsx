@@ -7,10 +7,12 @@ import { ESocketActionType, SocketContext } from "../context";
 //Hooks
 import { AxiosJwt } from '../hooks/AxiosJwt';
 import { useForm, Resolver } from 'react-hook-form'
-import { useWinrate } from "../hooks";
+import { getDefeat, getDraws, getVictories, getWinrate } from "../hooks";
 
 // Assets:
 import '../styles/pages/Profile.css'
+import { IGame } from "../types";
+import { AxiosResponse } from "axios";
 
 export type FormValues = {
 	username: string;
@@ -21,9 +23,14 @@ export function Profile() {
 	const dispatch = useContext(SocketContext).SocketDispatch
 	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
-	const winrate = useWinrate(me.id);
 
 	const [toggleEdit, setToggleEdit] = useState(false);
+	const [games, setGames] = useState<IGame[]>([]);
+
+	useEffect(() => {
+		axios.get('/game/historique/' + me.id)
+			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
+	}, []);
 
 	const ExistantUsername = async (value: string) => {
 		return (await (await axios.get('/user/is_user/' + value)).data);
@@ -188,18 +195,18 @@ export function Profile() {
 					<div className="user-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							Victories : {winrate.victories}
+							Victories : {getVictories(games, me.id)}
 						</div>
 						<div className="other-txt">
-							Defeats : {winrate.defeats}
+							Defeats : {getDefeat(games, me.id)}
 						</div>
 						<div className="other-txt">
-							Draw : {winrate.draws}
+							Draw : {getDraws(games, me.id)}
 						</div>
 
 						<div className="other-txt">
-							<div className={winrate.winrate >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
-								Winrate: {winrate.winrate}%
+							<div className={getWinrate(games, me.id) >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
+								Winrate: {getWinrate(games, me.id)}%
 							</div>
 						</div>
 					</div>
