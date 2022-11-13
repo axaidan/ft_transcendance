@@ -20,7 +20,8 @@ type FriendProps = {
 
 function FriendList({ friend }: FriendProps) {
 	const axios = AxiosJwt();
-	const dispatch = useContext(SocketContext).SocketDispatch
+	const dispatch = useContext(SocketContext).SocketDispatch;
+	const { me } = useContext(SocketContext).SocketState;
 
 	const RemoveFriend = (cibleId: number) => {
 		axios.post('/relation/remove_friend/' + cibleId);
@@ -31,6 +32,7 @@ function FriendList({ friend }: FriendProps) {
 		axios.post('/relation/block_user/' + cibleId);
 		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: friend });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: friend });
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 5 });
 		location.reload();
 	}
 

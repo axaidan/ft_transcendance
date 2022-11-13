@@ -9,6 +9,7 @@ export type IUser = {
 	twoFactorAuth: boolean,
 	avatarUrl: string,
 	status: number,
+	ranking: number,
 }
 
 export const DflUser: IUser = {
@@ -21,6 +22,7 @@ export const DflUser: IUser = {
 	twoFactorAuth: false,
 	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
 	status: 4,
+	ranking: 1000,
 }
 
 export const DflChannel: IUser = {
@@ -33,5 +35,6 @@ export const DflChannel: IUser = {
 	twoFactorAuth: false,
 	avatarUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg",
 	status: 4,
+	ranking: 1000,
 }
 

@@ -1,3 +1,8 @@
+.achiv-body {
+	height: 100%;
+	overflow-y: scroll;
+}
+
 .all_achiev {
 	display: flex;
 	flex-wrap: wrap;
