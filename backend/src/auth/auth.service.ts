@@ -26,6 +26,7 @@ export class AuthService {
 					login: login,
 					username: null,
 					email: login + '@student.42.fr',
+					ranking: 1000,
 				}
 			});
 

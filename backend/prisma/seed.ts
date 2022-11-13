@@ -76,6 +76,7 @@ async function main() {
 			login: 'mlormois',
 			username: 'Sergent',
 			avatarUrl: publicAvatarMlormois.url,
+			ranking: 1500,
 
 		},
 	})
@@ -87,6 +88,7 @@ async function main() {
 			login: 'axaidan',
 			username: 'skusku',
 			avatarUrl: publicAvatarAxel.url,
+			ranking: 1500,
 		},
 	})
 
@@ -97,6 +99,7 @@ async function main() {
 			login: 'fcatinau',
 			username: 'ouinouin',
 			avatarUrl: publicAvatarFurry.url,
+			ranking: 1500,
 		},
 	})
 
@@ -107,6 +110,7 @@ async function main() {
 			login: 'viporten',
 			username: 'el beaugausse',
 			avatarUrl: AvatarVictor.url,
+			ranking: 1500,
 		},
 	})
 
@@ -117,6 +121,7 @@ async function main() {
 			login: 'wluong',
 			avatarUrl: publicAvatarSmile.url,
 			email: 'wluong@student.42.fr',
+			ranking: 1500,
 		},
 	})
 
@@ -127,6 +132,7 @@ async function main() {
 			login: 'rmechety',
 			username: 'Magreb Warrior',
 			avatarUrl: publicAvatarFurry.url,
+			ranking: 1500,
 		},
 	})
 
@@ -137,6 +143,7 @@ async function main() {
 			login: 'lchristo',
 			username: 'M.Muscle',
 			avatarUrl: publicAvatarSmile.url,
+			ranking: 1500,
 		},
 	})
 
@@ -147,6 +154,7 @@ async function main() {
 			login: 'riblanc',
 			username: 'StaffNewGen',
 			avatarUrl: publicAvatarSmile.url,
+			ranking: 1500,
 		},
 	})
 
@@ -455,6 +463,7 @@ async function main() {
 				email: `user${i}@student.42.fr`,
 				twoFactorAuth: false,
 				avatarUrl: publicAvatarSmile.url,
+				ranking: 1000,
 			}
 		});
 	}

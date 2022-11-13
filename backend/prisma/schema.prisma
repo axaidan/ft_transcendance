@@ -45,6 +45,8 @@ model User {
 	avatar Avatar? @relation(fields: [avatarUrl], references: [url])
 	avatarUrl String?
 
+	ranking Int
+
     @@map("user")
 }
 
