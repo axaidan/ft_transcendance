@@ -364,11 +364,12 @@ export function Pong() {
 				player: {
 					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
 					score: 0,
-
+					player: 0,
 				},
 				player2: {
 					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
 					score: 0,
+					player: 0,
 				},
 				ball: {
 					x: canvas.width / 2 - BALL_HEIGHT / 2,
@@ -378,7 +379,8 @@ export function Pong() {
 						y: 2,
 					}
 				},
-
+				roomName: "0",
+				mode: 0,
 				rematch1: 0,
 				rematch2: 0,
 

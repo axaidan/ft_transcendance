@@ -48,6 +48,10 @@ export class LobbyService {
             console.log('tu es deja log; need to throw execption');
             return ;
         }
+        if (await this.findUserInQueue(meId, mode) === true) {
+            console.log('tu es deja in queue; need to throw execption');
+            return ;
+        }
         console.log('user %d ,join queue %d', meId, mode);
 
         this.joinQueue(meId, mode);
@@ -94,6 +98,33 @@ export class LobbyService {
         console.log('watch user in room')
         await this.socket.watchUsersInRoom(lobbyId)
 
+    };
+
+
+    async findUserInQueue(meId:number, mode: number) {
+        let idx:number;
+        if (mode === 0) {
+            idx = this.queue.indexOf(meId);
+            if (idx !== -1) {
+             return true;
+            }
+            return false;
+        }
+        if (mode === 2) {
+            idx = this.queueFastBall.indexOf(meId);
+            if (idx !== -1) {
+                return true;
+            }
+            return false
+        }
+        if (mode === 1) {
+            idx = this.queueShortPad.indexOf(meId);
+            if (idx !== -1) {
+             return true;
+            }
+            return false;
+        }
+        return false;
     };
 
 	getUsersOffQueues(u1: number, u2:number) {
