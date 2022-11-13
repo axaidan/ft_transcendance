@@ -49,7 +49,7 @@ const ChatOptionMenu = ({ user }:ChatOptionMenuProps ) => {
 
 	const watchGameLogic = () => {
 		axios.get('/lobby/spec/' + user.id)
-		.then();
+		.then(()  =>  navigate('/home/game'));
 	}
 
 
