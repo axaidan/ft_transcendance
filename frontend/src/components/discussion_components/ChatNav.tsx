@@ -6,7 +6,6 @@ import { ChatSocketContext } from "../../context";
 import { IUser } from "../../types";
 import { ChatOption } from ".";
 
-
 export interface ChatUserProps { user: IUser, msg: string | undefined }
 export const ChatUser: React.FunctionComponent<ChatUserProps> = ({ user, msg }) => {
 	return (

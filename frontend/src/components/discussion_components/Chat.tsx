@@ -10,7 +10,6 @@ import { DflUser, IMessage } from "../../types";
 // Assets:
 import '../../styles/components/discussion_components/Chat.css'
 
-
 type DiscMessageProps = { msg: IMessage }
 export function DiscMessage({ msg }: DiscMessageProps) {
 	const { me } = useContext(SocketContext).SocketState;
