@@ -17,6 +17,7 @@ export class UserService {
 				username: login,
 				email: login + '@student.42.fr',
 				avatarUrl: "",
+				ranking: 1000,
 			}
 		});
 	}
