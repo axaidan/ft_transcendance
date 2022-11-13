@@ -532,6 +532,16 @@ export function Pong() {
 			stop();
 		})
 
+		socket!.on('stopMe', (...arg) => {
+			console.log(`test passage front stopme, meid ${me.id}, arg[0] ${arg[0]}`)
+				if (arg[0] === game.player.player || arg[0] === game.player2.player) {
+					console.log(`je suis un player`);
+					vstop = 1;
+					stop();
+					socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
+				}
+		}) 
+
 		socket!.on('reload', (...arg) => {
 			console.log('relard de la page en cours')
 		})

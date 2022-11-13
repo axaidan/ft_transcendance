@@ -6,6 +6,7 @@
 */
 
 import { Controller, Delete, Get, Logger, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { get } from "http";
 import { GetUser } from "src/auth/decorator";
 import { JwtGuard } from "src/auth/guard";
 import { LobbyService } from "./lobby.service";
@@ -38,10 +39,10 @@ export class lobbyController {
         dependence : userId
         return : lobbyId
     */
-    @Get('join/:id')
+    @Get('join')
 	@UseGuards(JwtGuard)
-    async joinLobby(@GetUser('id') Meid: number, @Param('id', ParseIntPipe) mode: number) {
-        return this.lobbyService.joinLobby(Meid, mode);
+    async joinLobby(@GetUser('id') Meid: number) {
+        return this.lobbyService.joinLobby(Meid, 0);
     }
 
     /*
@@ -51,6 +52,14 @@ export class lobbyController {
     @Post('leave')
     async leaveLobby() {
     }
+
+    
+    @Get('quiteQueue')
+    @UseGuards(JwtGuard)
+    async quitqueue(@GetUser('id') meId: number) {
+        return this.quitqueue(meId);
+    }
+
 
     @Get('spec/:id')
     @UseGuards(JwtGuard)
@@ -68,16 +77,10 @@ export class lobbyController {
     async inviteToLobby() {
     }
 
-	@Delete('leaveLobby')
-	@UseGuards(JwtGuard)
-	async quite(@GetUser('id') meId: number) {
-		this.lobbyService.leaveLobby(meId);
-	}
 
     @Delete('cleanAll') // dev part
     async cleanAll() {
         return this.lobbyService.cleanLobbyMap();
     }
-
 
 }

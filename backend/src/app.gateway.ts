@@ -20,7 +20,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private logger: Logger = new Logger('AppGateway');
 	private clientsMap = new Map<number, Socket>(); // userid / socket associer au user
-	private statusMap = new Map<number, number>();  // userid / statusId
+	private statusMap = new Map<number, number>();  // userid / statusId => (0online, 1 occupe, 2 inqueue, 3 ingame, 4 offline)
 	private clientsMapRooms = new Map<string, Set<number>>();  // map de RoomName ArrayUserId
 
 
@@ -44,8 +44,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			if (client.id === value.id) {
 				this.logger.log(`USER ${id} LOGGED OUT app.gateway`);
 				this.wss.emit('logoutToClient', id);
-				this.clientsMap.delete(id);
 				this.exitRoom(id, client);
+				this.clientsMap.delete(id);
+				this.lobbyService.quitQueue(id);
 				//redirect home
 				//redirect pong
 				break;
@@ -253,6 +254,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	exitRoom(userId: number, client: Socket) {
+		console.log('je suis a exitRoom')
+		this.clientsMapRooms.forEach((arr, roomName) => {
+			if (arr.has(userId)) {
+				console.log(`je envoie a ${userId} dans la room ${roomName} stopme`)
+				this.wss.to(roomName).emit("stopMe", userId, roomName); 
+			}
+		})
 		this.clientsMapRooms.forEach((arr, roomName) => {
 			if (arr.delete(userId)) {
 				client.leave(roomName);
@@ -332,6 +340,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 		// create game dans la db avec b[1] score1 , b[2] player1, b[3] score2, b[4] player2
 		console.log('endgame', socket.id)
+		console.log(`user in game: ${b[2]} ${b[4]}`)
 		this.wss.to(b[0]).emit('endgame', parseInt(b[1]), parseInt(b[3]));
 		if (b[0] !== "0")
 			await this.gameService.createGame({userId1: Number(b[2]), score1: Number(b[1]) , userId2: Number(b[4]), score2: Number(b[3])});

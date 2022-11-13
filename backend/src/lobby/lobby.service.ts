@@ -294,6 +294,23 @@ export class LobbyService {
 		// exit viewer du lobby
 	}
 
+    async quitQueue(meId: number) {
+        let idx:number;
+        idx = this.queue.indexOf(meId);
+        if (idx !== -1) {
+            this.queue.slice(idx, 1);
+        }
+        idx = this.queueFastBall.indexOf(meId);
+        if (idx !== -1) {
+            this.queue.slice(idx, 1);
+        }
+         idx = this.queueShortPad.indexOf(meId);
+        if (idx !== -1) {
+            this.queue.slice(idx, 1);
+        }
+ 
+    }
+
    async clearLobby(lobbyId: number) {
     this.lobbies.delete(lobbyId);
    }
