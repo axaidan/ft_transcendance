@@ -122,7 +122,7 @@ export class ChatService {
 
         const monChannel = await this.channelService.getWusersWMessages(currentUserId, channel.id);
 
-        this.chatGateway.newChannelToClient(channel) // ICI JE DIS A TOUT LE MONDE QUE LE CHAN EXISTE
+        if ( dto.type != 1) {this.chatGateway.newChannelToClient(channel)}
         this.chatGateway.addChannelToOwner( currentUserId, monChannel );
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;

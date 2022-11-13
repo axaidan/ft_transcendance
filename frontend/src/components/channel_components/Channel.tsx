@@ -261,6 +261,18 @@ export function ChannelInput() {
 	)
 }
 
+export function BanListHandler() {
+	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
+
+	const banList = channels[index_channel].bans;
+
+	console.log(banList);
+
+	return (
+		<></>
+	)
+}
+
 export function ChannelSettings() {
 
 	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
@@ -431,6 +443,7 @@ export function ChannelSettings() {
 					</div>
 				</div>
 			</form>
+			< BanListHandler />
 		</div>
 	)
 }
