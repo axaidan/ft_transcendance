@@ -9,6 +9,9 @@ import { AxiosJwt } from "../../hooks";
 import { AxiosResponse } from "axios";
 import { IStatus } from ".";
 
+import bg_website from '../../assets/videos/bg_website.webm'
+
+
 export interface ISocketContextComponentProps extends PropsWithChildren {
 	user: IUser;
 }
@@ -113,7 +116,12 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
 	};
 
-	if (loadingSocket) return <p>Loading socket IO ... </p>;
+	if (loadingSocket)
+		return (
+			<div>
+				<video src={bg_website} playsInline autoPlay loop muted className='bg_video' />
+			</div>
+		);
 
 	return <SocketContextProvider value={{ SocketState, SocketDispatch }}>
 		{children}

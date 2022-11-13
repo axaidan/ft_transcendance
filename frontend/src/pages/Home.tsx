@@ -34,10 +34,6 @@ export function Home() {
 	if (user.username === null)
 		return navigate('/signin');
 
-	console.log("USER: ", user)
-
-
-
 	return (
 		<SocketContextComponent user={user}>
 			<ChatSocketContextComponent>

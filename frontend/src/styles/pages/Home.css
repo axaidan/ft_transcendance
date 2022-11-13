@@ -25,6 +25,7 @@ input {
 	display: flex;
 	width: calc(100vw - 220px);
 	height: calc(100vh - 83px);
+	overflow: hidden;
 }
 
 .bg_video {

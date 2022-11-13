@@ -23,8 +23,12 @@
 	text-decoration: none;
 }
 
-.other-navlinks:hover {
-	scale: 0.9;
+.othNavLinks {
+	display: flex;
+}
+
+.other-navlinks-div:hover {
+	scale: 1.1;
 }
 
 .othNavProfile-container {

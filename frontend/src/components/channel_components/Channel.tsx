@@ -79,7 +79,7 @@ export function ChannelUserPannel({ mode, user }: ChannelUserPannelProps) {
 				: <></>}
 			{mode <= 1 && role != 0 ? <>
 				<ChannelUserPannelBtn title={"Ban User"} logic={BanUserLogic} />
-				{isMuted ?  <ChannelUserPannelBtn title={"unMute User"} logic={unMuteUserLogic}/> : <ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic} />}
+				{isMuted ? <ChannelUserPannelBtn title={"unMute User"} logic={unMuteUserLogic} /> : <ChannelUserPannelBtn title={"Mute User"} logic={MuteUserLogic} />}
 			</> : <></>}
 			<UserCreateChat user={user.user}>
 				<ChannelUserPannelBtn title={"Send Message"} logic={sendMessageLogic} />
@@ -274,8 +274,8 @@ export function BanListHandler() {
 	const curr_channel = channels[index_channel]
 	const banList = curr_channel.bans;
 
-	type BanUserProps = { user: {userId: number, chanId: number, user: {username: string}}}
-	const BanUser = ({user}:BanUserProps) => {
+	type BanUserProps = { user: { userId: number, chanId: number, user: { username: string } } }
+	const BanUser = ({ user }: BanUserProps) => {
 
 		const unBanUserLogic = async () => {
 			await axios.delete('/channel/' + curr_channel.id + '/user/' + user.userId + '/ban')
@@ -283,7 +283,7 @@ export function BanListHandler() {
 
 		return (
 			<div className="channel-setting-user-ban">
-				<p>{ user.userId }</p>
+				<p>{user.userId}</p>
 				<button onClick={() => unBanUserLogic()}>unban</button>
 			</div>
 		)
@@ -294,11 +294,11 @@ export function BanListHandler() {
 		<div>
 			<h2>BanList:</h2>
 			<div id="channel-setting-ban-list">
-				{ banList.map(((user, index) => {
+				{banList.map(((user, index) => {
 					return (
 						< BanUser user={user} key={index} />
-						)
-					}))}
+					)
+				}))}
 			</div>
 		</div>
 	)
@@ -307,6 +307,7 @@ export function BanListHandler() {
 export function ChannelSettings() {
 
 	const { channels, index_channel } = useContext(ChatSocketContext).ChatSocketState;
+	const { me } = useContext(SocketContext).SocketState;
 
 	type ChannelEditForm = {
 		name?: string;
@@ -400,6 +401,7 @@ export function ChannelSettings() {
 
 	const onSubmitDelete = () => {
 		axios.delete('/channel/' + channels[index_channel].id);
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 11 });
 	};
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -468,13 +470,13 @@ export function ChannelSettings() {
 						<div className="channel-apply-settings">
 							<button onClick={onSubmit} className='channel-create-validate'>Apply modifications</button>
 						</div>
-						<div className="channel-delete-settings">
-							<button onClick={onSubmitDelete} id='channel-delete-validate'>DELETE</button>
-						</div>
 					</div>
 				</div>
 			</form>
 			< BanListHandler />
+			<div className="channel-delete-settings">
+				<button onClick={onSubmitDelete} id='channel-delete-validate'>DELETE</button>
+			</div>
 		</div>
 	)
 }

@@ -5,12 +5,10 @@ import { AxiosResponse } from 'axios';
 
 export const useUser = (id: string | undefined): IUser => {
 	const axios = AxiosJwt();
-	const [user, setUser] = useState<IUser>(DflUser);
+	let user = DflUser;
 
-	useEffect(() => {
-		axios.get('/user/' + id)
-			.then((res: AxiosResponse<IUser>) => { setUser(res.data); })
-	}, [user]);
+	axios.get('/user/' + id)
+		.then((res: AxiosResponse<IUser>) => { user = res.data })
 
 	return user;
 } 

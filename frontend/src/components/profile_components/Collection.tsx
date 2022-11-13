@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 
 //CONTEXT
 import { SocketContext } from '../../context';
@@ -28,6 +28,7 @@ export function Collection() {
 
 		await axios.postfile('/avatar/upload_public/', formData)
 			.then((res) => {
+				axios.post('/achiv/unlock', { userId: me.id, achivId: 9 });
 				location.reload();
 			})
 			.catch((error) => {
@@ -49,6 +50,9 @@ export function Collection() {
 			});
 	}
 
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [hasFile, setHasFile] = useState<boolean>(false);
+
 	return (
 		<div className='collection-body'>
 			<div className="collection-title">
@@ -61,10 +65,14 @@ export function Collection() {
 					</div>
 				)}
 				<form onSubmit={handleImageUpload} className='collection-upload'>
-					<label className='collection-inputFile'>
-						<input id="fileInput" type="file" />
+					<label className={!hasFile ? 'collection-inputFile' : 'collection-inputFile-ready'}>
+						<input id="fileInput" type="file" ref={inputRef} onChange={() => setHasFile(true)} />
+						{inputRef.current?.value}
 					</label>
-					<input type="submit" id='collection-submit' value="Valider" />
+					{hasFile ?
+						<input type="submit" id='collection-submit' value="Valider" />
+						: <></>
+					}
 				</form>
 			</div>
 		</div>

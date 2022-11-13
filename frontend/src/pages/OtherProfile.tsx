@@ -11,11 +11,13 @@ import { AxiosJwt } from '../hooks/AxiosJwt';
 import { ESocketActionType, SocketContext } from '../context';
 
 //INTERFACES
-import { IUser } from '../types/interfaces/IUser';
+import { IUser, DflUser } from '../types/interfaces/IUser';
 
 //CUSTOM HOOK
-import { useWinrate } from '../hooks/useWinrate';
+import { getVictories, getDefeat, getWinrate, getDraws } from '../hooks/useWinrate';
 import { useUser } from '../hooks/useUser';
+import { IGame } from '../types';
+import { useNavigate } from 'react-router-dom';
 
 //ASSET
 
@@ -26,13 +28,25 @@ export function OtherProfile() {
 	const { friends, blocks } = useContext(SocketContext).SocketState;
 	const { me } = useContext(SocketContext).SocketState;
 	const dispatch = useContext(SocketContext).SocketDispatch
+	const navigate = useNavigate();
 
 	const axios = AxiosJwt();
-	const othUser = useUser(id);
-	const winrate = useWinrate(othUser.id)
 
+	const [othUser, setOthUser] = useState(DflUser);
+	const [games, setGames] = useState<IGame[]>([]);
 	const [isFriend, setisFriend] = useState(false);
 	const [isBlocked, setisBlocked] = useState(false);
+
+	useEffect(() => {
+		axios.get('/game/historique/' + id)
+			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
+		axios.get('/user/' + id)
+			.then((res) => {
+				setOthUser(res.data);
+				if (!res.data)
+					navigate('/home/acceuil');
+			})
+	}, []);
 
 	useEffect(() => {
 		axios.get('/relation/is_friend/' + id)
@@ -45,6 +59,7 @@ export function OtherProfile() {
 		await axios.post('/relation/block_user/' + user.id);
 		dispatch({ type: ESocketActionType.ADD_BLOCKS, payload: user });
 		dispatch({ type: ESocketActionType.RM_FRIENDS, payload: user });
+		axios.post('/achiv/unlock', { userId: me.id, achivId: 5 });
 		location.reload();
 	}
 
@@ -95,7 +110,7 @@ export function OtherProfile() {
 					<div className="other-xp-fill"></div>
 					<div className="other-xp-nbr"></div>
 					<div className="other-xp-value">
-						25
+						{othUser.id}
 					</div>
 					<div className="other-profile-icon-div">
 						<img src={othUser.avatarUrl} id="other-profile-icon" />
@@ -128,18 +143,18 @@ export function OtherProfile() {
 					<div className="other-champion">
 						<h3>Victories</h3>
 						<div className="other-txt">
-							Victories : {winrate.victories}
+							Victories : {getVictories(games, othUser.id)}
 						</div>
 						<div className="other-txt">
-							Defeats : {winrate.defeats}
+							Defeats : {getDefeat(games, othUser.id)}
 						</div>
 						<div className="other-txt">
-							Draw : {winrate.draws}
+							Draw : {getDraws(games, othUser.id)}
 						</div>
 
 						<div className="other-txt">
-							<div className={winrate.winrate >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
-								Winrate: {winrate.winrate}%
+							<div className={getWinrate(games, othUser.id) >= 50 ? 'other-winrate-pos' : 'other-winrate-neg'}>
+								Winrate: {getWinrate(games, othUser.id)}%
 							</div>
 						</div>
 
