@@ -1,5 +1,5 @@
 import { faGreaterThanEqual, faTrashRestore } from '@fortawesome/free-solid-svg-icons';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from '../context';
 import SocketContextComponent from '../context/UserSocket/Components';
 import { AxiosJwt } from '../hooks';
@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { FormValues } from './Profile';
 import { useNavigate } from 'react-router-dom';
+import './pong.css'
 
 type FormNumberValue = {
 	id: number,
@@ -16,6 +17,12 @@ type FormNumberValue = {
 export function Pong() {
 	const navigate = useNavigate();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const [inLobby, setInLobby] = useState<boolean>(false);
+	const [inGame, setInGame] = useState<boolean>(false);
+	const [endGame, setEndGame] = useState<boolean>(true);
+	const [normalQueue, setNormalQueue] = useState<boolean>(false);
+	const [smallQueue, setSmallQueue] = useState<boolean>(false);
+	const [fastQueue, setFastQueue] = useState<boolean>(false);
 
 	let canvas: HTMLCanvasElement;
 	let game: {
@@ -147,7 +154,6 @@ export function Pong() {
 					if (me.id === game.player2.player)
 						socket!.emit('end', game.roomName + ':' + game.player.score + ':' + game.player.player + ':' + game.player2.score + ':' + game.player2.player);
 
-
 					stop();
 					//		clearDataGame();
 				}
@@ -256,8 +262,8 @@ export function Pong() {
 	}
 
 	function handleResize() {
-		canvas.height = window.innerHeight - 100;
 		canvas.width = window.innerWidth - 270;
+		canvas.height = canvas.width / 3;
 
 		PLAYER_HEIGHT = canvas.height / 3;
 		PLAYER_WIDTH = canvas.width / 100;
@@ -381,6 +387,8 @@ export function Pong() {
 		}
 	}
 
+
+
 	async function play() {
 		await draw();
 		await ballMove();
@@ -395,14 +403,20 @@ export function Pong() {
 	}
 
 	function getIntoLobby() {
+		setInLobby(true);
+		setNormalQueue(true);
 		axios.get('/lobby/join/0');
 	}
 
 	function getIntoLobbyShortPad() {
+		setInLobby(true);
+		setSmallQueue(true);
 		axios.get('/lobby/join/1');
 	}
 
 	function getIntoLobbyFastBall() {
+		setInLobby(true);
+		setFastQueue(true);
 		axios.get('/lobby/join/2');
 	}
 
@@ -421,6 +435,10 @@ export function Pong() {
 		topinitParty(game.player.player, game.player2.player, Number(game.roomName.substring(4)), game.mode);
 	}
 
+	function quitQueue() {
+		axios.post('/lobby/leave');
+	}
+
 	function quiteLobby() {
 		// emit pour quite la room au joueur
 		console.log(`quite lobby -game: ${game}`)
@@ -437,6 +455,10 @@ export function Pong() {
 				//stop emite at me
 			}
 		}
+		setInLobby(false);
+		setNormalQueue(false);
+		setSmallQueue(false);
+		setFastQueue(false);
 		axios.delete('/lobby/leaveLobby')
 	}
 
@@ -464,6 +486,8 @@ export function Pong() {
 	const StartListeners = () => {
 
 		socket!.on("startGame", (...arg) => {
+			setEndGame(false);
+			setInGame(true);
 			console.log('game start')
 			game.player.player = arg[0].p1;
 			game.player2.player = arg[0].p2;
@@ -506,7 +530,8 @@ export function Pong() {
 			console.log(arg)
 			game.player.score = arg[0];
 			game.player2.score = arg[1];
-			//	stop();
+			setInGame(false);
+			// stop();
 		})
 
 		socket!.on('rematch', (...arg) => {
@@ -565,22 +590,22 @@ export function Pong() {
 					<em className="canvas-score" id="joueur1"></em>
 					<em className="canvas-score" id="player-score">0</em> - <em id="joueur2"></em>
 					<em className="canvas-score" id="player2-score">0</em></p>
-				<canvas id={'canvas'} />
-				<button onClick={restore}> restore </button>
-				<button onClick={initParty}> initParty</button>
-				<button onClick={getIntoLobby}> Queue Normal Game</button>
-				<button onClick={getIntoLobbyShortPad}> Queue Short Pad Game</button>
-				<button onClick={getIntoLobbyFastBall}> Queue Fast Ball Game</button>
-				<button onClick={rematch}> rematch  </button>
-				<button onClick={quiteLobby}> quite lobby </button>
-
-				<form onSubmit={onSubmit}>
+				<div className="game-canvas-div">
+					<canvas id={'canvas'} />
+				</div>
+				<div id={!inGame && endGame ? 'game-queue-buttons' : 'disable'}>
+					<button onClick={getIntoLobby} disabled={normalQueue ? true : false}> Queue Normal Game</button>
+					<button onClick={getIntoLobbyShortPad} disabled={smallQueue ? true : false}> Queue Short Pad Game</button>
+					<button onClick={getIntoLobbyFastBall} disabled={fastQueue ? true : false}> Queue Fast Ball Game</button>
+				</div>
+				{/* <button onClick={rematch}> rematch  </button> */}
+				{/* <button id={inLobby && endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> Quit queue </button> */}
+				{/* <form onSubmit={onSubmit}>
 					<input  {...register("id")} type='number' placeholder='0' />
 					<input type='submit' onSubmit={onSubmit} />
-				</form>
-				<button onClick={deleteLobby}> delete lobby</button>
+				</form> */}
+				<button id={inLobby && !inGame && !endGame ? 'game-quit-lobby' : 'disable'} onClick={() => { quiteLobby(); setEndGame(true); setInLobby(false) }}> Leave Game </button>
 			</main>
-			<p>Jeu a mettre ici</p>
 		</div>
 	)
 }
