@@ -7,13 +7,14 @@ import { useSocket } from '../hooks/useSocket';
 import { useRef } from 'react';
 import { Resolver, useForm } from 'react-hook-form';
 import { FormValues } from './Profile';
+import { useNavigate } from 'react-router-dom';
 
 type FormNumberValue = {
 	id: number,
 }
 
 export function Pong() {
-
+	const navigate = useNavigate();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
 	let canvas: HTMLCanvasElement;
@@ -202,6 +203,8 @@ export function Pong() {
 
 	async function draw() {
 		// Draw Canvas
+		if (!game)
+			console.log('no game');
 		if (canvas) {
 			let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
 
@@ -337,6 +340,7 @@ export function Pong() {
 				rematch1: 0,
 				rematch2: 0,
 			}
+			console.log(`game after init: ${game}`)
 			document.querySelector('#player-score').textContent = "0";
 			document.querySelector('#player2-score').textContent = "0";
 			draw();
@@ -402,8 +406,8 @@ export function Pong() {
 
 	function rematch() {
 		
-			
-				socket!.emit('rematch', game.roomName + ':' + me.id)
+		if (game)	
+			socket!.emit('rematch', game.roomName + ':' + me.id)
 	}
 
 	function spec(id: number) {
@@ -417,17 +421,19 @@ export function Pong() {
 
 	function quiteLobby() {
 		// emit pour quite la room au joueur
-		
-		if (me.id === game.player.player || me.id === game.player2.player) {
+		console.log(`quite lobby -game: ${game}`)	
+		if (game !== undefined) {
+			if (me.id === game.player.player || me.id === game.player2.player) {
 			//emit stop emit all
 			console.log(`meId ${me.id} is in emit to close lobby`)
 			stop();
 			socket!.emit('CloseRoom', game.roomName +":"+ game.player.score+":"+ game.player.player+":"+ game.player2.score+":"+ game.player2.player);
-		}
-		else {
+			}
+			else {
 			console.log(`meId ${me.id} is in emit to leave lobby`)
 			socket!.emit('leaveRoom', me.id);
 			//stop emite at me
+			}
 		}
 		axios.delete('/lobby/leaveLobby')
 	}
@@ -446,8 +452,7 @@ export function Pong() {
 		canvas = document.getElementById('canvas');
 		initScreen();
 		play();
-		if (live === 0)
-			canvas.addEventListener('mousemove', playerMove);
+				canvas.addEventListener('mousemove', playerMove);
 		StartListeners();
 	}, []);
 
@@ -518,6 +523,10 @@ export function Pong() {
 		socket!.on('stop', (...arg) => {
 			vstop = 1;
 			stop();
+		})
+
+		socket!.on('reload', (...arg) => {
+			console.log('relard de la page en cours')
 		})
 
 	};

@@ -253,7 +253,13 @@ export class LobbyService {
 		if (lobby.PalettePlayer1 === meId || lobby.PalettePlayer2 === meId) {
 			console.log("LOBBY CLOSE");
 			this.clearLobby(lobbyId);
+            this.socket.closeRoom(lobby.LobbyId);
+            // make all player leave socket room
 		}
+        const idx = (lobby.ViewersId.indexOf(meId))
+        if ( idx !== -1)
+            lobby.ViewersId.splice(idx, 1);
+
 		// exit viewer du lobby
 	}
 

@@ -47,6 +47,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				this.wss.emit('logoutToClient', id);
 				this.clientsMap.delete(id);
 				this.exitRoom(id, client);
+				//redirect home
+				//redirect pong
 				break;
 			}
 		}
@@ -241,6 +243,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			if(arr.delete(userId) ) {
 				client.leave(roomName);
 				console.log(`user ${userId} exit the room`)
+				this.lobbyService.leaveLobby(userId);
 			}
 
 		} )
