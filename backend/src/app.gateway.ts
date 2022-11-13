@@ -59,7 +59,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	dispayClientsMap() {
 		 this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
 		for (const [key, value] of this.clientsMap) {
-			 this.logger.log(`\tclientsMap[${key}]\t=\t${value}`);
+			 this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
 		}
 	}
 
@@ -177,6 +177,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		console.log(`go close room: ${roomName}`)
 		this.clientsMapRooms.forEach((object, roomName) => {
 			object.forEach((inc) => {
+
 				console.log(`test :${inc}`);
 				this.clientsMap.get(inc).leave(roomName);
 				this.clientsMapRooms.get(roomName).delete(inc)

@@ -48,7 +48,7 @@ export class LobbyService {
             console.log('tu es deja log; need to throw execption');
             return ;
         }
-        console.log('user %d ,join queue ', meId);
+        console.log('user %d ,join queue %d', meId, mode);
 
         this.joinQueue(meId, mode);
         let u1: number ;
@@ -70,8 +70,9 @@ export class LobbyService {
 		else {
   	    	if (this.queue.length < 2)
   	        	return ;
-        	const u1 = this.queue.shift();
-        	const u2 = this.queue.shift();
+        	u1 = this.queue.shift();
+        	u2 = this.queue.shift();
+			console.log(`u1: ${u1} u2: ${u2}`)
 			this.getUsersOffQueues(u1, u2);
 		}
 

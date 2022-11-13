@@ -33,7 +33,7 @@ export function Pong() {
 	let BALL_SPEED = 1;
 	var BALL_ACCELERATE = true;
 	const queryParams = new URLSearchParams(window.location.search);
-	const live = queryParams.get('live');
+	const live = 0;
 
 	let vstop = 0;
 
@@ -78,6 +78,10 @@ export function Pong() {
 
 	async function ballMove() {
 		// Rebounds on top and bottom
+
+		 	if (game.player.score >= 5 || game.player2.score >= 5) {
+				stop();
+			}
 			if (game.ball.y >= canvas.height || game.ball.y <= 0) {
 				game.ball.speed.y *= -1;
 			}
@@ -304,8 +308,10 @@ export function Pong() {
 	}
 
 	function topinitParty(playerId1: number,playerId2: number, lobbyId:number, mode:number) {
+		console.log("go jonny go go")
+		vstop = 0;
 		if (canvas) {
-			console.log(`init game: user1, user2 ${playerId1}${playerId2} lobbyId ${lobbyId}`)
+			console.log(`init game: user1, user2 ${playerId1} - ${playerId2} lobbyId ${lobbyId}`)
 			game = {
 				player: {
 					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
@@ -440,7 +446,8 @@ export function Pong() {
 		canvas = document.getElementById('canvas');
 		initScreen();
 		play();
-		canvas.addEventListener('mousemove', playerMove);
+		if (live === 0)
+			canvas.addEventListener('mousemove', playerMove);
 		StartListeners();
 	}, []);
 
@@ -488,10 +495,11 @@ export function Pong() {
 		});
 
 		socket!.on('endgame', (...arg) => {
-			console.log('here we end game', me.id)
+			console.log('here we end game, arg:', me.id, arg)
+			console.log(arg)
 			game.player.score = arg[0];
 			game.player2.score = arg[1];
-			stop();
+		//	stop();
 		})
 
 		socket!.on('rematch', (...arg) => {
@@ -531,12 +539,12 @@ export function Pong() {
 	};
 
 
-const { register, handleSubmit, formState: { errors } } = useForm<FormNumberValue>({ resolver });
+	const { register, handleSubmit, formState: { errors } } = useForm<FormNumberValue>({ resolver });
 
-const onSubmit = handleSubmit((data) => {
-	console.log(`go button avec id: ${data.id}`)
-axios.get('/lobby/spec/' + data.id.toString());
-});
+	const onSubmit = handleSubmit((data) => {
+		console.log(`go button avec id: ${data.id}`)
+	axios.get('/lobby/spec/' + data.id.toString());
+	});
 
 	return (
 		<div>
