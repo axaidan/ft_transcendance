@@ -349,12 +349,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	@SubscribeMessage('CloseRoom')
 	async CloseRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+		console.log('testjklfskjfeskljsfdkjlsdfkjljklsdfglsdfklsdfjklsdfjlksfljksefjkl'
+		)
 		const b:string[] = body.toString().split(':');
+		this.wss.to(b[0]).emit('stop', "");
 		if (b[0] !== "0") {
 			if (Number(b[1]) < 5 && Number(b[3]) < 5)
 				await this.gameService.createGame({userId1: Number(b[2]), score1: Number(b[1]) , userId2: Number(b[4]), score2: Number(b[3])});
 		}
-		this.wss.to(b[0]).emit('stop')
+		console.log(`body: ${b}`);
 		this.closeRoom(Number((b[0]).substring(4)))
 
 	}
@@ -364,5 +367,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.exitRoom(Number((b[0]).substring(4)), socket)
 
 	}
+
+	/*
+	@SubscribeMessage('stop')
+	async stopG(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
+
+	}
+	*/
+
 
 }
