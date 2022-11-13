@@ -66,6 +66,13 @@ export enum EChatSocketActionType {
 	RM_USER_CHAN = 'remove_user_channel',
 	ROLE_CHAN = 'edit_role_user_channel',
 
+	EDIT_NAME_CHAN = 'edit_name_chan',
+	EDIT_TYPE_CHAN = 'edit_type_chan',
+
+	BAN_USER_CHAN = 'ban_user_channel',
+	UNBAN_USER_CHAN = 'unban_user_channel',
+	MUTE_USER_CHAN = 'mute_user_channel',
+	UNMUTE_USER_CHAN = 'unmute_user_channel',
 
 	DISPLAY_CHAN = 'change_channel_display',
 	SETTING_CHAN = 'change_channel_settings_display',
@@ -99,10 +106,19 @@ export type TChatSocketContextAction =
 	EChatSocketActionType.RM_USER_CHAN |
 	EChatSocketActionType.ROLE_CHAN |
 
+	EChatSocketActionType.BAN_USER_CHAN |
+	EChatSocketActionType.UNBAN_USER_CHAN |
+
+	EChatSocketActionType.MUTE_USER_CHAN |
+	EChatSocketActionType.UNMUTE_USER_CHAN |
+
+	EChatSocketActionType.EDIT_NAME_CHAN |
+	EChatSocketActionType.EDIT_TYPE_CHAN |
+
 	EChatSocketActionType.DISPLAY_CHAN |
 	EChatSocketActionType.SETTING_CHAN;
 
-export type TChatSocketContextPayload = number | Socket | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
+export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number } | { chanId: number, type: number } | { chanId: number, name: string } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;
@@ -139,7 +155,6 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 		case EChatSocketActionType.GET_ALLDISC:
 			state.allDiscussions = (action.payload as IDiscussion[]);
 			return {...state};
-
 		case EChatSocketActionType.GET_CHAN:
 			state.channels = (action.payload as IChannel[]);
 			return {...state};
@@ -168,20 +183,16 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			index = state.channels.findIndex(chan => chan.id == (action.payload as IChannelMessage).chanId)
 			if (index != -1) { state.channels[index].messages.push(action.payload as IChannelMessage); }
 			return { ...state };
-
-
 		case EChatSocketActionType.NEW_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
 			state.channels[index].users.push( (action.payload as IUserChannel) );
 			return { ...state };
-
 		case EChatSocketActionType.RM_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
 			state.channels[index].users = state.channels[index].users.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
 			return { ...state };
-
 		case EChatSocketActionType.ROLE_CHAN:
 			index = state.channels.findIndex(chan => {
 				return ( chan.id == (action.payload as IUserChannel).chanId)
@@ -190,7 +201,39 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			userChannel = state.channels[index].users.find((user) => { return user.userId == (action.payload as IUserChannel).userId })!;
 			userChannel.role = (action.payload as IUserChannel).role;
 			return { ...state };
-
+		case EChatSocketActionType.BAN_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			state.channels[index].users = state.channels[index].users.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
+			state.channels[index].bans.push( action.payload as { chanId: number, userId: number });
+			return { ...state };
+		case EChatSocketActionType.UNBAN_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			state.channels[index].bans = state.channels[index].bans.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
+			return { ...state };
+		case EChatSocketActionType.MUTE_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			state.channels[index].mutes.push( action.payload as { chanId: number, userId: number });
+			return { ...state };
+		case EChatSocketActionType.UNMUTE_USER_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index == -1 ) {return { ...state };}
+			state.channels[index].mutes = state.channels[index].mutes.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
+			return { ...state };
+		case EChatSocketActionType.EDIT_NAME_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index != -1 ) state.channels[index].name = (action.payload as { chanId: number, name: string }).name;
+			index = state.allChannels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)});
+			if (index != -1 ) state.allChannels[index].name = (action.payload as { chanId: number, name: string }).name
+			return { ...state };
+		case EChatSocketActionType.EDIT_TYPE_CHAN:
+			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
+			if (index != -1 ) state.channels[index].type = (action.payload as { chanId: number, type: number }).type
+			index = state.allChannels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)});
+			if (index != -1 ) state.allChannels[index].type = (action.payload as { chanId: number, type: number }).type
+			return { ...state };
 		case EChatSocketActionType.DISPLAY_CHAN:
 			return { ...state, channel_display: action.payload as boolean };
 		case EChatSocketActionType.SETTING_CHAN:

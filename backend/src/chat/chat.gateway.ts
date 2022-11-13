@@ -140,18 +140,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
 
-    invitedToChannel(channelUser: ChannelUser, channel: Channel) {
+    invitedToChannel(channelUser: ChannelUser, chan: Channel) {
         if (this.clientsMap.has(channelUser.userId)) {
             const client: Socket = this.clientsMap.get(channelUser.userId);
             client.emit('invitedToChannel', {
-                channel,
+                chan,
             });
         }
     }
 
     channelNameEdited(channel: Channel) {
         this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
-        this.wss.to(`chan${channel.id}`).emit('channelNameEdited', {
+        this.wss.emit('channelNameEdited', {
             chanId: channel.id,
             name: channel.name,
         });
@@ -159,7 +159,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     channelTypeEdited(channel: Channel) {
         this.logger.log(`CHANNEL ${channel.id} NAME EDITED TO '${channel.name}'`);
-        this.wss.to(`chan${channel.id}`).emit('channelTypeEdited', {
+        this.wss.emit('channelTypeEdited', {
             chanId: channel.id,
             type: channel.type,
         });

@@ -122,7 +122,7 @@ export class ChatService {
 
         const monChannel = await this.channelService.getWusersWMessages(currentUserId, channel.id);
 
-        this.chatGateway.newChannelToClient(channel) // ICI JE DIS A TOUT LE MONDE QUE LE CHAN EXISTE
+        if ( dto.type != 1) {this.chatGateway.newChannelToClient(channel)}
         this.chatGateway.addChannelToOwner( currentUserId, monChannel );
         this.chatGateway.joinChannelRoom(currentUserId, channel.id);
         return channel;
@@ -151,7 +151,10 @@ export class ChatService {
             }
         })
 
+        const CHATJOIN = await this.channelService.getWusersWMessages(currentUserId, channel.id);
+
         this.chatGateway.userJoinedChannel(NEWUSER);
+        this.chatGateway.addChannelToOwner( currentUserId, CHATJOIN );
         return channel;
     }
 
@@ -238,10 +241,23 @@ export class ChatService {
         const channelUser = await this.channelService.inviteUser(currentUserId, chanId, userId);
         const channelMute = await this.channelMuteService.findOne(userId, chanId);
         channelUser[`mute`] = channelMute;
+
+        const NEWUSER = await  this.prisma.channelUser.findFirst({
+            where: {
+                AND: [{ userId: userId}, {chanId: chanId}],
+            },
+            include: {
+                user: true,
+            }
+        })
+
+        const CHATJOIN = await this.channelService.getWusersWMessages(userId, channelUser.chanId);
+
         this.chatGateway.joinChannelRoom(channelUser.userId, channelUser.chanId);
-        this.chatGateway.userJoinedChannel(channelUser);
-        const channel = await this.channelService.findOne(channelUser.chanId);
-        this.chatGateway.invitedToChannel(channelUser, channel);
+        this.chatGateway.userJoinedChannel(NEWUSER);
+        // const channel = await this.channelService.findOne(channelUser.chanId);
+
+        this.chatGateway.invitedToChannel(channelUser, CHATJOIN);
         return channelUser;
     }
 

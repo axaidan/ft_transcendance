@@ -20,7 +20,6 @@ type LadderProps = {
 }
 
 function LadderList({ user }: LadderProps) {
-
 	const { me, blocks } = useContext(SocketContext).SocketState;
 	const [isBlocked, setisBlocked] = useState(false);
 	const axios = AxiosJwt();
@@ -59,10 +58,8 @@ function LadderList({ user }: LadderProps) {
 }
 
 export function Ladder() {
-
 	const [users, setUsers] = useState<IUser[]>([]);
 	const axios = AxiosJwt();
-
 
 	useEffect(() => {
 		axios.get('/user/all')

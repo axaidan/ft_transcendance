@@ -128,10 +128,10 @@ export class ChannelService {
         const channel = await this.prisma.channel.findUnique({
             where: { id: chanId },
             include: {
-                users: { include: { user : { select: { username: true } } } },
-                bans: { include: { user : { select: { username: true } } } },
-                mutes: { include: { user : { select: { username: true } } } },
-                messages : { include: { user : { select: { username: true } } } },
+                users: { include: { user : true } },
+                bans: { include: { user : true } },
+                mutes: { include: { user : true } },
+                messages : { include: { user : true } },
             },
         });
         const channelUser = await this.channelUserService.findOne(currentUserId, chanId);

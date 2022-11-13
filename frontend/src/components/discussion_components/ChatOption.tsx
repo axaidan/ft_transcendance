@@ -1,8 +1,10 @@
 // Extern:
 import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Intern:
-import { ChatSocketContext, EChatSocketActionType } from "../../context";
+import { ChatSocketContext, EChatSocketActionType, SocketContext } from "../../context";
+import { AxiosJwt } from "../../hooks";
 
 // Assets:
 import "../../styles/components/discussion_components/ChatOptionMenu.css"
@@ -12,14 +14,46 @@ const btn = ( id: number ) => {
 	console.log(id)
 }
 
-const ChatOptionMenu = () => {
+const ListChanAdmin = ({ user }:ChatOptionMenuProps) => {
+	const { me, channels } = useContext(ChatSocketContext).ChatSocketState;
+	const axios = AxiosJwt();
+	const myChan = channels.filter((chan) =>  chan.users.find(user =>  user.userId == me.id &&  user.role < 2 ) != undefined )
+
+	const inviteChannel = ( chanId: number ) => {
+		console.log('/channel/' + chanId + '/user/' + user.id);
+		axios.post('/channel/' + chanId + '/user/' + user.id )
+	}
+
+	return (
+		<div>
+			{ myChan.map( (chan, index) => {
+				return (
+					<div key={index} className="disc-btn-pannel" onClick={() => inviteChannel( chan.id )}>
+						<p>{chan.name}</p>
+					</div>
+				)
+			}) }
+		</div>
+	)
+}	
+interface ChatOptionMenuProps { user: IUser }
+const ChatOptionMenu = ({ user }:ChatOptionMenuProps ) => {
+
+	const { users } = useContext(SocketContext).SocketState;
+	const navigate = useNavigate();
+	const [ displayChan, setDisplayChan ] = useState<boolean>(false);
+
+	const status = users.find(( elem => elem.userId == user.id ))?.status;
+	if (status == undefined ) status == 4;
 
 	return (
 		<div className="Chat-Option-Menu">
-			<div className="div1" onClick={() => btn(1)} >1</div>
-			<div className="div1" onClick={() => btn(2)}>2</div>
-			<div className="div1" onClick={() => btn(3)}>3</div>
-			<div className="div1" onClick={() => btn(4)}>4</div>
+			<div className="div1" onClick={() => navigate('/home/' + user.id )}>Profile</div>
+			<div className="div1" onClick={() => setDisplayChan(!displayChan)}>Invite Channel</div>
+			{ displayChan ? <ListChanAdmin user={user} /> : <></>}
+			{ status == 0 ? <div className="div1" onClick={() => btn(4)}>Invite Game</div> :
+			  status == 3 ? <div className="div1" onClick={() => btn(4)}>Watch Game</div> :
+			<></> }
 		</div>
 	);
 }
@@ -40,7 +74,7 @@ export const ChatOption = ({ user, mod }:ChatOptionProps) => {
 		<div className='messages-options'>
 			<button id='btn-messages-reduction' onClick={() => reduceChat()} />
 			<button id={ mod ? 'btn-messages-panel' : "btn-messages-panel-disable" } onClick={() => {if (mod) { setDisplay(!display)}} } />
-			{ display ? <ChatOptionMenu /> : <></> }
+			{ display ? <ChatOptionMenu user={user}/> : <></> }
 			<></>
 		</div>
 	)

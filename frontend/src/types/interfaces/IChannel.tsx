@@ -4,7 +4,7 @@ export type IChannelSimple = {
     id: number;
 	createdAt: Date;
 	joined: boolean;
-	name: number;
+	name: string;
 	role: number;
     status: number;
     type: number;
