@@ -32,6 +32,15 @@ export function Profile() {
 			.then((res: AxiosResponse<IGame[]>) => { setGames(res.data) });
 	}, []);
 
+	useEffect(() => {
+		if (games.length >= 1) {
+			axios.post('/achiv/unlock', { userId: me.id, achivId: 2 });
+		}
+		if (getVictories(games, me.id) >= 3) {
+			axios.post('/achiv/unlock', { userId: me.id, achivId: 3 });
+		}
+	})
+
 	const ExistantUsername = async (value: string) => {
 		return (await (await axios.get('/user/is_user/' + value)).data);
 	}

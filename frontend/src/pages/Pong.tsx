@@ -609,7 +609,7 @@ export function Pong() {
 						</div>
 					</div>
 				</div>
-				<button id={!endGame ? 'game-leave-game' : 'disable'} onClick={() => { quiteLobby() }}> Leave Game </button>
+				<button id={inLobby && !inGame && !endGame ? 'game-leave-game' : 'disable'} onClick={() => { quiteLobby() }}> Leave Game </button>
 			</main >
 		</div >
 	)

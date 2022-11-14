@@ -304,12 +304,12 @@ export class LobbyService {
 		idx = this.queueFastBall.indexOf(meId);
 		console.log(idx);
 		if (idx !== -1) {
-			this.queue.pop()
+			this.queueFastBall.pop()
 		}
 		idx = this.queueShortPad.indexOf(meId);
 		console.log(idx);
 		if (idx !== -1) {
-			this.queue.pop();
+			this.queueShortPad.pop();
 		}
 		console.log(this.queue)
 

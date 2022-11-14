@@ -1,29 +1,36 @@
 import { IUser } from '../../types/interfaces/IUser';
 import { Navigate, useOutletContext, useNavigate } from 'react-router-dom';
 import { AxiosJwt } from '../../hooks/AxiosJwt';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { IAchievment } from '../../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import '../../styles/components/Achievements.css';
 import { faArrowDownWideShort, faAward, faEarthEurope, faExplosion, faFingerprint, faMartiniGlassCitrus, faMugSaucer, faPersonHarassing, faPodcast, faPoo, faQuestion, faSatelliteDish, faTrophy, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { faEnvelope } from '@fortawesome/free-regular-svg-icons';
+import { SocketContext } from '../../context';
 
 
 export function Achievement() {
 
-	let user: IUser = useOutletContext();
+	const { me } = useContext(SocketContext).SocketState;
 	const axios = AxiosJwt();
 	const [unlocked, setUnlocked] = useState([]);
 	const [locked, setLocked] = useState([]);
 
 	useEffect(() => {
-		axios.get('/achiv/list_unlock/', user.id)
+		axios.get('/achiv/list_unlock/', me.id)
 			.then((res) => setUnlocked(res.data));
 
-		axios.get('/achiv/list_lock', user.id)
+		axios.get('/achiv/list_lock', me.id)
 			.then((res) => setLocked(res.data));
 	}, [])
+
+	useEffect(() => {
+		console.log(locked.length);
+		if (locked.length === 1)
+			axios.post('/achiv/unlock', { userId: me.id, achivId: 12 });
+	})
 
 	const iconSwitcher = (path: string): IconProp => {
 		switch (path) {
@@ -50,6 +57,8 @@ export function Achievement() {
 			case "fa-solid fa-explosion":
 				return faExplosion;
 			case "fa-solid fa-trophy":
+				return faTrophy;
+			default:
 				return faTrophy;
 		}
 	};

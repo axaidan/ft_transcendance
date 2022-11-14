@@ -41,8 +41,8 @@ export class lobbyController {
 	*/
 	@Get('join/:id')
 	@UseGuards(JwtGuard)
-	async joinLobby(@GetUser('id') Meid: number) {
-		return this.lobbyService.joinLobby(Meid, 0);
+	async joinLobby(@GetUser('id') Meid: number, @Param('id', ParseIntPipe) mode: number) {
+		return this.lobbyService.joinLobby(Meid, mode);
 	}
 
 	/*
