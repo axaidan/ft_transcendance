@@ -70,7 +70,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 		})
 
 		socket.on('ChangeStatusToClient', (userStatus: IStatus) => {
-			console.log('Users Status: ', userStatus);
+			console.log('Users Status: ',userStatus);
 			SocketDispatch({ type: ESocketActionType.UP_STATUS, payload: userStatus })
 		})
 
@@ -92,10 +92,18 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 			SocketDispatch({ type: ESocketActionType.RM_BLOCKS, payload: rmBlock });
 		})
 
-		socket.on('mouveToGame', () => {
+		socket.on('mouveToGame', (lobbyId: number) => {
+			console.log(`RECEIVED 'mouveToGame' W/ lobbyId: ${lobbyId}`)
 			navigate('/home/game');
+			setTimeout(() => {
+				socket.emit('inviteNavigateDone', lobbyId);
+			}, 1000);
 		})
 
+
+
+
+		
 		// /** Reconnect event **/
 		// socket.io.on('reconnect', (attempt) => {
 		//     console.info('Reconnected on attempt: ' + attempt);

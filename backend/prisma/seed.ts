@@ -210,26 +210,26 @@ async function main() {
 	})
 
 
-	const achiv5 = await prisma.achievement.upsert({
-		where: { title: 'social club is open' },
-		update: {},
-		create: {
-			title: 'social club is open',
-			descriptions: 'tu as rejoins une groupe',
-			path: 'fa-solid fa-martini-glass-citrus',
-		},
-	})
+	// const achiv5 = await prisma.achievement.upsert({
+	// 	where: { title: 'social club is open' },
+	// 	update: {},
+	// 	create: {
+	// 		title: 'social club is open',
+	// 		descriptions: 'tu as rejoins une groupe',
+	// 		path: 'fa-solid fa-martini-glass-citrus',
+	// 	},
+	// })
 
 
-	const achiv6 = await prisma.achievement.upsert({
-		where: { title: 'huston do you ear me' },
-		update: {},
-		create: {
-			title: 'huston do you ear me',
-			descriptions: 'tu as envoyer ton premier message',
-			path: 'fa-regular fa-envelope',
-		},
-	})
+	// const achiv6 = await prisma.achievement.upsert({
+	// 	where: { title: 'huston do you ear me' },
+	// 	update: {},
+	// 	create: {
+	// 		title: 'huston do you ear me',
+	// 		descriptions: 'tu as envoyer ton premier message',
+	// 		path: 'fa-regular fa-envelope',
+	// 	},
+	// })
 
 
 	const achiv7 = await prisma.achievement.upsert({

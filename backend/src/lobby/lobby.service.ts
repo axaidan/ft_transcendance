@@ -258,45 +258,20 @@ export class LobbyService {
 	}
 
     async inviteToLobby(meId:number, targetId: number) {
-// check meId et targetId connect et status online
-console.log('inviteToLobby')
-       if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
-        console.log('people available')
-// check targetId haven,t block you
+
+
+       	if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
+        // console.log('people available')
         if ((await this.relation.is_block(targetId, meId)) === true){
-        
-        console.log('people block me')
-            return ;
+            return false;
         }
-
-// delete meId et targetId from Lobbyqueue
-        this.quitQueue(meId);
-        this.quitQueue(targetId);
-// createSpecialLobby with both of us
-        const lobbyId = await this.createLobby(meId, targetId, 0);
-
-// lance une game
-
-// at first je creer une room
-console.log(`join room for ${meId}-${targetId}`)
-        this.socket.joinGameRoom(meId, lobbyId);
-        this.socket.joinGameRoom(targetId, lobbyId);
-        console.log('go to game')
-        this.socket.wss.to("game" + lobbyId).emit('mouveToGame');
-
-        // event ws qui envoie qu deux id 
-
-        var lobby = this.lobbies.get(lobbyId);
-        // redirect meId et targetId to /home/game
-		this.socket.watchUsersInRoom(lobby.LobbyId);
-
-
-        setTimeout(() => {console.log('waiting 1 sec'), 1000});
-        await this.socket.startGame(meId, targetId, lobbyId, 0);
- 
+	 	const lobbyId = await this.createLobby(meId, targetId, 0);
+	 	this.socket.joinGameRoom(meId, lobbyId);
+	 	this.socket.joinGameRoom(targetId, lobbyId);
+		this.socket.wss.to("game" + lobbyId).emit('mouveToGame', {lobbyId: lobbyId});
+		// this.goJohnny(meId, targetId, lobbyId)
        }
-       return ;
-   }
+   	}
 
 	async lstViewer(lobbieId: number) {
 		const lobby = this.lobbies.get(lobbieId);

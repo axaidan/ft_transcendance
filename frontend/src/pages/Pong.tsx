@@ -486,7 +486,7 @@ export function Pong() {
 			setEndGame(false);
 			setInGame(true);
 			setInLobby(true);
-		setNormalQueue(true);
+			setNormalQueue(true);
 			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
 			console.log('\'startGame\' EVENT RECEIVED');
 
@@ -498,6 +498,23 @@ export function Pong() {
 			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
 			console.log(`player1 : ${game.player.player} , player2 ${game.player2.player}`)
 
+		});
+
+		socket!.on("inviteGameStart", (...arg) => {
+			setEndGame(false);
+			setInGame(true);
+			setInLobby(true);
+			setNormalQueue(true);
+			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
+			console.log('\'startGame\' EVENT RECEIVED');
+
+			game.player.player = arg[0].p1;
+			game.player2.player = arg[0].p2;
+			game.roomName = arg[0].lobbyId;
+			game.mode = arg[0].mode;
+			console.log('\'startGame\'   lobbyId: ' + arg[0].lobbyId);
+			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
+			console.log(`player1 : ${game.player.player} , player2 ${game.player2.player}`)
 		});
 
 		socket!.on("updatePos", (...arg) => {

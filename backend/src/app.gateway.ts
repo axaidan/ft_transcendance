@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import Lobby from './class/lobby.class';
 import { GameService } from './game/game.service';
 import { LobbyService } from './lobby/lobby.service';
 import { OnlineStatusDto } from './users/dto';
@@ -237,19 +238,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	watchUsersInRoom(lobbieId: number) {
 		var roomName: string = 'game' + lobbieId;
-
 		let listEle: Set<number> = this.clientsMapRooms.get(roomName)
 
-
 		if (listEle) {
-			//remove element oflist ele
 			let Ele = listEle.forEach((object) => {
-				console.log(`userId in rooms ${object}`);
+				console.log(`watchUsersInRoom() - userId in rooms ${object}`);
 			})
-
 		}
 		else {
-			console.log('room doesnt exit');
+			console.log('watchusersInRoom() - room doesnt exit');
 		}
 	}
 
@@ -280,9 +277,24 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	startGame(userId1: number, userId2: number, lobbyId: number, mode: number) {
-		console.log('test emitions ')
-		console.log(`emit to game + ${lobbyId}`);
+		// console.log('test emitions ')
+		// console.log(`emit to game + ${lobbyId}`);
 		this.wss.to('game' + lobbyId).emit("startGame", { p1: userId1, p2: userId2, lobbyId: lobbyId, mode: mode });
+	}
+
+	@SubscribeMessage('inviteNavigateDone')
+	inviteNavigateDoneReceived(
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() body: {lobbyId: number} ) {
+		this.logger.log('RECEIVED \'inviteNavigateDone\' W/ lobbyId: ' + body.lobbyId);
+		const lobby: Lobby = this.lobbyService.lobbies.get(body.lobbyId);
+		this.logger.log('LOBBY ' + (lobby === null || lobby === undefined) ? '!EXIST' : 'EXISTS');
+		this.wss.to('game' + body.lobbyId).emit('inviteGameStart', {
+			p1: lobby.PlayersId[0],
+			p2: lobby.PlayersId[1],
+			lobbyId: lobby.LobbyId,
+			mode: lobby.mode,
+		});
 	}
 
 
@@ -389,7 +401,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	}
 
-
+	mouveToGameToClient(userId: number) {
+		const client: Socket = this.clientsMap.get(userId);
+		client.emit('mouveToGame');
+	}	
 
 	/*
 	@SubscribeMessage('stop')
