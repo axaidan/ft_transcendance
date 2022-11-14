@@ -8,8 +8,7 @@ import { SocketContext } from '../context/UserSocket/Socket';
 
 export function Navbar() {
 
-	const { socket } = useContext(SocketContext).SocketState;
-	const { me } = useContext(SocketContext).SocketState;
+	const { socket , me, disable} = useContext(SocketContext).SocketState;
 	const request = AxiosJwt();
 	const [toggleMenu, setToggleMenu] = useState(false);
 	const [largeur, setLargeur] = useState(window.innerWidth);
@@ -45,7 +44,7 @@ export function Navbar() {
 	const splitLocation = pathname.split("/");
 
 	return (
-		<div className="navbar">
+		<div className={disable ? 'disabled-nav' :  "navbar"}>
 			<ul className="nav_links">
 				<li className="play">
 					<NavLink to='/home/game'>

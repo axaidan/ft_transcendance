@@ -96,3 +96,12 @@
 #div3 {
 	margin: 20px;
 }
+
+#anti-clic-navbar {
+	position: absolute;
+	top: 0;
+	background-color: red;
+	height: 82px;
+	width: 100vw;
+	z-index: 1;
+}

@@ -13,6 +13,8 @@ export interface ISocketContextState {
 	users: IStatus[];
 	friends: IUser[];
 	blocks: IUser[];
+
+	disable: boolean;
 }
 
 export const defaultSocketContextState: ISocketContextState = {
@@ -21,6 +23,7 @@ export const defaultSocketContextState: ISocketContextState = {
 	users: [],
 	friends: [],
 	blocks: [],
+	disable: false,
 }
 
 export enum ESocketActionType {
@@ -37,6 +40,7 @@ export enum ESocketActionType {
 	RM_BLOCKS = 'rm_new_block',
 	UP_STATUS = 'update_user_status',
 	UP_USERNAME = 'update_username',
+	DISABLE = 'disable_all',
 }
 
 export type TSocketContextActions = ESocketActionType.UP_SOKET |
@@ -51,9 +55,10 @@ export type TSocketContextActions = ESocketActionType.UP_SOKET |
 	ESocketActionType.ADD_BLOCKS |
 	ESocketActionType.UP_STATUS |
 	ESocketActionType.RM_BLOCKS |
-	ESocketActionType.UP_USERNAME;
+	ESocketActionType.UP_USERNAME |
+	ESocketActionType.DISABLE;
 	
-export type TSocketContextPayload = number[] | number | Socket | IUser | IUser[] | IStatus | IStatus[] | string;	
+export type TSocketContextPayload = number[] | number | boolean | Socket | IUser | IUser[] | IStatus | IStatus[] | string;	
 
 export interface ISocketContextActions {
 	type: TSocketContextActions;
@@ -97,6 +102,9 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
 		case ESocketActionType.UP_USERNAME:
 			state.me.username = (action.payload as string);
 			return { ...state }
+		case ESocketActionType.DISABLE:
+			state.disable = (action.payload as boolean)
+			return { ...state};
 		default:
 			return { ...state };
 	}

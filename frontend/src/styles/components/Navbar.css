@@ -214,3 +214,7 @@
 	margin-left: auto;
 	margin-right: 70px;
 }
+
+.disabled-nav {
+	display: none;
+}
