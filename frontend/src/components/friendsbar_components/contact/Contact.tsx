@@ -27,7 +27,6 @@ export function Contact({ user }: ContactProps) {
 	if (user == undefined)
 		return <></>
 
-	// console.log(user);
 	let status: number = 4;
 	if ( getStatus(user.id) != undefined ) 
 		status = getStatus(user.id)!;

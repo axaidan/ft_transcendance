@@ -118,7 +118,7 @@ export type TChatSocketContextAction =
 	EChatSocketActionType.DISPLAY_CHAN |
 	EChatSocketActionType.SETTING_CHAN;
 
-export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number, user: { username: string } } | { chanId: number, type: number } | { chanId: number, name: string } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
+export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number, user: { username: string } } | { chanId: number, userId: number } | { chanId: number, type: number } | { chanId: number, name: string } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;

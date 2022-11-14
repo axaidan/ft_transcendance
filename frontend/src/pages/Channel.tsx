@@ -200,19 +200,6 @@ export function ChannelFromJoin() {
 }
 
 
-// export interface ChannelJoinLogicProps extends PropsWithChildren { chan: IChannel };
-// export const ChannelJoinLogic: React.FunctionComponent<ChannelJoinLogicProps> = ({ children, chan }) => {
-
-// 	// ICI FAIRE LA LOGIC POUR JOIN UN CHANNEL
-
-
-// 	return (
-// 		<div onClick={() => { console.log(chan.name) }}>
-// 			{ children }
-// 		</div>
-// 	);
-// }
-
 export interface ChannelPublicProps { chan: IChannelSimple }
 export function ChannelPublic({ chan }: ChannelPublicProps) {
 

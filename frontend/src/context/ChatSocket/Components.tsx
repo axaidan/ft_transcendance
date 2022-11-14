@@ -26,7 +26,6 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 	})
 
 	useEffect(() => {
-		console.log("UserId: ", me.id);
 		chatSocket.connect();
 		// Save the socket in context //
 		ChatSocketDispatch({ type: EChatSocketActionType.UP_SOKET, payload: chatSocket });
@@ -40,13 +39,11 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 		axios.get('/channels/all')
 			.then((res: AxiosResponse<IChannelSimple[]>) => {
-				console.log("ALL CHAN ", res.data);
 				ChatSocketDispatch({ type: EChatSocketActionType.GET_ACHAN, payload: res.data });
 			});
 
 		axios.get('/channels')
 			.then((res: AxiosResponse<IChannel[]>) => {
-				console.log("MY CHAN ", res.data);
 				ChatSocketDispatch({ type: EChatSocketActionType.GET_CHAN, payload: res.data });
 			});
 
@@ -82,7 +79,6 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 			ChatSocketDispatch({ type: EChatSocketActionType.RM_ACHAN, payload: dto.chanId });
 		})
 		chatSocket.on('chanMsgToClient', (chan: IChannelMessage) => {
-			console.log('chanMsgToClient', chan);
 			ChatSocketDispatch({ type: EChatSocketActionType.NEW_MSG_CHAN, payload: chan });
 		})
 		///////////////////
@@ -121,13 +117,13 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 
 		//////////////////
 		//  BAN EVENTS  //
-		chatSocket.on('channelUserBanned', (dto: { chanId: number, userId: number }) => {
+		chatSocket.on('channelUserBanned', (dto: { chanId: number, userId: number, user: { username: string } }) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.BAN_USER_CHAN, payload: dto });
 			if (dto.userId == me.id)
 				ChatSocketDispatch({ type: EChatSocketActionType.RM_CHAN, payload: dto.chanId });
 		})
 
-		chatSocket.on('channelUserUnbanned', (dto: { chanId: number, userId: number }) => {
+		chatSocket.on('channelUserUnbanned', (dto: { chanId: number, userId: number, user: { username: string } }) => {
 			ChatSocketDispatch({ type: EChatSocketActionType.UNBAN_USER_CHAN, payload: dto });
 		})
 		//////////////////

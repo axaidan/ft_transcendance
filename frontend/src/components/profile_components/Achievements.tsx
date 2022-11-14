@@ -27,7 +27,6 @@ export function Achievement() {
 	}, [])
 
 	useEffect(() => {
-		console.log(locked.length);
 		if (locked.length === 1)
 			axios.post('/achiv/unlock', { userId: me.id, achivId: 12 });
 	})
