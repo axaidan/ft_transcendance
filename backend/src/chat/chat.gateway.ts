@@ -185,10 +185,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     //  BAN EVENTS  //
     //////////////////
 
-    channelUserBanned(channelBan: ChannelBan) {
+    channelUserBanned(channelBan: ChannelBan, username: string) {
         this.wss.to(`chan${channelBan.chanId}`).emit('channelUserBanned', {
             chanId: channelBan.chanId,
             userId: channelBan.userId,
+            user: { username: username },
         });
     }
 

@@ -283,15 +283,14 @@ export function BanListHandler() {
 
 		return (
 			<div className="channel-setting-user-ban">
-				<p>{user.userId}</p>
+				<p>{user.user.username}</p>
 				<button onClick={() => unBanUserLogic()}>unban</button>
 			</div>
 		)
-
 	}
 
 	return (
-		<div>
+		<div id="div3">
 			<h2>BanList:</h2>
 			<div id="channel-setting-ban-list">
 				{banList.map(((user, index) => {

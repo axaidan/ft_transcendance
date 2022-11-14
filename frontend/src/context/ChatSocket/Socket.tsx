@@ -118,7 +118,7 @@ export type TChatSocketContextAction =
 	EChatSocketActionType.DISPLAY_CHAN |
 	EChatSocketActionType.SETTING_CHAN;
 
-export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number } | { chanId: number, type: number } | { chanId: number, name: string } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
+export type TChatSocketContextPayload = number | Socket | { chanId: number, userId: number, user: { username: string } } | { chanId: number, type: number } | { chanId: number, name: string } | number[] | IDiscussion[] | IUserChannel | IMessage | IChannelMessage | IChannelSimple | IDiscussion | IUser | IChannelSimple[] | any[] | IChannel | boolean;
 
 export interface IChatSocketContextAction {
 	type: TChatSocketContextAction;
@@ -205,7 +205,7 @@ export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatS
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})
 			if (index == -1 ) {return { ...state };}
 			state.channels[index].users = state.channels[index].users.filter((user) => user.userId !== (action.payload as IUserChannel).userId);
-			state.channels[index].bans.push( action.payload as { chanId: number, userId: number });
+			state.channels[index].bans.push( action.payload as { chanId: number, userId: number, user: { username: string } });
 			return { ...state };
 		case EChatSocketActionType.UNBAN_USER_CHAN:
 			index = state.channels.findIndex(chan => {return ( chan.id == (action.payload as IUserChannel).chanId)})

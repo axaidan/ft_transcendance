@@ -1,4 +1,5 @@
 // Extern:
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -42,6 +43,7 @@ const ChatOptionMenu = ({ user }:ChatOptionMenuProps ) => {
 	const { users } = useContext(SocketContext).SocketState;
 	const navigate = useNavigate();
 	const [ displayChan, setDisplayChan ] = useState<boolean>(false);
+	const axios = AxiosJwt();
 
 	const status = users.find(( elem => elem.userId == user.id ))?.status;
 	if (status == undefined ) status == 4;
@@ -51,12 +53,17 @@ const ChatOptionMenu = ({ user }:ChatOptionMenuProps ) => {
 		.then(() => navigate('/home/game'));
 	}
 
+	const inviteGameLogic = () => {
+		axios.post("/lobby/inviteGame/" + user.id)
+		.then(() => navigate('/home/game'));
+	}
+
 	return (
 		<div className="Chat-Option-Menu">
 			<div className="div1" onClick={() => navigate('/home/' + user.id )}>Profile</div>
 			<div className="div1" onClick={() => setDisplayChan(!displayChan)}>Invite Channel</div>
 			{ displayChan ? <ListChanAdmin user={user} /> : <></>}
-			{ status == 0 ? <div className="div1" onClick={() => btn(4)}>Invite Game</div> :
+			{ status == 0 ? <div className="div1" onClick={() => inviteGameLogic()}>Invite Game</div> :
 			  status == 3 ? <div className="div1" onClick={() => watchGameLogic()}>Watch Game</div> :
 			<></> }
 		</div>

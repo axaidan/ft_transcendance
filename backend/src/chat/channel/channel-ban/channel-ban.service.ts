@@ -16,6 +16,7 @@ export class ChannelBanService {
     {
         const channelBan = await this.prisma.channelBan.findUnique({
             where: { chanId_userId: { chanId: chanId, userId: userId } },
+            include: { user : { select: { username : true } } },
         })
         return channelBan;
     }

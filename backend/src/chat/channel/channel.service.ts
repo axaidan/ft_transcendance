@@ -292,7 +292,8 @@ export class ChannelService {
     //////////////////
 
     async banChannelUser(dto: ChannelBanDto)
-        : Promise<ChannelBan> {
+        // : Promise<ChannelBan> 
+        {
         const channelUser = await this.channelUserService.findOne(dto.userId, dto.chanId);
         if (channelUser.role !== EChannelRoles.NORMAL)
             throw new ForbiddenException('cannot ban admin or owner');

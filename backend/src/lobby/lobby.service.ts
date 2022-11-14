@@ -286,7 +286,7 @@ console.log('inviteToLobby')
         var lobby = this.lobbies.get(lobbyId);
         // redirect meId et targetId to /home/game
         this.socket.wss.to("game" + lobby.LobbyId).emit('mouveToGame');
-
+		this.socket.watchUsersInRoom(lobby.LobbyId);
 
 
         await this.socket.startGame(meId, targetId, lobbyId, 0);

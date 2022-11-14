@@ -269,8 +269,9 @@ export class ChatService {
     : Promise<ChannelBan>
     {
         const channelBan = await this.channelService.banChannelUser(dto);
+        const user = await this.userService.getUser(channelBan.userId);
         this.chatGateway.leaveChannelRoom(channelBan.userId, channelBan.chanId);
-        this.chatGateway.channelUserBanned(channelBan);
+        this.chatGateway.channelUserBanned(channelBan, user.username);
         return channelBan;
     }
 

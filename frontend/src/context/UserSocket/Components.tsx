@@ -10,6 +10,7 @@ import { AxiosResponse } from "axios";
 import { IStatus } from ".";
 
 import bg_website from '../../assets/videos/bg_website.webm'
+import { useNavigate } from "react-router-dom";
 
 
 export interface ISocketContextComponentProps extends PropsWithChildren {
@@ -20,6 +21,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 	const [SocketState, SocketDispatch] = useReducer(SocketReducer, defaultSocketContextState);
 	const [loadingSocket, setLoading] = useState(true);
 	const axios = AxiosJwt();
+	const navigate = useNavigate();
 
 	const socket = useSocket('localhost:3000', {
 		reconnectionAttempts: 5,
@@ -88,6 +90,10 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 		socket.on('removeBlockToClient', (rmBlock: IUser) => {
 			console.log('Remove block: ', rmBlock.username, "was removed");
 			SocketDispatch({ type: ESocketActionType.RM_BLOCKS, payload: rmBlock });
+		})
+
+		socket.on('mouveToGame', () => {
+			navigate('/home/game');
 		})
 
 		// /** Reconnect event **/
