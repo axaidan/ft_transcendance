@@ -74,7 +74,9 @@ export class lobbyController {
 		return : lobbyId
 	 */
 	@Post('inviteGame/:id')
-	async inviteToLobby() {
+    @UseGuards(JwtGuard)
+	async inviteToLobby(@GetUser('id')meId: number, @Param('id', ParseIntPipe) targetId:number) {
+        return this.lobbyService.inviteToLobby(meId, targetId);
 	}
 
 

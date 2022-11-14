@@ -285,6 +285,18 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.wss.to('game' + lobbyId).emit("startGame", { p1: userId1, p2: userId2, lobbyId: lobbyId, mode: mode });
 	}
 
+
+	isUserAvailable(targetId: number) {
+		let ret = this.clientsMap.get(targetId);
+		if (ret === undefined)
+			return false;
+		let status = this.statusMap.get(targetId);
+		if (status === 0 || status === 2) {
+			return true;
+		}
+		return false;
+	}
+
 	@SubscribeMessage('printscore')
 	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.split(':');
@@ -376,6 +388,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.exitRoom(Number((b[0]).substring(4)), socket)
 
 	}
+
+
 
 	/*
 	@SubscribeMessage('stop')

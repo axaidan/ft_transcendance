@@ -251,9 +251,35 @@ export class LobbyService {
 			console.log('user not in game');
 		}
 
-
-
 	}
+
+    async inviteToLobby(meId:number, targetId: number) {
+// check meId et targetId connect et status online
+       if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
+// check targetId haven,t block you
+
+// delete meId et targetId from Lobbyqueue
+        this.quitQueue(meId);
+        this.quitQueue(targetId);
+// createSpecialLobby with both of us
+        const lobbyId = await this.createLobby(meId, targetId, 0);
+
+// lance une game
+
+// at first je creer une room
+        await this.socket.joinGameRoom(meId, lobbyId);
+        await this.socket.joinGameRoom(targetId, lobbyId);
+
+        var lobby = this.lobbies.get(lobbyId);
+        // redirect meId et targetId to /home/game
+
+
+
+        await this.socket.startGame(meId, targetId, lobbyId, 0);
+ 
+       }
+       return ;
+   }
 
 	async lstViewer(lobbieId: number) {
 		const lobby = this.lobbies.get(lobbieId);
