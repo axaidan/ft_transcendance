@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 
-import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, WelcomerTest, OtherProfile, UsernameLogger, Pong } from "./pages";
+import { Profile, Ladder, Acceuil, ErrorPages, Welcomer, Home, Channel, Store, OtherProfile, UsernameLogger, Pong } from "./pages";
 import { MyNavProfile, OthNavProfile, History, Friends, Collection, Achievement } from "./components";
 
 export default function App() {
@@ -29,7 +29,6 @@ export default function App() {
 				</Route>
 				<Route path='/signin' element={<UsernameLogger />} />
 				<Route path='*' element={<ErrorPages mode={404} />} />
-				<Route path='/signinTest' element={<WelcomerTest />} />
 			</Routes>
 		</div>
 	);

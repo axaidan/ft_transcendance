@@ -1,9 +1,7 @@
-import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res, Post, Body } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards, Req, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FtGuard } from './guard';
 import { Request, Response } from 'express';
-import { GetUser } from './decorator';
-import { SigninTestDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,13 +20,11 @@ export class AuthController {
 			.then((res) => {
 				token = res;
 				response.cookie('access_token', token, {
-					expires: new Date(Date.now() + 6000000)
+					expires: new Date(Date.now() + 6000000000)
 				});
 				response.redirect("http://localhost:4200/home");
 			})
 			.catch((e) => {
-				console.log("ERROR");
-				console.log(e);
 				response.redirect("http://localhost:4200");
 			})
 	}
@@ -38,29 +34,8 @@ export class AuthController {
 
 		const token = query.token;
 		response.cookie('access_token', token, {
-			expires: new Date(Date.now() + 6000000)
+			expires: new Date(Date.now() + 6000000000)
 		});
 		response.redirect("http://localhost:4200/home");
-	}
-
-	@Get('signin-test')
-	async signinTest(
-		@Query('login') login : string,
-		@Res({ passthrough: true }) response: Response
-	) {
-		let token: string;
-		console.log("AuthController - signinTest(" + login + ")");
-		await this.authService.signinTest(login)
-			.then((res) => {
-				token = res;
-				response.cookie('access_token', token, {
-					expires: new Date(Date.now() + 6000000)
-				});
-				console.log("AuthController - redirecting to 4200/home");
-				response.redirect("http://localhost:4200/home");
-			})
-			.catch((e) => {
-				response.redirect("http://localhost:4200/signinTest");
-			})
 	}
 }

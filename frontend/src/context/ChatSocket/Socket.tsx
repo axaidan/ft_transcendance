@@ -126,7 +126,6 @@ export interface IChatSocketContextAction {
 }
 
 export const ChatSocketReducer = (state: IChatSocketContextState, action: IChatSocketContextAction) => {
-	console.log(`ChatContext - Action: ${action.type} - Payload : `, action.payload);
 
 	let index: number;
 	let userChannel: IUserChannel;

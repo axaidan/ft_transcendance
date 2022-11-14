@@ -66,7 +66,6 @@ export interface ISocketContextActions {
 }
 
 export const SocketReducer = (state: ISocketContextState, action: ISocketContextActions) => {
-	console.log(`Message Receive - Action: ${action.type} - Payload : `, action.payload);
 	let user: IStatus | undefined;
 	let friend: IUser | undefined;
 

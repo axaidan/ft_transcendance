@@ -7,7 +7,6 @@ export * from './Welcomer'
 export * from './ErrorPages'
 export * from './Channel'
 export * from './Store'
-export * from './WelcomerTest'
 export * from "./Pong"
 export * from './OtherProfile'
 export * from './Username'

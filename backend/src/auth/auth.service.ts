@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from "@nestjs/jwt";
 import { MailService } from '../mail/mail.service';
-import { find, NotFoundError } from 'rxjs';
 import { UserService } from 'src/users/users.service';
 
 @Injectable()
@@ -63,10 +62,8 @@ export class AuthService {
 
 	//	FAKE-USER-BEGIN !!!
 	async signinTest(login: string) {
-		console.log("AuthService - signinTest(" + login + ")");
 		let user = await this.prisma.user.findFirst({ where: { login: login } });
 		if (!user) {
-			console.log("AuthService - " + login + " NOT FOUND");
 			throw new NotFoundException(`TEST SIGNIN FAILED - USER ${login} NOT FOUND`);
 		};
 		const token = await this.signToken(user.id, user.login);
@@ -76,7 +73,6 @@ export class AuthService {
 			// "CHECK YOUR MAIL TO LOGIN"
 			// WINDOW POP-UP
 		}
-		console.log("AuthService - " + login + " FOUND");
 		return token.access_token;
 	}
 	//	FAKE-USER-END !!!

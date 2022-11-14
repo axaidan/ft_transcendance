@@ -24,14 +24,7 @@ export class lobbyController {
 	@Get()
 	@UseGuards(JwtGuard)
 	getLobby(@GetUser('id') meId: number) {
-		console.log('getLobby:');
-		console.log(meId);
 		var test = this.lobbyService.findUserInLobbies(meId);
-		if (test)
-			console.log(test);
-		else
-			console.log('pas de user dans les lobby')
-
 		return test;
 	}
 

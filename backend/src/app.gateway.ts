@@ -251,17 +251,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	exitRoom(userId: number, client: Socket) {
-		console.log('je suis a exitRoom')
 		this.clientsMapRooms.forEach((arr, roomName) => {
 			if (arr.has(userId)) {
-				console.log(`je envoie a ${userId} dans la room ${roomName} stopme`)
 				this.wss.to(roomName).emit("stopMe", userId, roomName);
 			}
 		})
 		this.clientsMapRooms.forEach((arr, roomName) => {
 			if (arr.delete(userId)) {
 				client.leave(roomName);
-				console.log(`user ${userId} exit the room`)
 				this.lobbyService.leaveLobby(userId);
 			}
 
@@ -277,8 +274,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	startGame(userId1: number, userId2: number, lobbyId: number, mode: number) {
-		// console.log('test emitions ')
-		// console.log(`emit to game + ${lobbyId}`);
 		this.wss.to('game' + lobbyId).emit("startGame", { p1: userId1, p2: userId2, lobbyId: lobbyId, mode: mode });
 	}
 
@@ -312,22 +307,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	@SubscribeMessage('printscore')
 	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.split(':');
-
-		console.log(`score edit: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
-		/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
-					this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
-				}*/
 		this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
 	}
 
 	@SubscribeMessage('printscore1')
 	editScore1(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.split(':');
-
-		console.log(`score edit123: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
-		/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
-					this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
-				}*/
 		this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
 	}
 
@@ -336,10 +321,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	@SubscribeMessage('updateGame')
 	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
-
-		//	console.log('test socket bacj')
-
-		//		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
 		this.wss.to(b[4]).emit("updatePos", Number(b[0]), Number(b[1]), Number(b[2]), Number(b[3]));
 	}
 
@@ -354,7 +335,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async ballUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
 
-		//	console.log(b)
 		this.wss.to(b[0]).emit('updatBall', Number(b[1]), Number(b[2]), Number(b[3]), Number(b[4]));
 	}
 
@@ -363,8 +343,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		const b: string[] = body.toString().split(':');
 
 		// create game dans la db avec b[1] score1 , b[2] player1, b[3] score2, b[4] player2
-		console.log('endgame', socket.id)
-		console.log(`user in game: ${b[2]} ${b[4]}`)
 		this.wss.to(b[0]).emit('endgame', parseInt(b[1]), parseInt(b[3]));
 		if (b[0] !== "0")
 			await this.gameService.createGame({ userId1: Number(b[2]), score1: Number(b[1]), userId2: Number(b[4]), score2: Number(b[3]) });
@@ -382,15 +360,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	@SubscribeMessage('CloseRoom')
 	async CloseRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
-		console.log('testjklfskjfeskljsfdkjlsdfkjljklsdfglsdfklsdfjklsdfjlksfljksefjkl'
-		)
 		const b: string[] = body.toString().split(':');
 		this.wss.to(b[0]).emit('stop', "");
 		if (b[0] !== "0") {
 			if (Number(b[1]) < 5 && Number(b[3]) < 5)
 				await this.gameService.createGame({ userId1: Number(b[2]), score1: Number(b[1]), userId2: Number(b[4]), score2: Number(b[3]) });
 		}
-		console.log(`body: ${b}`);
 		this.closeRoom(Number((b[0]).substring(4)))
 
 	}

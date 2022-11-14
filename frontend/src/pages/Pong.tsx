@@ -1,22 +1,9 @@
-import { faGreaterThanEqual, faTrashRestore } from '@fortawesome/free-solid-svg-icons';
 import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from '../context';
-import SocketContextComponent from '../context/UserSocket/Components';
 import { AxiosJwt } from '../hooks';
-import { useSocket } from '../hooks/useSocket';
-import { useRef } from 'react';
-import { Resolver, useForm } from 'react-hook-form';
-import { FormValues } from './Profile';
-import { useNavigate } from 'react-router-dom';
 import './pong.css'
 
-type FormNumberValue = {
-	id: number,
-}
-
 export function Pong() {
-	const navigate = useNavigate();
-	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [inLobby, setInLobby] = useState<boolean>(false);
 	const [inGame, setInGame] = useState<boolean>(false);
 	const [endGame, setEndGame] = useState<boolean>(true);
@@ -38,14 +25,11 @@ export function Pong() {
 		rematch1: number,
 		rematch2: number,
 	};
-	let anim: number;
 	let PLAYER_HEIGHT = 60;
 	let PLAYER_WIDTH = 5;
 	let BALL_HEIGHT = 10;
 	let BALL_SPEED = 3;
 	var BALL_ACCELERATE = true;
-	const queryParams = new URLSearchParams(window.location.search);
-	const live = 0;
 
 	let vstop = 0;
 
@@ -138,7 +122,6 @@ export function Pong() {
 
 			console.log('balle predu');
 			if (player === game.player) {
-				console.log('p1 op')
 				// Change ball direction + reset speed
 				game.ball.speed.x = BALL_SPEED * -1;
 				// Update score
@@ -151,7 +134,6 @@ export function Pong() {
 				var t = document.querySelector('#player2-score')!.textContent;
 
 				if (game.player2.score >= 5 || (t && parseInt(t) >= 5)) {
-					console.log('end game normaly')
 					setInGame(false);
 					if (me.id === game.player2.player)
 						socket!.emit('end', game.roomName + ':' + game.player.score + ':' + game.player.player + ':' + game.player2.score + ':' + game.player2.player);
@@ -160,7 +142,6 @@ export function Pong() {
 				}
 			} else {
 				// Change ball direction + reset speed
-				console.log('p2 op')
 				game.ball.speed.x = BALL_SPEED;
 				// Update score
 				game.player.score++;
@@ -172,7 +153,6 @@ export function Pong() {
 				document.querySelector('#player-score')!.textContent = game.player.score.toString();
 				var t = document.querySelector('#player-score')!.textContent;
 				if (game.player.score >= 5 || (t && parseInt(t) >= 5)) {
-					console.log('end game by player2')
 					setInGame(false);
 					// game.player2.player
 
@@ -319,10 +299,8 @@ export function Pong() {
 	}
 
 	function topinitParty(playerId1: number, playerId2: number, lobbyId: number, mode: number) {
-		console.log("go jonny go go")
 		vstop = 0;
 		if (canvas) {
-			console.log(`init game: user1, user2 ${playerId1} - ${playerId2} lobbyId ${lobbyId}`)
 			game = {
 				player: {
 					y: canvas.height / 2.5 - PLAYER_HEIGHT / 2,
@@ -348,13 +326,11 @@ export function Pong() {
 				rematch1: 0,
 				rematch2: 0,
 			}
-			console.log(`game after init: ${game}`)
 			document.querySelector('#player-score').textContent = "0";
 			document.querySelector('#player2-score').textContent = "0";
 			draw();
 		}
 		else {
-			console.log('ya pas conva')
 		}
 	}
 
@@ -420,7 +396,6 @@ export function Pong() {
 	}
 
 	function spec(id: number) {
-		console.log(`spec id: ${id}`)
 		axios.get('spec/' + id);
 	}
 
@@ -439,17 +414,14 @@ export function Pong() {
 
 	function quiteLobby() {
 		// emit pour quite la room au joueur
-		console.log(`quite lobby -game: ${game}`)
 		if (game !== undefined) {
 			if (me.id === game.player.player || me.id === game.player2.player) {
 				//emit stop emit all
-				console.log(`meId ${me.id} is in emit to close lobby`)
 				stop();
 				socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
 				// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 });
 			}
 			else {
-				console.log(`meId ${me.id} is in emit to leave lobby`)
 				socket!.emit('leaveRoom', me.id);
 				// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
 				//stop emite at me
@@ -489,15 +461,12 @@ export function Pong() {
 			setInLobby(true);
 			setNormalQueue(true);
 			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
-			console.log('\'startGame\' EVENT RECEIVED');
 
 			game.player.player = arg[0].p1;
 			game.player2.player = arg[0].p2;
 			game.roomName = arg[0].lobbyId;
 			game.mode = arg[0].mode;
-			console.log('\'startGame\'   lobbyId: ' + arg[0].lobbyId);
 			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
-			console.log(`player1 : ${game.player.player} , player2 ${game.player2.player}`)
 
 		});
 
@@ -507,15 +476,12 @@ export function Pong() {
 			setInLobby(true);
 			setNormalQueue(true);
 			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
-			console.log('\'startGame\' EVENT RECEIVED');
 
 			game.player.player = arg[0].p1;
 			game.player2.player = arg[0].p2;
 			game.roomName = arg[0].lobbyId;
 			game.mode = arg[0].mode;
-			console.log('\'startGame\'   lobbyId: ' + arg[0].lobbyId);
 			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
-			console.log(`player1 : ${game.player.player} , player2 ${game.player2.player}`)
 		});
 
 		socket!.on("updatePos", (...arg) => {
@@ -542,15 +508,12 @@ export function Pong() {
 			game.ball.x *= canvas.width;
 			game.ball.y = arg[1];
 			game.ball.y *= canvas.height;
-			//	console.log(`canvas width height ${canvas.width}, ${canvas.height}`)
 			game.ball.speed.x = arg[2] * canvas.width;
 			game.ball.speed.y = arg[3] * canvas.height;
 		});
 
 		socket!.on('endgame', (...arg) => {
 			setInGame(false);
-			console.log('here we end game, arg:', me.id, arg)
-			console.log(arg)
 			game.player.score = arg[0];
 			game.player2.score = arg[1];
 			// stop();

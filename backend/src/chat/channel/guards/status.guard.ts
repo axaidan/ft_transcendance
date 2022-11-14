@@ -34,7 +34,6 @@ export class ForbiddenStatusGuard implements CanActivate {
             return true;
         }
 
-        // console.log(`forbiddenStatus = ${roles}`)
         
         if (forbiddenStatus[0] === 'mute') {
             const channelMute = await this.channelMuteService.findOne(userId, chanId);
@@ -46,7 +45,6 @@ export class ForbiddenStatusGuard implements CanActivate {
             if (channelBan !== null)
                 return false;
         }
-        // console.log(`returning false`);
         return true;
     }
 }

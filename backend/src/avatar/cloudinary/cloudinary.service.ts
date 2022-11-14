@@ -21,10 +21,8 @@ export class CloudinaryService {
   async getTag(pbId: string) {
 
 
-	console.log(pbId);
 	var test = v2.image(pbId, );
 	
-	console.log(test)
 	return test;
 	let tag = v2.image(pbId, {
 		transformation: [
@@ -32,7 +30,6 @@ export class CloudinaryService {
 			{ radius: 'max' },
 		  ],
 	})
-	console.log(tag);
 	return tag;
   }
   

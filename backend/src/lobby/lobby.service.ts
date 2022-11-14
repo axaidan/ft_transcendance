@@ -1,8 +1,5 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
-import { User } from "@prisma/client";
-import { Socket } from "socket.io";
 import { AppGateway } from "src/app.gateway";
-import { RelationModule } from "src/relations/relation.module";
 import { RelationService } from "src/relations/relation.service";
 import Lobby, { LobbyId } from "../class/lobby.class";
 /**
@@ -47,16 +44,12 @@ export class LobbyService {
 	queueFastBall = new Array<number>(); // number =  UserId serait mieux
 
 	async joinLobby(meId: number, mode: number) {
-		console.log('lobbyservice');
 		if (await this.findUserInLobby(meId) === true) {
-			console.log('tu es deja log; need to throw execption');
 			return;
 		}
 		if (await this.findUserInQueue(meId, mode) === true) {
-			console.log('tu es deja in queue; need to throw execption');
 			return;
 		}
-		console.log('user %d ,join queue %d', meId, mode);
 
 		this.joinQueue(meId, mode);
 		let u1: number;
@@ -80,7 +73,6 @@ export class LobbyService {
 				return;
 			u1 = this.queue.shift();
 			u2 = this.queue.shift();
-			console.log(`u1: ${u1} u2: ${u2}`)
 			this.getUsersOffQueues(u1, u2);
 		}
 
@@ -99,7 +91,6 @@ export class LobbyService {
 		//   await this.socket.exitGameRoom(u2, lobbyId)
 		//        await this.socket.closeRoom(lobbyId);
 		//start la game
-		console.log('watch user in room')
 		await this.socket.watchUsersInRoom(lobbyId)
 
 	};
@@ -177,7 +168,6 @@ export class LobbyService {
 
 
 	async createLobby(userId1: number, userId2: number, mode: number) {
-		console.log('create a lobby with usermenber %d, and %d', userId1, userId2);
 		const lobby = new Lobby();
 		lobby.PlayersId.push(userId1);
 		lobby.PlayersId.push(userId2);
@@ -186,8 +176,6 @@ export class LobbyService {
 		lobby.mode = mode;
 
 		this.lobbies.set(lobby.LobbyId, lobby);
-		console.log('id du lobby creer :', lobby.LobbyId);
-		console.log(lobby.LobbyId);
 		return lobby.LobbyId;
 	}
 
@@ -195,8 +183,6 @@ export class LobbyService {
 		for (const l of this.lobbies.values()) {
 			var ret = l.PlayersId.find(e => e === userId);
 			if (ret) {
-				console.log(l.LobbyId)
-				console.log(l.PlayersId)
 				return true;
 			}
 		}
@@ -223,11 +209,9 @@ export class LobbyService {
 		console.log(`user ${meId} want to spec lobby ${lobbyId}`);
 		const lobby = this.lobbies.get(lobbyId);
 		if (!lobby) {
-			console.log('no lobby')
 			return; // no lobby here
 		}
 		if (lobby.ViewersId.find(user => user === meId)) {
-			console.log('already watch lobby')
 			return; // already a viewer
 		}
 		lobby.ViewersId.push(meId);
@@ -237,7 +221,6 @@ export class LobbyService {
 
 
 	async specUser(meId: number, targetId: number) {
-		console.log(`user ${meId} want to spec user${targetId}`);
 
 		//        let roomId :string = await this.socket.lobbyUserInGame(targetId);
 		let roomId = await this.findUserInLobbies(targetId);
@@ -245,23 +228,17 @@ export class LobbyService {
 		if (roomId !== undefined) {
 			let looby = this.lobbies.get(roomId);
 			if (looby !== undefined) {
-				console.log(`${looby.LobbyId}`)
 				looby.ViewersId.push(meId);
 				this.socket.specLobby(meId, roomId);
 				this.lstViewer(looby.LobbyId)
 			}
 		}
-		else {
-			console.log('user not in game');
-		}
-
 	}
 
     async inviteToLobby(meId:number, targetId: number) {
 
 
        	if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
-        // console.log('people available')
         if ((await this.relation.is_block(targetId, meId)) === true){
             return false;
         }
@@ -300,7 +277,6 @@ export class LobbyService {
 			return;
 		let lobby = this.lobbies.get(lobbyId);
 		if (lobby.PalettePlayer1 === meId || lobby.PalettePlayer2 === meId) {
-			console.log("LOBBY CLOSE");
 			this.clearLobby(lobbyId);
 			this.socket.closeRoom(lobby.LobbyId);
 			// make all player leave socket room

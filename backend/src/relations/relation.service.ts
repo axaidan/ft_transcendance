@@ -117,7 +117,6 @@ export class RelationService{
 		if (!findTarget) {
 			throw new ForbiddenException("user you looking for doesn't exist")
 		}
-		// console.log("test unbvlovk user");
 		const relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: targetId}});
 		if (relation) {
 			if (relation.isBlock === 1)	{
@@ -256,7 +255,6 @@ export class RelationService{
 		let relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: userId}});
 		if (relation) {
 			if (relation.isBlock === 1) {
-				console.log('je confirme')
 				return true;
 			}
 			return false;
@@ -293,7 +291,6 @@ export class RelationService{
 				}
 
 			})
-			console.log(friends2);
 			return friends2;
 		}
 	}

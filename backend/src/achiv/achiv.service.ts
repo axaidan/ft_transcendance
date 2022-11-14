@@ -12,7 +12,6 @@ export class AchievementService {
 
 	async getAchiv() {
 		const achivs = await this.prisma.achievement.findMany({ include: { users: true } });
-		console.log(achivs);
 		return achivs;
 	}
 
@@ -30,7 +29,6 @@ export class AchievementService {
 				}
 			}
 		});
-		console.log(unlock);
 		return unlock;
 	}
 
@@ -43,11 +41,9 @@ export class AchievementService {
 		let achiv = await this.prisma.achievement.findFirst({ where: { id: aid } }).users({ where: { id: uid } });
 
 		if (!achiv.length) {
-			console.log("nothing found")
 			return false;
 		}
 		else {
-			console.log("true");
 			return true;
 		}
 

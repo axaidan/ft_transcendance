@@ -146,7 +146,6 @@ export const ChatSocketContextComponent: React.FunctionComponent<IChatSocketCont
 	};
 
 	const StartHandshake = () => {
-		console.info('Sending handshake to server ...');
 		chatSocket.emit('loginToServer', me.id);
 		setLoading(false);
 	};

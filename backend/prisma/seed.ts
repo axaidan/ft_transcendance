@@ -5,22 +5,22 @@ const prisma = new PrismaClient()
 async function main() {
 
 	const publicAvatarAxel = await prisma.avatar.upsert({
-		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg' },
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460309/gt098zh9hypub4sludzg.jpg' },
 		update: {},
 		create: {
-			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665425792/vbxxdzbgzoixomwrdxrr.jpg',
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460309/gt098zh9hypub4sludzg.jpg',
 			is_public: true,
-			public_id: 'vbxxdzbgzoixomwrdxrr',
+			public_id: 'gt098zh9hypub4sludzg',
 		}
 	})
 
 	const publicAvatarMlormois = await prisma.avatar.upsert({
-		where: { url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg' },
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460297/pzp0gatlbhud7letu8fo.jpg' },
 		update: {},
 		create: {
 			is_public: true,
-			url: 'http://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
-			public_id: 'cfkfccmyazzhmuqgazr4',
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460297/pzp0gatlbhud7letu8fo.jpg',
+			public_id: 'pzp0gatlbhud7letu8fo',
 		}
 	})
 
@@ -35,39 +35,25 @@ async function main() {
 	})
 
 	const publicAvatarSmile = await prisma.avatar.upsert({
-		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg' },
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460284/inpixjrh8urpztsdlsdm.jpg' },
 		update: {},
 		create: {
 			is_public: true,
-			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665429892/btflycu1uiba5bmxte17.jpg',
-			public_id: 'btflycu1uiba5bmxte17',
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460284/inpixjrh8urpztsdlsdm.jpg',
+			public_id: 'inpixjrh8urpztsdlsdm',
 		}
 	})
 
 
 	const publicAvatarFurry = await prisma.avatar.upsert({
-		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg' },
+		where: { url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460272/r6wwdmfhetze6evalr4h.jpg' },
 		update: {},
 		create: {
 			is_public: true,
-			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1665427593/cfkfccmyazzhmuqgazr4.jpg',
-			public_id: 'cfkfccmyazzhmuqgazr4',
+			url: 'https://res.cloudinary.com/dq998jfzk/image/upload/v1668460272/r6wwdmfhetze6evalr4h.jpg',
+			public_id: 'r6wwdmfhetze6evalr4h',
 		}
 	})
-
-
-	/*
-		const publicAvatar2 = await prisma.avatar.upsert({
-			where: {url: ''},
-			update: {},
-			create: {
-				is_pubic: true,
-				url: ''
-			}
-		}) 
-	
-		*/
-
 
 	const sergent = await prisma.user.upsert({
 		where: { login: 'mlormois' },
@@ -209,29 +195,6 @@ async function main() {
 		},
 	})
 
-
-	// const achiv5 = await prisma.achievement.upsert({
-	// 	where: { title: 'social club is open' },
-	// 	update: {},
-	// 	create: {
-	// 		title: 'social club is open',
-	// 		descriptions: 'tu as rejoins une groupe',
-	// 		path: 'fa-solid fa-martini-glass-citrus',
-	// 	},
-	// })
-
-
-	// const achiv6 = await prisma.achievement.upsert({
-	// 	where: { title: 'huston do you ear me' },
-	// 	update: {},
-	// 	create: {
-	// 		title: 'huston do you ear me',
-	// 		descriptions: 'tu as envoyer ton premier message',
-	// 		path: 'fa-regular fa-envelope',
-	// 	},
-	// })
-
-
 	const achiv7 = await prisma.achievement.upsert({
 		where: { title: 'you have chose your name' },
 		update: {},
@@ -272,16 +235,6 @@ async function main() {
 			title: 'ragnarok',
 			descriptions: 'delete un chanel',
 			path: 'fa-solid fa-explosion',
-		},
-	})
-
-	const achiv11 = await prisma.achievement.upsert({
-		where: { title: 'platine' },
-		update: {},
-		create: {
-			title: 'platine',
-			descriptions: 'all success unlock',
-			path: 'fa-solid fa-trophy',
 		},
 	})
 
@@ -433,12 +386,6 @@ async function main() {
 		},
 	})
 
-
-
-
-
-
-
 	const block8 = await prisma.relation.upsert({
 		where: { id: 8 },
 		update: {},
@@ -448,143 +395,6 @@ async function main() {
 			relation: 2,
 		},
 	})
-
-
-
-	//	FAKE USERS SEED
-
-	for (let i = 0; i < 10; i++) {
-		await prisma.user.upsert({
-			where: { login: `user${i}` },
-			update: {},
-			create: {
-				login: `user${i}`,
-				username: `USERNAME${i}`,
-				email: `user${i}@student.42.fr`,
-				twoFactorAuth: false,
-				avatarUrl: publicAvatarSmile.url,
-				ranking: 1000,
-			}
-		});
-	}
-
-
-	// --------------------------- //
-	//      RELATIONS SEED         //
-	// --------------------------- //
-
-	/*
-	
-		for (let i = 0; i < 10; i++) {
-			// FRIENDS OF mlormois
-			await prisma.relation.create({
-				data: {
-					userId: 1,
-					userIWatchId: 9 + i,
-					relation: 1,
-				}
-			});
-			// FRIENDS OF Axaidan
-			await prisma.relation.create({
-				data: {
-					userId: 2,
-					userIWatchId: 9 + i,
-					relation: 1,
-				}
-			});
-			if ( i != 8 ) {
-				await prisma.relation.create({
-					data: {
-						userId: 9,
-						userIWatchId: i + 1,
-						relation: 1,
-					}
-				});
-			}
-		}
-		*/
-
-	// --------------------------- //
-	//     DISCUSSION SEED         //
-	// --------------------------- //
-
-	// mlormois - user0
-	// const discMax = []
-	// for (let i = 9; i < 13; i++) {
-	// 	discMax[i - 9] = await prisma.discussion.create({
-	// 		data: {
-	// 			user1Id: 1,
-	// 			user2Id: i,
-	// 		}
-	// 	})
-	// };
-
-	// const discU0 = []
-	// for (let i = 1; i < 9; i++) {
-	// 	discU0[i - 9] = await prisma.discussion.create({
-	// 		data: {
-	// 			user1Id: 9,
-	// 			user2Id: i,
-	// 		}
-	// 	})
-	// };
-
-	// // axaidan - user0
-	// const disc2 = await prisma.discussion.create({
-	// 	data: {
-	// 		user1Id: 2,
-	// 		user2Id: 9,
-	// 	}
-	// });
-	// // viporten - user0
-	// await prisma.discussion.create({
-	// 	data: {
-	// 		user1Id: 4,
-	// 		user2Id: 9,
-	// 	}
-	// });
-
-	// DISCUSSIONMESSAGES SEED
-	// user0 => mlormois MESSAGES
-	// for (let j = 0; j < 5; j++) {
-	// 	for (let i = 0; i < 5; i++) {
-	// 		await prisma.discussionMessage.create({
-	// 			data: {
-	// 				userId: discMax[j].user2Id,
-	// 				discussionId: discMax[j].id,
-	// 				text: "user" + discMax[j].user2Id + "msg" + i,
-	// 			}
-	// 		});
-	// 		await prisma.discussionMessage.create({
-	// 			data: {
-	// 				userId: sergent.id,
-	// 				discussionId: discMax[j].id,
-	// 				text: "mlormois msg" + i,
-	// 			}
-	// 		});
-	// 	}
-	// }
-
-	// user0 => axaidan MESSAGES
-	// for (let i = 0; i < 5; i++) {
-	// 	await prisma.discussionMessage.create({
-	// 		data: {
-	// 			userId: 9,
-	// 			discussionId: disc2.id,
-	// 			text: "user0 msg" + i,
-	// 		}
-	// 	});
-	// }
-	// // axaidan => user0 MESSAGES
-	// for (let i = 0; i < 5; i++) {
-	// 	await prisma.discussionMessage.create({
-	// 		data: {
-	// 			userId: Axel.id,
-	// 			discussionId: disc2.id,
-	// 			text: "axaidan msg" + i,
-	// 		}
-	// 	});
-	// }
 }
 
 main()

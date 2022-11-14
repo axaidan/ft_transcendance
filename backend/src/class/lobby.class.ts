@@ -19,7 +19,6 @@ export default class Lobby {
     constructor() {this.LobbyId= idValue++;
         this.PlayersId = new Array<number>();
         this.ViewersId = new Array<number>();
-        console.log(this.LobbyId);
     }
 
     /**

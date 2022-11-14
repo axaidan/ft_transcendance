@@ -5,7 +5,6 @@ import { JwtStrategy, FtStrategy} from './strategie';
 import { UserService } from '../users/users.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from 'src/mail/mail.module';
-// import { AppGateway } from 'src/app.gateway';
 
 @Module({
 	imports: [

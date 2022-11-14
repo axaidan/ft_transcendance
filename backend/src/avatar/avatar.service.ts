@@ -74,7 +74,6 @@ export class AvatarService {
 			}
 		})
 
-		console.log(list);
 		return list;
 	}
 

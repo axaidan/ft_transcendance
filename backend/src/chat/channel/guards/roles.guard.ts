@@ -30,15 +30,12 @@ export class ChannelRolesGuard implements CanActivate {
         if (channelUser === null)
             throw new NotFoundException('user or channel not found');
         if (roles[0] === 'admin') {
-            // console.log(`returning ${channelUser.role === EChannelRoles.ADMIN || channelUser.role === EChannelRoles.OWNER}`);
             return (channelUser.role === EChannelRoles.ADMIN || channelUser.role === EChannelRoles.OWNER);
         }
         if (roles[0] === 'owner') {
-            // console.log(`returning ${channelUser.role === EChannelRoles.OWNER}`);
             return (channelUser.role === EChannelRoles.OWNER);
         }
 
-        // console.log(`returning false`);
         return false;
     }
 }
