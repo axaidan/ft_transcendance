@@ -46,13 +46,18 @@ const ChatOptionMenu = ({ user }:ChatOptionMenuProps ) => {
 	const status = users.find(( elem => elem.userId == user.id ))?.status;
 	if (status == undefined ) status == 4;
 
+	const watchGameLogic = () => {
+		axios.get('/lobby/spec/' + user.id)
+		.then(() => navigate('/home/game'));
+	}
+
 	return (
 		<div className="Chat-Option-Menu">
 			<div className="div1" onClick={() => navigate('/home/' + user.id )}>Profile</div>
 			<div className="div1" onClick={() => setDisplayChan(!displayChan)}>Invite Channel</div>
 			{ displayChan ? <ListChanAdmin user={user} /> : <></>}
 			{ status == 0 ? <div className="div1" onClick={() => btn(4)}>Invite Game</div> :
-			  status == 3 ? <div className="div1" onClick={() => btn(4)}>Watch Game</div> :
+			  status == 3 ? <div className="div1" onClick={() => watchGameLogic()}>Watch Game</div> :
 			<></> }
 		</div>
 	);
