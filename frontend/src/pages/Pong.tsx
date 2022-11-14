@@ -25,6 +25,7 @@ export function Pong() {
 	const [fastQueue, setFastQueue] = useState<boolean>(false);
 
 	let canvas: HTMLCanvasElement;
+
 	let game: {
 		ball: {
 			x: number, y: number,
@@ -41,7 +42,7 @@ export function Pong() {
 	let PLAYER_HEIGHT = 60;
 	let PLAYER_WIDTH = 5;
 	let BALL_HEIGHT = 10;
-	let BALL_SPEED = 1;
+	let BALL_SPEED = 3;
 	var BALL_ACCELERATE = true;
 	const queryParams = new URLSearchParams(window.location.search);
 	const live = 0;
@@ -120,7 +121,7 @@ export function Pong() {
 		}
 
 		game.ball.x += game.ball.speed.x;
-		game.ball.y += game.ball.speed.y;
+		game.ball.y += game.ball.speed.y / 4;
 		// emit seulement la balle
 		socket!.emit('updateBall', game.roomName + ':' + (game.ball.x / canvas.width) + ':' + (game.ball.y / canvas.height) + ':' + (game.ball.speed.x / canvas.width) + ':' + (game.ball.speed.y / canvas.height))
 	}
@@ -131,8 +132,8 @@ export function Pong() {
 		bottom = Number(player.y) + Number(PLAYER_HEIGHT);
 		if (game.ball.y < player.y || game.ball.y > bottom) {
 			// Set ball and players to the center
-			game.ball.x = canvas.width / 2 - BALL_HEIGHT / 2;
-			game.ball.y = canvas.height / 2 - BALL_HEIGHT / 2;
+			game.ball.x = canvas.width / 2;
+			game.ball.y = canvas.height / 2;
 			game.ball.speed.y = BALL_SPEED;
 
 			console.log('balle predu');
@@ -214,7 +215,6 @@ export function Pong() {
 			console.log('no game');
 		if (canvas) {
 			let context: CanvasRenderingContext2D | null = canvas.getContext('2d');
-
 			if (context) {
 				if (game.mode === 2) {
 					PLAYER_HEIGHT = canvas.height / 3;
@@ -252,7 +252,8 @@ export function Pong() {
 				context.fillRect(canvas.width - PLAYER_WIDTH, game.player2.y, PLAYER_WIDTH, PLAYER_HEIGHT);
 				context.beginPath();
 				context.fillStyle = 'red';
-				context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
+				context.arc(game.ball.x, game.ball.y, BALL_HEIGHT / 2, 0, 2 * Math.PI, 1);
+				// context.fillRect(game.ball.x, game.ball.y, BALL_HEIGHT, BALL_HEIGHT);
 				context.fill();
 
 			}
@@ -262,7 +263,7 @@ export function Pong() {
 
 	function handleResize() {
 		canvas.width = window.innerWidth - 270;
-		canvas.height = canvas.width / 3;
+		canvas.height = canvas.width / 2;
 
 		PLAYER_HEIGHT = canvas.height / 3;
 		PLAYER_WIDTH = canvas.width / 100;
@@ -274,7 +275,7 @@ export function Pong() {
 
 		//		cancelAnimationFrame(anim);
 
-		game.ball.x = canvas.width / 2 - BALL_HEIGHT / 2;
+		game.ball.x = canvas.width / 2;
 		game.ball.y = canvas.height / 2 - BALL_HEIGHT / 2;
 		game.player.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
 		game.player2.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
@@ -291,21 +292,21 @@ export function Pong() {
 		if (canvas) {
 			game = {
 				player: {
-					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					y: canvas.height / 2.5 - PLAYER_HEIGHT / 2,
 					score: 0,
 					player: 0,
 				},
 				player2: {
-					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					y: canvas.height / 2.5 - PLAYER_HEIGHT / 2,
 					score: 0,
 					player: 0,
 				},
 				ball: {
-					x: canvas.width / 2 - BALL_HEIGHT / 2,
-					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					x: canvas.width / 2,
+					y: canvas.height / 2,
 					speed: {
-						x: 0,
-						y: 0,
+						x: 3,
+						y: 3,
 					}
 				},
 				roomName: '0',
@@ -324,22 +325,22 @@ export function Pong() {
 			console.log(`init game: user1, user2 ${playerId1} - ${playerId2} lobbyId ${lobbyId}`)
 			game = {
 				player: {
-					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					y: canvas.height / 2.5 - PLAYER_HEIGHT / 2,
 					score: 0,
 					player: playerId1,
 
 				},
 				player2: {
-					y: canvas.height / 2 - PLAYER_HEIGHT / 2,
+					y: canvas.height / 2.5 - PLAYER_HEIGHT / 2,
 					score: 0,
 					player: playerId2
 				},
 				ball: {
-					x: canvas.width / 2 - BALL_HEIGHT / 2,
-					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					x: canvas.width / 2,
+					y: canvas.height / 2,
 					speed: {
-						x: 1,
-						y: 1,
+						x: 3,
+						y: 3,
 					}
 				},
 				roomName: 'game' + lobbyId.toString(),
@@ -356,6 +357,7 @@ export function Pong() {
 			console.log('ya pas conva')
 		}
 	}
+
 	function initParty() {
 
 		if (canvas) {
@@ -371,11 +373,11 @@ export function Pong() {
 					player: 0,
 				},
 				ball: {
-					x: canvas.width / 2 - BALL_HEIGHT / 2,
-					y: canvas.height / 2 - BALL_HEIGHT / 2,
+					x: canvas.width / 2,
+					y: canvas.height / 2,
 					speed: {
-						x: 2,
-						y: 2,
+						x: 5,
+						y: 5,
 					}
 				},
 				roomName: "0",
@@ -428,7 +430,7 @@ export function Pong() {
 
 	function quitQueue() {
 		axios.get('/lobby/quiteQueue/');
-		socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
+		// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
 		setInLobby(false);
 		setNormalQueue(false);
 		setSmallQueue(false);
@@ -444,19 +446,17 @@ export function Pong() {
 				console.log(`meId ${me.id} is in emit to close lobby`)
 				stop();
 				socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
+				// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 });
 			}
 			else {
 				console.log(`meId ${me.id} is in emit to leave lobby`)
 				socket!.emit('leaveRoom', me.id);
+				// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
 				//stop emite at me
 			}
 		}
 		axios.delete('/lobby/leaveLobby');
 		location.reload();
-	}
-
-	function deleteOneLobby() {
-		axios.delete('/lobby/')
 	}
 
 	function deleteLobby() {
@@ -467,6 +467,8 @@ export function Pong() {
 		let isMounted = true;
 		window.addEventListener("resize", handleResize);
 		canvas = document.getElementById('canvas');
+		canvas.width = innerWidth - 250;
+		canvas.height = canvas.width / 2
 		initScreen();
 		play();
 		canvas.addEventListener('mousemove', playerMove);
@@ -475,6 +477,7 @@ export function Pong() {
 
 	useEffect(() => {
 		axios.get('/lobby/quiteQueue/');
+		// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 });
 	}, []);
 
 	const StartListeners = () => {

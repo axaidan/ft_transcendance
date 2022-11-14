@@ -107,12 +107,17 @@ export function ChannelFromCreate() {
 
 	const onSubmit = handleSubmit((data) => {
 		const dto = DflCreateChannel;
-		dto.name += data.name;
-		dto.type += parseInt(data.type);
+		dto.name = data.name;
+		dto.type = parseInt(data.type);
 		if (data.hash !== '')
 			dto.hash = data.hash;
 		axios.post('/channel/', dto);
 		axios.post('/achiv/unlock', { userId: me.id, achivId: 10 });
+		reset({
+			name: '',
+			hash: '',
+			confirmhash: '',
+		});
 	});
 
 	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

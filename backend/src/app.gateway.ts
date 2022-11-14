@@ -8,13 +8,13 @@ import { OnlineStatusDto } from './users/dto';
 @WebSocketGateway({ cors: '*:*', })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 
-	 constructor(
-	 	@Inject(forwardRef(() => GameService))
-	 	private gameService: GameService,
-	 	@Inject(forwardRef(() => LobbyService))
-	 	private lobbyService: LobbyService,
+	constructor(
+		@Inject(forwardRef(() => GameService))
+		private gameService: GameService,
+		@Inject(forwardRef(() => LobbyService))
+		private lobbyService: LobbyService,
 
-	 ) { }
+	) { }
 
 	@WebSocketServer() wss: Server;
 
@@ -33,7 +33,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	// @UseGuards(JwtGuard)
 	handleConnection(client: Socket, ...args: any[]) {
-		 this.logger.log(`CLIENT ${client.id} CONNECTED: app.gateway`);
+		this.logger.log(`CLIENT ${client.id} CONNECTED: app.gateway`);
 		client.broadcast.emit('loginToClient', client.id);
 
 	}
@@ -61,7 +61,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	changeStatus(client: Socket, data: any) {
 		this.logger.log(`CLIENT ${client.id} Change status`);
 		this.statusMap.delete(data.userId);
-		this.statusMap.set( data.userId, data.status );
+		this.statusMap.set(data.userId, data.status);
 		client.broadcast.emit('ChangeStatusToClient', data);
 	}
 
@@ -71,7 +71,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	dispayClientsMap() {
 		this.logger.log('=== number of clients = ' + this.wss.engine.clientsCount)
 		for (const [key, value] of this.clientsMap) {
-			 this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
+			this.logger.log(`\tclientsMap[${key}]\t=\t${value.id}`);
 		}
 	}
 
@@ -88,9 +88,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.statusMap.set(userId, 0);
 		this.logger.log(`USER ${userId} LOGGED IN appgateway`);
 
-		
 
-		client.broadcast.emit('loginToClient', { userId:userId, status:this.statusMap.get(userId)});
+
+		client.broadcast.emit('loginToClient', { userId: userId, status: this.statusMap.get(userId) });
 		this.dispayClientsMap();
 	}
 
@@ -258,7 +258,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.clientsMapRooms.forEach((arr, roomName) => {
 			if (arr.has(userId)) {
 				console.log(`je envoie a ${userId} dans la room ${roomName} stopme`)
-				this.wss.to(roomName).emit("stopMe", userId, roomName); 
+				this.wss.to(roomName).emit("stopMe", userId, roomName);
 			}
 		})
 		this.clientsMapRooms.forEach((arr, roomName) => {
@@ -279,50 +279,50 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		return null
 	}
 
-	startGame(userId1: number, userId2: number, lobbyId: number, mode:number){
+	startGame(userId1: number, userId2: number, lobbyId: number, mode: number) {
 		console.log('test emitions ')
 		console.log(`emit to game + ${lobbyId}`);
-        this.wss.to('game' + lobbyId).emit("startGame", {p1: userId1 , p2:userId2 , lobbyId:lobbyId, mode: mode});
+		this.wss.to('game' + lobbyId).emit("startGame", { p1: userId1, p2: userId2, lobbyId: lobbyId, mode: mode });
 	}
 
 	@SubscribeMessage('printscore')
-	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body:string) {
+	editScore(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.split(':');
 
 		console.log(`score edit: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
-/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
-			this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
-		}*/
-			this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
+		/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
+					this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
+				}*/
+		this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
 	}
 
 	@SubscribeMessage('printscore1')
-	editScore1(@ConnectedSocket() socket: Socket, @MessageBody() body:string) {
+	editScore1(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.split(':');
 
 		console.log(`score edit123: room ${b[0]} score1 : ${b[1]} score2: ${b[2]}`)
-/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
-			this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
-		}*/
-			this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
+		/*		if (parseInt(b[1]) >= 5 || parseInt(b[2]) >= 5) {
+					this.wss.to(b[0]).emit("endGame", parseInt(b[1]), parseInt(b[2]))
+				}*/
+		this.wss.to(b[0]).emit("updateScore", parseInt(b[1]), parseInt(b[2]));
 	}
 
 
 
 	@SubscribeMessage('updateGame')
-	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body : string){
+	async updateGame(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
 
-	//	console.log('test socket bacj')
+		//	console.log('test socket bacj')
 
-//		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
-		this.wss.to(b[4]).emit("updatePos", Number(b[0]), Number(b[1]) ,Number(b[2]) , Number(b[3]));
+		//		console.log(`lobbynamne: ${b[4]}, pos1: ${b[0]}, pos2: ${b[1]} ballx: ${b[2]} y: ${b[3]}}`)
+		this.wss.to(b[4]).emit("updatePos", Number(b[0]), Number(b[1]), Number(b[2]), Number(b[3]));
 	}
 
 	@SubscribeMessage('padUpdate')
 	async padUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
-		
+
 		this.wss.to(b[0]).emit("padUpdat", Number(b[1]), Number(b[2]));
 	}
 
@@ -330,7 +330,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async ballUpdate(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
 
-	//	console.log(b)
+		//	console.log(b)
 		this.wss.to(b[0]).emit('updatBall', Number(b[1]), Number(b[2]), Number(b[3]), Number(b[4]));
 	}
 
@@ -343,13 +343,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		console.log(`user in game: ${b[2]} ${b[4]}`)
 		this.wss.to(b[0]).emit('endgame', parseInt(b[1]), parseInt(b[3]));
 		if (b[0] !== "0")
-			await this.gameService.createGame({userId1: Number(b[2]), score1: Number(b[1]) , userId2: Number(b[4]), score2: Number(b[3])});
-	//	this.closeRoom(Number((b[0]).substring(4))) // lobbiesId
+			await this.gameService.createGame({ userId1: Number(b[2]), score1: Number(b[1]), userId2: Number(b[4]), score2: Number(b[3]) });
+		//	this.closeRoom(Number((b[0]).substring(4))) // lobbiesId
 		// close loobies mtn
-	//	this.lobbyService.clearLobby(Number((b[0]).substring(4)))
+		//	this.lobbyService.clearLobby(Number((b[0]).substring(4)))
 	}
 
-	@SubscribeMessage('rematch') 
+	@SubscribeMessage('rematch')
 	async rematch(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		const b: string[] = body.toString().split(':');
 		this.wss.to(b[0]).emit('rematch', Number(b[1]))
@@ -360,11 +360,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async CloseRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
 		console.log('testjklfskjfeskljsfdkjlsdfkjljklsdfglsdfklsdfjklsdfjlksfljksefjkl'
 		)
-		const b:string[] = body.toString().split(':');
+		const b: string[] = body.toString().split(':');
 		this.wss.to(b[0]).emit('stop', "");
 		if (b[0] !== "0") {
 			if (Number(b[1]) < 5 && Number(b[3]) < 5)
-				await this.gameService.createGame({userId1: Number(b[2]), score1: Number(b[1]) , userId2: Number(b[4]), score2: Number(b[3])});
+				await this.gameService.createGame({ userId1: Number(b[2]), score1: Number(b[1]), userId2: Number(b[4]), score2: Number(b[3]) });
 		}
 		console.log(`body: ${b}`);
 		this.closeRoom(Number((b[0]).substring(4)))
@@ -372,7 +372,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 	@SubscribeMessage('leaveRoom')
 	async leaveRoom(@ConnectedSocket() socket: Socket, @MessageBody() body: string) {
-		const b:string[] = body.toString().split(':');
+		const b: string[] = body.toString().split(':');
 		this.exitRoom(Number((b[0]).substring(4)), socket)
 
 	}

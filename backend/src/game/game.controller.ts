@@ -5,22 +5,23 @@ import { CreateGameDto, HistoriqueDto } from "./dto";
 
 @Controller('game')
 export class GameController {
-    constructor (private gameService: GameService) {}
+	constructor(private gameService: GameService) { }
 
 
 	@Post('hist')
-		async hist(@Body() {userId}){ 
-			var nbr = parseInt(userId, 10);
-			return this.gameService.history(nbr);
-		}
-	
+	async hist(@Body() { userId }) {
+		var nbr = parseInt(userId, 10);
+		return this.gameService.history(nbr);
+	}
 
-    @Get('historique/:id')
-    async historique(@Param('id', ParseIntPipe) userId: number){
-        return this.gameService.history( userId );
-    }
 
-    async createGame(@Body() dto: CreateGameDto) {
-        return this.gameService.createGame(dto);
-    }
+	@Get('historique/:id')
+	async historique(@Param('id', ParseIntPipe) userId: number) {
+		return this.gameService.history(userId);
+	}
+
+
+	// async createGame(@Body() dto: CreateGameDto) {
+	//     return this.gameService.createGame(dto);
+	// }
 }
