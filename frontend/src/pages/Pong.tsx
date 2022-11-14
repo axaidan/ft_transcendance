@@ -275,6 +275,7 @@ export function Pong() {
 
 		//		cancelAnimationFrame(anim);
 
+		vstop = 1;
 		game.ball.x = canvas.width / 2 - BALL_HEIGHT / 2;
 		game.ball.y = canvas.height / 2 - BALL_HEIGHT / 2;
 		game.player.y = canvas.height / 2 - PLAYER_HEIGHT / 2;
@@ -448,12 +449,13 @@ export function Pong() {
 			if (me.id === game.player.player || me.id === game.player2.player) {
 				//emit stop emit all
 				console.log(`meId ${me.id} is in emit to close lobby`)
-				stop();
+			//	stop();
 				socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
 			}
 			else {
 				console.log(`meId ${me.id} is in emit to leave lobby`)
 				socket!.emit('leaveRoom', me.id);
+				stop();
 				//stop emite at me
 			}
 		}
@@ -550,9 +552,20 @@ export function Pong() {
 		})
 
 		socket!.on('stop', (...arg) => {
+			console.log('emit stop')
 			vstop = 1;
 			stop();
 		})
+
+		socket!.on('stopMe', (...arg) => {
+			console.log(`test passage front stopme, meid ${me.id}, arg[0] ${arg[0]}`)
+				if (arg[0] === game.player.player || arg[0] === game.player2.player) {
+					console.log(`je suis un player`);
+					vstop = 1;
+					stop();
+					socket!.emit('CloseRoom', game.roomName + ":" + game.player.score + ":" + game.player.player + ":" + game.player2.score + ":" + game.player2.player);
+				}
+		}) 
 
 		socket!.on('reload', (...arg) => {
 			console.log('relard de la page en cours')
