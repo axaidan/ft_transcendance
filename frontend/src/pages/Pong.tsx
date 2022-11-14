@@ -151,9 +151,9 @@ export function Pong() {
 
 				if (game.player2.score >= 5 || (t && parseInt(t) >= 5)) {
 					console.log('end game normaly')
+					setInGame(false);
 					if (me.id === game.player2.player)
 						socket!.emit('end', game.roomName + ':' + game.player.score + ':' + game.player.player + ':' + game.player2.score + ':' + game.player2.player);
-
 					stop();
 					//		clearDataGame();
 				}
@@ -172,6 +172,7 @@ export function Pong() {
 				var t = document.querySelector('#player-score')!.textContent;
 				if (game.player.score >= 5 || (t && parseInt(t) >= 5)) {
 					console.log('end game by player2')
+					setInGame(false);
 					// game.player2.player
 
 					if (me.id === game.player.player)
@@ -189,8 +190,6 @@ export function Pong() {
 				game.ball.speed.x *= -1;
 			changeDirection(player.y);
 			socket!.emit('updateBall', game.roomName + ':' + (game.ball.x / canvas.width) + ':' + (game.ball.y / canvas.height) + ':' + (game.ball.speed.x / canvas.width) + ':' + (game.ball.speed.y / canvas.height))
-
-
 		}
 	}
 
@@ -397,35 +396,25 @@ export function Pong() {
 		anim = requestAnimationFrame(play);
 	}
 
-	function restore() {
-		console.log("restore button clic")
-		initParty();
-		play();
-
-	}
-
 	function getIntoLobby() {
+		socket!.emit('ChangeStatusToServer', { userId: me.id, status: 2 })
 		setInLobby(true);
 		setNormalQueue(true);
 		axios.get('/lobby/join/0');
 	}
 
 	function getIntoLobbyShortPad() {
+		socket!.emit('ChangeStatusToServer', { userId: me.id, status: 2 })
 		setInLobby(true);
 		setSmallQueue(true);
 		axios.get('/lobby/join/1');
 	}
 
 	function getIntoLobbyFastBall() {
+		socket!.emit('ChangeStatusToServer', { userId: me.id, status: 2 })
 		setInLobby(true);
 		setFastQueue(true);
 		axios.get('/lobby/join/2');
-	}
-
-	function rematch() {
-
-		if (game)
-			socket!.emit('rematch', game.roomName + ':' + me.id)
 	}
 
 	function spec(id: number) {
@@ -438,7 +427,12 @@ export function Pong() {
 	}
 
 	function quitQueue() {
-		axios.get('/lobby/quiteQueue');
+		axios.get('/lobby/quiteQueue/');
+		socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
+		setInLobby(false);
+		setNormalQueue(false);
+		setSmallQueue(false);
+		setFastQueue(false);
 	}
 
 	function quiteLobby() {
@@ -457,11 +451,8 @@ export function Pong() {
 				//stop emite at me
 			}
 		}
-		setInLobby(false);
-		setNormalQueue(false);
-		setSmallQueue(false);
-		setFastQueue(false);
-		axios.delete('/lobby/leaveLobby')
+		axios.delete('/lobby/leaveLobby');
+		location.reload();
 	}
 
 	function deleteOneLobby() {
@@ -482,14 +473,16 @@ export function Pong() {
 		StartListeners();
 	}, []);
 
-
-
+	useEffect(() => {
+		axios.get('/lobby/quiteQueue/');
+	}, []);
 
 	const StartListeners = () => {
 
 		socket!.on("startGame", (...arg) => {
 			setEndGame(false);
 			setInGame(true);
+			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
 			console.log('game start')
 			game.player.player = arg[0].p1;
 			game.player2.player = arg[0].p2;
@@ -528,11 +521,11 @@ export function Pong() {
 		});
 
 		socket!.on('endgame', (...arg) => {
+			setInGame(false);
 			console.log('here we end game, arg:', me.id, arg)
 			console.log(arg)
 			game.player.score = arg[0];
 			game.player2.score = arg[1];
-			setInGame(false);
 			// stop();
 		})
 
@@ -560,30 +553,6 @@ export function Pong() {
 
 	};
 
-	const resolver: Resolver<FormNumberValue> = async (values) => {
-
-
-		return {
-			values: values.id ? values : {},
-			errors: !values.id
-				? {
-					id: {
-						type: 'required',
-						message: 'Enter a new username or cancel.',
-					},
-				}
-				: {}
-		}
-	};
-
-
-	const { register, handleSubmit, formState: { errors } } = useForm<FormNumberValue>({ resolver });
-
-	const onSubmit = handleSubmit((data) => {
-		console.log(`go button avec id: ${data.id}`)
-		axios.get('/lobby/spec/' + data.id.toString());
-	});
-
 	return (
 		<div>
 			<h1>Pong</h1>
@@ -596,18 +565,52 @@ export function Pong() {
 					<canvas id={'canvas'} />
 				</div>
 				<div id={!inGame && endGame ? 'game-queue-buttons' : 'disable'}>
-					<button onClick={getIntoLobby} disabled={normalQueue ? true : false}> Queue Normal Game</button>
-					<button onClick={getIntoLobbyShortPad} disabled={smallQueue ? true : false}> Queue Short Pad Game</button>
-					<button onClick={getIntoLobbyFastBall} disabled={fastQueue ? true : false}> Queue Fast Ball Game</button>
+					<div className="game-btn-container">
+						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<div className="confirm-btn">
+							<div className={!normalQueue ? "btn-inner-border" : "queue-inner-border"}>
+								<button onClick={getIntoLobby} disabled={normalQueue ? true : false} id={!normalQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>
+
+									{
+										normalQueue ? 'In queue...' : 'Find classic game'
+									}
+								</button>
+								<div className={!normalQueue ? "btn-left-clip-mend" : "queue-left-clip-mend"}>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="game-btn-container">
+						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<div className="confirm-btn">
+							<div className={!smallQueue ? "btn-inner-border" : "queue-inner-border"}>
+								<button onClick={getIntoLobbyShortPad} disabled={smallQueue ? true : false} id={!smallQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>
+									{
+										smallQueue ? 'In queue...' : 'Find short pad game'
+									}
+								</button>
+								<div className={!smallQueue ? "btn-left-clip-mend" : "queue-left-clip-mend"}>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div className="game-btn-container">
+						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<div className="confirm-btn">
+							<div className={!fastQueue ? "btn-inner-border" : "queue-inner-border"}>
+								<button onClick={getIntoLobbyFastBall} disabled={fastQueue ? true : false} id={!fastQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>
+									{
+										fastQueue ? 'In queue...' : 'Find fast ball game'
+									}
+								</button>
+								<div className={!fastQueue ? "btn-left-clip-mend" : "queue-left-clip-mend"}>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				{/* <button onClick={rematch}> rematch  </button> */}
-				<button id={inLobby && endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> Quit queue </button>
-				{/* <form onSubmit={onSubmit}>
-					<input  {...register("id")} type='number' placeholder='0' />
-					<input type='submit' onSubmit={onSubmit} />
-				</form> */}
-				<button id={inLobby && !inGame && !endGame ? 'game-quit-lobby' : 'disable'} onClick={() => { quiteLobby(); setEndGame(true); setInLobby(false) }}> Leave Game </button>
-			</main>
-		</div>
+				<button id={!endGame ? 'game-leave-game' : 'disable'} onClick={() => { quiteLobby() }}> Leave Game </button>
+			</main >
+		</div >
 	)
 }
