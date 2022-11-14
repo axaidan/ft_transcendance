@@ -72,6 +72,12 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 		socket.on('ChangeStatusToClient', (userStatus: IStatus) => {
 			console.log('Users Status: ',userStatus);
 			SocketDispatch({ type: ESocketActionType.UP_STATUS, payload: userStatus })
+			if ( userStatus.status == 3 ) {
+				SocketDispatch({ type: ESocketActionType.DISABLE, payload: true })
+			} else {
+				SocketDispatch({ type: ESocketActionType.DISABLE, payload: false })
+			}
+
 		})
 
 		/* ---- GESTION DE L'ACTUALISATION DYNAMIQUE DES LIST D'AMIS ---- */

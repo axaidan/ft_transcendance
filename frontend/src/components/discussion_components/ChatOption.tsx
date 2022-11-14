@@ -11,17 +11,12 @@ import { AxiosJwt } from "../../hooks";
 import "../../styles/components/discussion_components/ChatOptionMenu.css"
 import { IUser } from "../../types";
 
-const btn = ( id: number ) => {
-	console.log(id)
-}
-
 const ListChanAdmin = ({ user }:ChatOptionMenuProps) => {
 	const { me, channels } = useContext(ChatSocketContext).ChatSocketState;
 	const axios = AxiosJwt();
 	const myChan = channels.filter((chan) =>  chan.users.find(user =>  user.userId == me.id &&  user.role < 2 ) != undefined )
 
 	const inviteChannel = ( chanId: number ) => {
-		console.log('/channel/' + chanId + '/user/' + user.id);
 		axios.post('/channel/' + chanId + '/user/' + user.id )
 	}
 

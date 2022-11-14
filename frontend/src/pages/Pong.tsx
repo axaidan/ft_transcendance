@@ -465,6 +465,7 @@ export function Pong() {
 
 	useEffect(() => {
 		let isMounted = true;
+		// socket!.emit('ChangeStatusToServer', { userId: me.id, status: 0 })
 		window.addEventListener("resize", handleResize);
 		canvas = document.getElementById('canvas');
 		canvas.width = innerWidth - 250;
@@ -637,6 +638,9 @@ export function Pong() {
 				</div>
 				<button id={inLobby && !inGame && !endGame ? 'game-leave-game' : 'disable'} onClick={() => { quiteLobby() }}> Leave Game </button>
 			</main >
+			{/* { status == 3 ? <div id="anti-clic-navbar" /> : <></> } */}
 		</div >
+
+
 	)
 }

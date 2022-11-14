@@ -36,7 +36,6 @@ export class UserController {
 
 	@Get('is_user/:name')
 	isUser(@Param('name') userName: string) {
-		console.log('test');
 		return this.userService.isUser(userName);
 	}
 

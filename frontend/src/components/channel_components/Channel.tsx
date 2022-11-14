@@ -48,17 +48,14 @@ export function ChannelUserPannel({ mode, user }: ChannelUserPannelProps) {
 
 	const BanUserLogic = async () => {
 		await axios.post('/channel/' + curr_channel.id + '/user/' + user.userId + '/ban')
-		console.log('Ban de: ' + user.user.login)
 	}
 
 	const MuteUserLogic = async () => {
 		await axios.post('/channel/' + curr_channel.id + '/user/' + user.userId + '/mute')
-		console.log('Mute de: ' + user.user.login)
 	}
 
 	const unMuteUserLogic = async () => {
 		await axios.delete('/channel/' + curr_channel.id + '/user/' + user.userId + '/mute')
-		console.log('UnMute de: ' + user.user.login)
 	}
 
 	const role = user.role;
@@ -387,14 +384,12 @@ export function ChannelSettings() {
 	const { register, handleSubmit, formState: { errors } } = useForm<ChannelEditForm>({ resolver });
 
 	const onSubmit = handleSubmit((data) => {
-		console.log(data);
 		let dto: IEditChannel = DflEditChannel;
 		if (data.name)
 			dto.name = data.name;
 		dto.type = parseInt(typeForm);
 		if (pwd !== '')
 			dto.hash = pwd;
-		console.log(dto);
 		axios.patch('/channel/' + channels[index_channel].id, dto);
 	});
 

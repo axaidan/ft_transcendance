@@ -86,8 +86,7 @@ export const ChannelListCategorie: React.FunctionComponent = () => {
 
 export function othUserChat() {
 	const { me, allDiscussions } = useContext(ChatSocketContext).ChatSocketState;
-	const { friends } = useContext(SocketContext).SocketState;
-
+	const { friends, blocks } = useContext(SocketContext).SocketState;
 	let othUser: IUser[] = [];
 	const discTab = allDiscussions;
 	for (const disc of discTab) {
@@ -97,7 +96,7 @@ export function othUserChat() {
 			othUser.push( disc.user2 );
 		}
 	}
-	return othUser;
+	return othUser.filter( (user ) => { return (blocks.findIndex(( boug ) => {return boug.id == user.id}) == -1 )} );
 }
 
 export function FriendsList() {
