@@ -2,6 +2,8 @@ import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { Socket } from "socket.io";
 import { AppGateway } from "src/app.gateway";
+import { RelationModule } from "src/relations/relation.module";
+import { RelationService } from "src/relations/relation.service";
 import Lobby, { LobbyId } from "../class/lobby.class";
 /**
  *  Lobby class :
@@ -34,7 +36,9 @@ export class LobbyService {
 
 	constructor(
 		@Inject(forwardRef(() => AppGateway))
-		private socket: AppGateway
+		private socket: AppGateway,
+        private relation: RelationService,
+        
 	) { }
 
 	lobbies = new Map<LobbyId, Lobby>();
@@ -251,9 +255,45 @@ export class LobbyService {
 			console.log('user not in game');
 		}
 
-
-
 	}
+
+    async inviteToLobby(meId:number, targetId: number) {
+// check meId et targetId connect et status online
+console.log('inviteToLobby')
+       if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
+        console.log('people available')
+// check targetId haven,t block you
+        if (this.relation.is_block(targetId, meId)){
+        
+        console.log('people block me')
+            return ;
+        }
+
+// delete meId et targetId from Lobbyqueue
+        this.quitQueue(meId);
+        this.quitQueue(targetId);
+// createSpecialLobby with both of us
+        const lobbyId = await this.createLobby(meId, targetId, 0);
+
+// lance une game
+
+// at first je creer une room
+        await this.socket.joinGameRoom(meId, lobbyId);
+        await this.socket.joinGameRoom(targetId, lobbyId);
+
+        // event ws qui envoie qu deux id 
+
+        var lobby = this.lobbies.get(lobbyId);
+        // redirect meId et targetId to /home/game
+        this.socket.wss.to("game" + lobby.LobbyId).emit('mouveToGame');
+
+
+
+        await this.socket.startGame(meId, targetId, lobbyId, 0);
+ 
+       }
+       return ;
+   }
 
 	async lstViewer(lobbieId: number) {
 		const lobby = this.lobbies.get(lobbieId);
