@@ -256,6 +256,7 @@ export class RelationService{
 		let relation = await this.prisma.relation.findFirst({where: {userId: meId, userIWatchId: userId}});
 		if (relation) {
 			if (relation.isBlock === 1) {
+				console.log('je confirme')
 				return true;
 			}
 			return false;

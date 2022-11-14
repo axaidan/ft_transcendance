@@ -473,7 +473,7 @@ export function Pong() {
 		play();
 		canvas.addEventListener('mousemove', playerMove);
 		StartListeners();
-	}, []);
+	}, [vstop]);
 
 	useEffect(() => {
 		axios.get('/lobby/quiteQueue/');
@@ -485,13 +485,19 @@ export function Pong() {
 		socket!.on("startGame", (...arg) => {
 			setEndGame(false);
 			setInGame(true);
+			setInLobby(true);
+		setNormalQueue(true);
 			socket!.emit('ChangeStatusToServer', { userId: me.id, status: 3 })
-			console.log('game start')
+			console.log('\'startGame\' EVENT RECEIVED');
+
 			game.player.player = arg[0].p1;
 			game.player2.player = arg[0].p2;
 			game.roomName = arg[0].lobbyId;
 			game.mode = arg[0].mode;
+			console.log('\'startGame\'   lobbyId: ' + arg[0].lobbyId);
 			topinitParty(arg[0].p1, arg[0].p2, arg[0].lobbyId, arg[0].mode);
+			console.log(`player1 : ${game.player.player} , player2 ${game.player2.player}`)
+
 		});
 
 		socket!.on("updatePos", (...arg) => {
@@ -569,7 +575,7 @@ export function Pong() {
 				</div>
 				<div id={!inGame && endGame ? 'game-queue-buttons' : 'disable'}>
 					<div className="game-btn-container">
-						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<button id={!inGame && endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
 						<div className="confirm-btn">
 							<div className={!normalQueue ? "btn-inner-border" : "queue-inner-border"}>
 								<button onClick={getIntoLobby} disabled={normalQueue ? true : false} id={!normalQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>
@@ -584,7 +590,7 @@ export function Pong() {
 						</div>
 					</div>
 					<div className="game-btn-container">
-						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<button id={!inGame && endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
 						<div className="confirm-btn">
 							<div className={!smallQueue ? "btn-inner-border" : "queue-inner-border"}>
 								<button onClick={getIntoLobbyShortPad} disabled={smallQueue ? true : false} id={!smallQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>
@@ -598,7 +604,7 @@ export function Pong() {
 						</div>
 					</div>
 					<div className="game-btn-container">
-						<button id={endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
+						<button id={!inGame && endGame ? 'game-quit-lobby' : 'disable'} onClick={quitQueue}> X </button>
 						<div className="confirm-btn">
 							<div className={!fastQueue ? "btn-inner-border" : "queue-inner-border"}>
 								<button onClick={getIntoLobbyFastBall} disabled={fastQueue ? true : false} id={!fastQueue ? 'game-queue-btn' : 'game-inqueue-btn'}>

@@ -263,7 +263,7 @@ console.log('inviteToLobby')
        if (this.socket.isUserAvailable(meId) && this.socket.isUserAvailable(targetId)) {
         console.log('people available')
 // check targetId haven,t block you
-        if (this.relation.is_block(targetId, meId)){
+        if ((await this.relation.is_block(targetId, meId)) === true){
         
         console.log('people block me')
             return ;
@@ -278,17 +278,20 @@ console.log('inviteToLobby')
 // lance une game
 
 // at first je creer une room
-        await this.socket.joinGameRoom(meId, lobbyId);
-        await this.socket.joinGameRoom(targetId, lobbyId);
+console.log(`join room for ${meId}-${targetId}`)
+        this.socket.joinGameRoom(meId, lobbyId);
+        this.socket.joinGameRoom(targetId, lobbyId);
+        console.log('go to game')
+        this.socket.wss.to("game" + lobbyId).emit('mouveToGame');
 
         // event ws qui envoie qu deux id 
 
         var lobby = this.lobbies.get(lobbyId);
         // redirect meId et targetId to /home/game
-        this.socket.wss.to("game" + lobby.LobbyId).emit('mouveToGame');
 		this.socket.watchUsersInRoom(lobby.LobbyId);
 
 
+        setTimeout(() => {console.log('waiting 1 sec'), 1000});
         await this.socket.startGame(meId, targetId, lobbyId, 0);
  
        }
@@ -337,21 +340,17 @@ console.log('inviteToLobby')
 	async quitQueue(meId: number) {
 		let idx: number;
 		idx = this.queue.indexOf(meId);
-		console.log(idx);
 		if (idx !== -1) {
 			this.queue.pop();
 		}
 		idx = this.queueFastBall.indexOf(meId);
-		console.log(idx);
 		if (idx !== -1) {
 			this.queueFastBall.pop()
 		}
 		idx = this.queueShortPad.indexOf(meId);
-		console.log(idx);
 		if (idx !== -1) {
 			this.queueShortPad.pop();
 		}
-		console.log(this.queue)
 
 	}
 
